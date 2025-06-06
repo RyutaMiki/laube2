@@ -56,6 +56,124 @@ class JobBeforeStartTime(IntEnum):
 
 
 """
+Enum:打刻区分
+JOB_START            出勤打刻
+JOB_FINISH            退勤打刻
+BREAKTIME_START        休憩開始打刻
+BREAKTIME_FINISH    休憩終了打刻
+"""
+
+
+
+
+"""
+Enum:打刻方法
+CORPUS コーパスからの移行
+SMART_PHONE スマホ打刻
+PC パソコン打刻
+FELICA フェリカ打刻
+QRCODE QRバーコード打刻
+TABLET タブレット打刻
+VEIN_AUTHENTICATION 静脈認証打刻
+FINGERPRINT_AUTHENTICATION 指紋認証打刻
+FACE_AUTHENTICATION 顔認証打刻
+IMPRINT_CORRECTION 打刻補正
+KRONOS 自動登録
+ALEXA Alexa打刻
+INPUT_ATTENDANCE_RECORD 出勤簿手入力
+"""
+
+
+class EntryFlg(IntEnum):
+    CORPUS = 1
+    SMART_PHONE = 2
+    PC = 3
+    FELICA = 4
+    QRCODE = 5
+    TABLET = 6
+    VEIN_AUTHENTICATION = 7
+    FINGERPRINT_AUTHENTICATION = 8
+    FACE_AUTHENTICATION = 9
+    IMPRINT_CORRECTION = 10
+    KRONOS = 11
+    ALEXA = 12
+    INPUT_ATTENDANCE_RECORD = 13
+
+    @property
+    def label(self) -> str:
+        return {
+            EntryFlg.CORPUS: "コーパスからの移行",
+            EntryFlg.SMART_PHONE: "スマホ打刻",
+            EntryFlg.PC: "パソコン打刻",
+            EntryFlg.FELICA: "フェリカ打刻",
+            EntryFlg.QRCODE: "QRバーコード打刻",
+            EntryFlg.TABLET: "タブレット打刻",
+            EntryFlg.VEIN_AUTHENTICATION: "静脈認証打刻",
+            EntryFlg.FINGERPRINT_AUTHENTICATION: "指紋認証打刻",
+            EntryFlg.FACE_AUTHENTICATION: "顔認証打刻",
+            EntryFlg.IMPRINT_CORRECTION: "打刻補正",
+            EntryFlg.KRONOS: "自動登録",
+            EntryFlg.ALEXA: "Alexa打刻",
+            EntryFlg.INPUT_ATTENDANCE_RECORD: "出勤簿手入力",
+        }[self]
+
+
+class StampingType(IntEnum):
+    JOB_START = 1
+    JOB_FINISH = 2
+    BREAKTIME_START = 3
+    BREAKTIME_FINISH = 4
+
+    @property
+    def label(self) -> str:
+        return {
+            StampingType.JOB_START: "出勤打刻",
+            StampingType.JOB_FINISH: "退勤打刻",
+            StampingType.BREAKTIME_START: "休憩開始打刻",
+            StampingType.BREAKTIME_FINISH: "休憩終了打刻",
+        }[self]
+
+
+
+"""
+Enum:反映フラグ
+WAIT 作成中
+REFLECTED 反映済
+NON_REFLECTED 未反映
+ERROR_DUPLICATE 出勤中に出勤打刻エラー
+"""
+
+
+class ReflectionFlg(IntEnum):
+    WAIT = 1
+    REFLECTED = 2
+    NON_REFLECTED = 3
+    ERROR_DUPLICATE = 4
+
+    @property
+    def label(self) -> str:
+        return {
+            ReflectionFlg.WAIT: "作成中",
+            ReflectionFlg.REFLECTED: "反映済",
+            ReflectionFlg.NON_REFLECTED: "未反映",
+            ReflectionFlg.ERROR_DUPLICATE: "出勤中に出勤打刻エラー",
+        }[self]
+
+
+"""
+Enum:自動承認フラグ
+AUTOMATIC_APPROVAL 自動承認
+MANUAL_APPROVAL 手動承認
+"""
+
+
+class AutoApproverlFlag(IntEnum):
+    AUTOMATIC_APPROVAL = 1
+    MANUAL_APPROVAL = 2
+
+
+
+"""
 Enum:所定労働日区分
 ON 　所定労働日扱い
 OFF　所定労働日扱いしない

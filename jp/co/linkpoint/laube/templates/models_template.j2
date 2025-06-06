@@ -10,8 +10,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import uuid
-from enumType import EnumType
-from specifiedValue import *
+from jp.co.linkpoint.laube.models.enumType import EnumType
+from jp.co.linkpoint.laube.models.specifiedValue import *
 Base = declarative_base()
 
 {% macro render_sqla_type(col) -%}
@@ -42,7 +42,7 @@ class {{ model.class_name }}({{ model.inherits if model.inherits else "Base" }})
     {% if col.default       %}{% set _ = parts.append("default=" ~ col.default | tojson) %}{% endif %}
     {% if col.onupdate      %}{% set _ = parts.append("onupdate=" ~ col.onupdate) %}{% endif %}
     {% if col.server_default%}{% set _ = parts.append("server_default=" ~ col.server_default) %}{% endif %}
-    {% if col.comment       %}{% set _ = parts.append("comment='" ~ col.comment ~ "'") %}{% endif %}
+    {% if col.comment %}{% set _ = parts.append('comment="' ~ col.comment.replace('"', '\\\"') ~ '"') %}{% endif %}
     {{ col.name }} = Column({{ parts | join(", ") }})
 {% endfor %}
 {% if model.mapper_args %}

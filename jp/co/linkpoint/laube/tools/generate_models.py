@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-generate_models.py
+generate_models.py - 完全版
 """
 
 import sys
@@ -18,13 +18,11 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 if len(sys.argv) >= 2:
     src_file = Path(sys.argv[1])
 else:
-    # ★ デフォルトは schema.yaml に変更
     src_file = Path("schema.yaml")
     print(f"[INFO] 引数が無いので {src_file} を読みます")
 
 if not src_file.exists():
-    sys.exit(f"[ERROR] ファイルが見つかりません: {src_file}")
-
+    sys.exit(f"[ERROR] ファイルが見つかりません: {src_file.resolve()}")
 
 # ------------------------------------------------------------
 # 2. JSON / YAML ロード
@@ -38,10 +36,12 @@ def load_file(path: Path):
         return yaml.safe_load(path.read_text(encoding="utf-8"))
     return json.loads(path.read_text(encoding="utf-8"))
 
+try:
+    data = load_file(src_file)
+except Exception as e:
+    traceback.print_exc()
+    sys.exit(f"[ERROR] ファイル読込エラー: {e}")
 
-data = load_file(src_file)
-
-# ルートが list ならそのまま、dict の場合は models キーを探す
 if isinstance(data, list):
     models_list = data
 elif isinstance(data, dict) and isinstance(data.get("models"), list):
@@ -54,8 +54,30 @@ print(f"[DEBUG] 読み込んだモデル数: {len(models_list)}")
 # ------------------------------------------------------------
 # 3. Jinja2 環境
 # ------------------------------------------------------------
-TEMPLATE_DIR = Path(__file__).parent / "templates"
+# テンプレートディレクトリは「tools」の1つ上の「templates」 or 「template」等にしておく
+TEMPLATE_CANDIDATES = [
+    Path(__file__).parent.parent / "templates",   # 普通ここ
+    Path(__file__).parent.parent / "template",    # たまに"s"無しパターンも
+    Path(__file__).parent / "templates",
+    Path(__file__).parent / "template"
+]
+
 TEMPLATE_NAME = "models_template.j2"
+TEMPLATE_DIR = None
+
+for candidate in TEMPLATE_CANDIDATES:
+    if (candidate / TEMPLATE_NAME).exists():
+        TEMPLATE_DIR = candidate
+        break
+
+if not TEMPLATE_DIR:
+    print("[ERROR] テンプレートが見つかりません。以下のパスをチェックして！")
+    for candidate in TEMPLATE_CANDIDATES:
+        print("  -", candidate.resolve())
+    sys.exit(f"[ERROR] テンプレート '{TEMPLATE_NAME}' が見つからない！")
+
+print(f"[DEBUG] TEMPLATE_DIR: {TEMPLATE_DIR.resolve()}")
+print(f"[DEBUG] テンプレート一覧: {[f.name for f in TEMPLATE_DIR.glob('*')]}")
 
 env = Environment(
     loader=FileSystemLoader(str(TEMPLATE_DIR)),
@@ -63,15 +85,14 @@ env = Environment(
     trim_blocks=True,
     lstrip_blocks=True,
 )
-
-# regex_replace フィルタ
 env.filters["regex_replace"] = lambda v, p, r: re.sub(p, r, v)
 
 # テンプレ取得
 try:
     template = env.get_template(TEMPLATE_NAME)
 except Exception as e:
-    sys.exit(f"[ERROR] テンプレート読み込み失敗: {e}")
+    traceback.print_exc()
+    sys.exit(f"[ERROR] テンプレート読み込み失敗: {TEMPLATE_NAME} : {e}")
 
 # ------------------------------------------------------------
 # 4. レンダリング
@@ -85,6 +106,15 @@ except Exception:
 # ------------------------------------------------------------
 # 5. 出力
 # ------------------------------------------------------------
-output_file = Path("models.py")
-output_file.write_text(rendered, encoding="utf-8")
-print(f"生成完了: {output_file.resolve()}")
+# 出力先: jp/co/linkpoint/laube/daos/base/models.py
+BASE_DAO_DIR = Path(__file__).parent.parent / "daos" / "base"
+BASE_DAO_DIR.mkdir(parents=True, exist_ok=True)
+
+output_file = BASE_DAO_DIR / "models.py"
+try:
+    output_file.write_text(rendered, encoding="utf-8")
+    print(f"生成完了: {output_file.resolve()}")
+except Exception as e:
+    traceback.print_exc()
+    sys.exit(f"[ERROR] 書き込み失敗: {e}")
+

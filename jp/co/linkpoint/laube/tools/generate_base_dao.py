@@ -1,9 +1,11 @@
+import sys
 import os
 import re
 import importlib.util
 import inspect
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
+sys.path.insert(0, os.getenv("PROJECT_DIR") or "d:/git/laube2")
 
 # === パス設定 ===
 from dotenv import load_dotenv

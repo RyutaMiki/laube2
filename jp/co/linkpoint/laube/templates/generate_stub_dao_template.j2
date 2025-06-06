@@ -1,8 +1,7 @@
-あなた:
-from infra.models import {{ model_class }}
+from jp.co.linkpoint.laube.daos.base.models import {{ model_class }}
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from infra.daos.base.{{ model_lower }}_dao_base import {{ base_dao_class_name }}
+from jp.co.linkpoint.laube.daos.base.{{ model_lower }}_dao_base import {{ base_dao_class_name }}
 
 class {{ dao_class_name }}({{ base_dao_class_name }}):
     """

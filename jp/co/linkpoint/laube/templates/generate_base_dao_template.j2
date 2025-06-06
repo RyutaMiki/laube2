@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional
-from infra.models import {{ model_class }}
+from jp.co.linkpoint.laube.daos.base.base_dao import BaseDao
+from jp.co.linkpoint.laube.daos.base.models import {{ model_class }}
 
 {% set datetime_imports = [] %}
 {% if 'datetime' in imports %}
@@ -17,10 +18,11 @@ from infra.models import {{ model_class }}
 from datetime import {{ datetime_imports | join(', ') }}
 {% endif %}
 
-class {{ base_dao_class_name }}:
+class {{ base_dao_class_name }}(BaseDao[{{ model_class }}]):
     """
     Data Access Object for {{ model_class }}.
     """
+    model = {{ model_class }}
 
     def get_by_key(self, db_session: Session{% for pk in pk_fields %}, {{ pk.name }}: {{ pk.type }}{% endfor %}) -> List[{{ model_class }}]:
         """

@@ -348,3 +348,41 @@ UNUSABLE 出来ません
 class Permission(IntEnum):
     AVAILABLE = 1
     UNUSABLE = 2
+
+
+class PullingFlag(IntEnum):
+    # 何か値
+    A = 1
+    B = 2
+
+
+class WithdrawalFlag(IntEnum):
+    ENABLED = 1
+    DISABLED = 2
+
+
+class RouteFlag(IntEnum):
+    DIRECT = 1
+    INDIRECT = 2
+
+
+class ApplicationStatus(IntEnum):
+    DRAFT = 1
+    SUBMITTED = 2
+    APPROVED = 3
+    REJECTED = 4
+
+
+class ActivityStatus(IntEnum):
+    # 適宜、本来の値を定義
+    IN_PROGRESS = 1
+    COMPLETED = 2
+    CANCELED = 3
+
+
+class ApplicantStatus(IntEnum):
+    NEW = 1
+    SENT = 2
+    RECEIVED = 3
+    CANCELED = 4
+

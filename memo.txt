@@ -1,0 +1,23 @@
+Sequence（シーケンス）
+Parallel Split（並列分岐）
+Synchronization（同期）
+Exclusive Choice（排他的選択）
+Simple Merge（単純結合）
+Multi-Choice（多重選択）
+Synchronizing Merge（同期結合）
+Multiple Merge（多重結合）
+Discriminator（判別結合）
+Arbitrary Cycles（任意のループ）
+Implicit Termination（暗黙的終了）
+Multiple Instances Without Synchronization（同期なし複数インスタンス）
+Multiple Instances With a Priori Design-Time Knowledge（事前定義インスタンス数あり）
+Multiple Instances With a Priori Runtime Knowledge（実行時にインスタンス数決定）
+Multiple Instances Without a Priori Runtime Knowledge（インスタンス数無制限）
+Deferred Choice（保留選択）
+Interleaved Parallel Routing（交互並列ルーティング）
+Milestone（マイルストーン）
+Cancel Activity（アクティビティのキャンセル）
+Cancel Case（ケース全体のキャンセル）
+Structured Loop（構造化ループ）
+Recursion（再帰）
+Transient Trigger（トランジェントトリガー）

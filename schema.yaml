@@ -1709,6 +1709,18 @@ models:
         nullable: true
         comment: 条件式（JSONやDSL）
 
+      - name: approval_condition_type
+        type: EnumType
+        args: [enum_class=ApprovalConditionType]
+        nullable: false
+        default: "ALL"
+        comment: 承認完了条件の種別（ALL=全員, MAJORITY=過半数, ANY=誰か1人）
+
+      - name: approval_threshold
+        type: Integer
+        nullable: true
+        comment: 任意人数承認で可とする場合の閾値（approval_condition_type='THRESHOLD'時）
+
       - name: sort_number
         type: Integer
         nullable: true

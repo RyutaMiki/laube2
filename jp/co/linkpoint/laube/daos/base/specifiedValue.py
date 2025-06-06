@@ -134,6 +134,12 @@ class StampingType(IntEnum):
         }[self]
 
 
+class ApprovalConditionType(IntEnum):
+    ALL = 1  # 全員
+    MAJORITY = 2  # 過半数
+    ANY = 3  # 誰か1人
+    THRESHOLD = 4  # 指定人数以上
+
 
 """
 Enum:反映フラグ

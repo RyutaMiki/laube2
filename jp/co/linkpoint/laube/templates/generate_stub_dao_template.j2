@@ -1,0 +1,11 @@
+あなた:
+from infra.models import {{ model_class }}
+from sqlalchemy.orm import Session
+from typing import List, Optional
+from infra.daos.base.{{ model_lower }}_dao_base import {{ base_dao_class_name }}
+
+class {{ dao_class_name }}({{ base_dao_class_name }}):
+    """
+    {{ model_class }} に関するカスタムDAO処理を書く場所
+    """
+    pass  # 必要に応じてカスタムメソッドをここに追加してください

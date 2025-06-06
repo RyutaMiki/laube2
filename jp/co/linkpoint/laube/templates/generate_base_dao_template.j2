@@ -1,0 +1,123 @@
+from sqlalchemy.orm import Session
+from sqlalchemy import func
+from typing import List, Optional
+from infra.models import {{ model_class }}
+
+{% set datetime_imports = [] %}
+{% if 'datetime' in imports %}
+{% set _ = datetime_imports.append('datetime') %}
+{% endif %}
+{% if 'date' in imports %}
+{% set _ = datetime_imports.append('date') %}
+{% endif %}
+{% if 'time' in imports %}
+{% set _ = datetime_imports.append('time') %}
+{% endif %}
+{% if datetime_imports %}
+from datetime import {{ datetime_imports | join(', ') }}
+{% endif %}
+
+class {{ base_dao_class_name }}:
+    """
+    Data Access Object for {{ model_class }}.
+    """
+
+    def get_by_key(self, db_session: Session{% for pk in pk_fields %}, {{ pk.name }}: {{ pk.type }}{% endfor %}) -> List[{{ model_class }}]:
+        """
+        {{ model_class }} を指定された主キー条件であいまい取得します。
+
+        Args:
+            db_session (Session): DBセッション
+        {% for pk in pk_fields %}
+            {{ pk.name }} (Optional[{{ pk.type|default('str') }}]): {{ pk.comment }}（指定された場合のみ条件に含めます）
+        {% endfor %}
+
+        Returns:
+            List[{{ model_class }}]: 条件に一致するレコードのリスト
+        """
+        query = db_session.query({{ model_class }})
+        {% for pk in pk_fields %}
+        if {{ pk.name }} is not None:
+            query = query.filter({{ model_class }}.{{ pk.name }} == {{ pk.name }})
+        {% endfor %}
+        return query.all()
+
+    def insert(self, db_session: Session, instance: {{ model_class }}) -> {{ model_class }}:
+        """
+        {{ model_class }} を登録します。
+
+        Args:
+            db_session (Session): DBセッション
+            instance ({{ model_class }}): 保存するインスタンス
+
+        Returns:
+            {{ model_class }}: 保存後のインスタンス
+        """
+        db_session.add(instance)
+        db_session.flush()
+        return instance
+
+    def delete(self, db_session: Session, instance: {{ model_class }}) -> None:
+        """
+        {{ model_class }} を削除します。
+
+        Args:
+            db_session (Session): DBセッション
+            instance ({{ model_class }}): 削除するインスタンス
+
+        Returns:
+            None
+        """
+        db_session.delete(instance)
+        db_session.flush()
+
+    def get_all(self, db_session: Session, limit: int = 100, offset: int = 0) -> List[{{ model_class }}]:
+        """
+        {{ model_class }} を全件取得します（ページング対応）。
+
+        Args:
+            db_session (Session): DBセッション
+            limit (int): 最大取得件数
+            offset (int): 取得開始位置
+
+        Returns:
+            List[{{ model_class }}]: 取得されたインスタンスのリスト
+        """
+        return db_session.query({{ model_class }}).limit(limit).offset(offset).all()
+
+    def count(self, db_session: Session) -> int:
+        """
+        {{ model_class }} の総件数を取得します。
+
+        Args:
+            db_session (Session): DBセッション
+
+        Returns:
+            int: 件数
+        """
+        return db_session.query(func.count()).select_from({{ model_class }}).scalar()
+
+    def update(self, db_session: Session{% for pk in pk_fields %}, {{ pk.name }}: {{ pk.type|default('str') }}{% endfor %}, update_data: dict) -> Optional[{{ model_class }}]:
+        """
+        指定された主キーに一致する {{ model_class }} を更新します。
+
+        Args:
+            db_session (Session): DBセッション
+            {% for pk in pk_fields %}
+            {{ pk.name }} ({{ pk.type|default('str') }}): {{ pk.comment }}
+            {% endfor %}
+            update_data (dict): 更新内容の辞書
+
+        Returns:
+            Optional[{{ model_class }}]: 更新後のインスタンスまたは None
+        """
+        results = self.get_by_key(db_session{% for pk in pk_fields %}, {{ pk.name }}={{ pk.name }}{% endfor %})
+        instance = results[0] if results else None
+
+        if instance:
+            for key, value in update_data.items():
+                setattr(instance, key, value)
+            db_session.add(instance)
+
+        db_session.flush()
+        return instance

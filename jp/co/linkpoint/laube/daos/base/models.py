@@ -523,6 +523,8 @@ class ActivityTransit(Base):
     transition_type = Column('transition_type', EnumType(enum_class=TransitionType), nullable=False, comment='遷移タイプ（AND/OR/CONDITION）')
     group_key = Column('group_key', String(20, collation='ja_JP.utf8'), nullable=True, comment='分岐グループキー')
     condition_expression = Column('condition_expression', String(255, collation='ja_JP.utf8'), nullable=True, comment='条件式（JSONやDSL）')
+    approval_condition_type = Column('approval_condition_type', EnumType(enum_class=ApprovalConditionType), nullable=False, default="ALL", comment='承認完了条件の種別（ALL=全員, MAJORITY=過半数, ANY=誰か1人）')
+    approval_threshold = Column('approval_threshold', Integer, nullable=True, comment='任意人数承認で可とする場合の閾値（approval_condition_type='THRESHOLD'時）')
     sort_number = Column('sort_number', Integer, nullable=True, comment='並び順')
     create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)

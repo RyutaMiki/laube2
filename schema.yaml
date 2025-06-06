@@ -171,13 +171,11 @@ models:
         autoincrement: true
         comment: サロゲートキー
 
-      - name: company_code
+      - name: tenant_uuid
         type: String
-        args: [10]
-        collation: ja_JP.utf8
+        args: [36]
         nullable: false
-        foreign_key: m_company.company_code
-        comment: 会社コード
+        comment: テナントUUID
 
       - name: user_uuid
         type: String
@@ -200,12 +198,11 @@ models:
         nullable: true
         comment: 申請書コード
 
-      - name: boss_company_code
+      - name: boss_tenant_uuid
         type: String
-        args: [10]
-        collation: ja_JP.utf8
+        args: [36]
         nullable: false
-        comment: 直属上司の会社コード
+        comment: 直属上司のテナントUUID
 
       - name: boss_group_code
         type: String
@@ -249,15 +246,15 @@ models:
         nullable: false
 
     indexes:
-      - [company_code, group_code, user_uuid, application_form_code]
-      - [company_code]
+      - [tenant_uuid, group_code, user_uuid, application_form_code]
+      - [tenant_uuid]
 
     uniques:
-      - [company_code, group_code, user_uuid, application_form_code]
+      - [tenant_uuid, group_code, user_uuid, application_form_code]
 
     foreign_keys:
-      - columns: [company_code, user_uuid]
-        references: [m_employee.company_code, m_employee.user_uuid]
+      - columns: [tenant_uuid, user_uuid]
+        references: [m_employee.tenant_uuid, m_employee.user_uuid]
 
   - class_name: DeputyApprovel
     table_name: m_deputy_approvel
@@ -512,12 +509,11 @@ models:
         primary_key: true
         autoincrement: true
         comment: サロゲートキー
-      - name: company_code
+      - name: tenant_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
-        foreign_key: m_company.company_code
-        comment: 会社コード
+        comment: テナントUUID
       - name: application_form_code
         type: String
         args: [10]
@@ -603,13 +599,13 @@ models:
         type: Integer
         nullable: false
     indexes:
-      - [company_code, application_form_code]
-      - [company_code]
+      - [tenant_uuid, application_form_code]
+      - [tenant_uuid]
       - [application_form_code]
     uniques:
-      - [company_code, application_form_code]
-      - [company_code, application_form_name]
-      - [company_code, table_name]
+      - [tenant_uuid, application_form_code]
+      - [tenant_uuid, application_form_name]
+      - [tenant_uuid, table_name]
 
   - class_name: ApplicationFormRoute
     table_name: m_application_form_route
@@ -622,12 +618,11 @@ models:
         primary_key: true
         autoincrement: true
         comment: サロゲートキー
-      - name: company_code
+      - name: tenant_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
-        foreign_key: m_company.company_code
-        comment: 会社コード
+        comment: テナントUUID
       - name: application_form_code
         type: String
         args: [10]
@@ -669,10 +664,10 @@ models:
         type: Integer
         nullable: false
     indexes:
-      - [company_code, application_form_code, group_code]
-      - [company_code]
+      - [tenant_uuid, application_form_code, group_code]
+      - [tenant_uuid]
     uniques:
-      - [company_code, application_form_code, group_code]
+      - [tenant_uuid, application_form_code, group_code]
 
   - class_name: IndividualRoute
     table_name: m_individual_route
@@ -685,12 +680,11 @@ models:
         primary_key: true
         autoincrement: true
         comment: サロゲートキー
-      - name: company_code
+      - name: tenant_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
-        foreign_key: m_company.company_code
-        comment: 会社コード
+        comment: テナントUUID
       - name: individual_route_code
         type: String
         args: [10]
@@ -722,11 +716,11 @@ models:
         type: Integer
         nullable: false
     indexes:
-      - [company_code, individual_route_code]
-      - [company_code]
+      - [tenant_uuid, individual_route_code]
+      - [tenant_uuid]
     uniques:
-      - [company_code, individual_route_code]
-      - [company_code, individual_route_name]
+      - [tenant_uuid, individual_route_code]
+      - [tenant_uuid, individual_route_name]
 
   - class_name: IndividualActivity
     table_name: m_individual_activity
@@ -739,12 +733,11 @@ models:
         primary_key: true
         autoincrement: true
         comment: サロゲートキー
-      - name: company_code
+      - name: tenant_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
-        foreign_key: m_company.company_code
-        comment: 会社コード
+        comment: テナントUUID
       - name: individual_route_code
         type: String
         args: [10]
@@ -754,11 +747,11 @@ models:
         type: Integer
         nullable: false
         comment: アクティビティコード
-      - name: approverl_company_code
+      - name: approverl_ctenant_uuid
         type: String
         args: [10]
         nullable: true
-        comment: 承認者の会社コード
+        comment: 承認者のテナントUUID
       - name: approverl_role_code
         type: String
         args: [30]
@@ -769,11 +762,11 @@ models:
         args: [10]
         nullable: true
         comment: 承認者の部署コード
-      - name: approverl_employee_code
+      - name: approverl_user_uuid
         type: String
         args: [10]
         nullable: true
-        comment: 承認者の従業員番号
+        comment: 承認者のユーザーUUID
       - name: function
         type: EnumType
         args: [enum_class=ApprovalFunction]
@@ -800,15 +793,15 @@ models:
         type: Integer
         nullable: false
     indexes:
-      - [company_code, individual_route_code, activity_code]
-      - [company_code, individual_route_code]
-      - [company_code, approverl_role_code]
-      - [company_code]
+      - [tenant_uuid, individual_route_code, activity_code]
+      - [tenant_uuid, individual_route_code]
+      - [tenant_uuid, approverl_role_code]
+      - [tenant_uuid]
     uniques:
-      - [company_code, individual_route_code, activity_code]
+      - [tenant_uuid, individual_route_code, activity_code]
     foreign_keys:
-      - columns: [company_code, individual_route_code]
-        references: [m_individual_route.company_code, m_individual_route.individual_route_code]
+      - columns: [tenant_uuid, individual_route_code]
+        references: [m_individual_route.tenant_uuid, m_individual_route.individual_route_code]
 
   - class_name: CommonRoute
     table_name: m_common_route
@@ -821,12 +814,11 @@ models:
         primary_key: true
         autoincrement: true
         comment: サロゲートキー
-      - name: company_code
+      - name: tenant_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
-        foreign_key: m_company.company_code
-        comment: 会社コード
+        comment: テナントUUID
       - name: common_route_code
         type: String
         args: [10]
@@ -858,11 +850,11 @@ models:
         type: Integer
         nullable: false
     indexes:
-      - [company_code, common_route_code]
-      - [company_code]
+      - [tenant_uuid, common_route_code]
+      - [tenant_uuid]
     uniques:
-      - [company_code, common_route_code]
-      - [company_code, common_route_name]
+      - [tenant_uuid, common_route_code]
+      - [tenant_uuid, common_route_name]
 
   - class_name: CommonActivity
     table_name: m_common_activity
@@ -875,12 +867,11 @@ models:
         primary_key: true
         autoincrement: true
         comment: サロゲートキー
-      - name: company_code
+      - name: tenant_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
-        foreign_key: m_company.company_code
-        comment: 会社コード
+        comment: テナントUUID
       - name: common_route_code
         type: String
         args: [10]
@@ -890,11 +881,11 @@ models:
         type: Integer
         nullable: false
         comment: アクティビティコード
-      - name: approverl_company_code
+      - name: approverl_tenant_uuid
         type: String
         args: [10]
         nullable: true
-        comment: 承認者の会社コード
+        comment: 承認者のテナントUUID
       - name: approverl_role_code
         type: String
         args: [30]
@@ -905,11 +896,11 @@ models:
         args: [10]
         nullable: true
         comment: 承認者の部署コード
-      - name: approverl_employee_code
+      - name: approverl_user_uuid
         type: String
         args: [10]
         nullable: true
-        comment: 承認者の従業員番号
+        comment: 承認者のユーザーUUID
       - name: function
         type: EnumType
         args: [enum_class=ApprovalFunction]
@@ -936,15 +927,15 @@ models:
         type: Integer
         nullable: false
     indexes:
-      - [company_code, common_route_code, activity_code]
-      - [company_code, common_route_code]
-      - [company_code, approverl_role_code]
-      - [company_code]
+      - [tenant_uuid, common_route_code, activity_code]
+      - [tenant_uuid, common_route_code]
+      - [tenant_uuid, approverl_role_code]
+      - [tenant_uuid]
     uniques:
-      - [company_code, common_route_code, activity_code]
+      - [tenant_uuid, common_route_code, activity_code]
     foreign_keys:
-      - columns: [company_code, common_route_code]
-        references: [m_common_route.company_code, m_common_route.common_route_code]
+      - columns: [tenant_uuid, common_route_code]
+        references: [m_common_route.tenant_uuid, m_common_route.common_route_code]
 
   - class_name: ApplicationObject
     table_name: t_application_object

@@ -10,8 +10,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import uuid
-from jp.co.linkpoint.laube.models.enumType import EnumType
-from jp.co.linkpoint.laube.models.specifiedValue import *
+from jp.co.linkpoint.laube.daos.base.enumType import EnumType
+from jp.co.linkpoint.laube.daos.base.specifiedValue import *
 Base = declarative_base()
 
 {% macro render_sqla_type(col) -%}
@@ -91,7 +91,6 @@ class {{ model.class_name }}({{ model.inherits if model.inherits else "Base" }})
     )
 {%- endif %}
 {%- if not loop.last %}
-
 
 
 {% endif %}

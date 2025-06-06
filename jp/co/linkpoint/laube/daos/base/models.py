@@ -7,8 +7,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import uuid
-from jp.co.linkpoint.laube.models.enumType import EnumType
-from jp.co.linkpoint.laube.models.specifiedValue import *
+from jp.co.linkpoint.laube.daos.base.enumType import EnumType
+from jp.co.linkpoint.laube.daos.base.specifiedValue import *
 Base = declarative_base()
 
 
@@ -27,7 +27,6 @@ class Users(Base):
     update_count = Column('update_count', Integer, nullable=False, comment="更新回数")
 
 
-
 class Tenants(Base):
     """
     　会社ごとのテナント情報
@@ -40,7 +39,6 @@ class Tenants(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now, comment="更新日時")
     update_user_uuid = Column('update_user_uuid', String(10, collation='ja_JP.utf8'), nullable=False, comment="更新者ユーザーコード")
     update_count = Column('update_count', Integer, nullable=False, comment="更新回数")
-
 
 
 class Employee(Base):
@@ -65,18 +63,17 @@ class Employee(Base):
         UniqueConstraint('tenant_uuid', 'user_uuid', 'belong_start_date')
     )
 
-
 class Boss(Base):
     """
     　上司マスタ
     """
     __tablename__ = 'm_boss'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
-    company_code = Column('company_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="会社コード")
+    tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="テナントUUID")
     user_uuid = Column('user_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="ユーザーUUID")
     group_code = Column('group_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="部署コード")
     application_form_code = Column('application_form_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="申請書コード")
-    boss_company_code = Column('boss_company_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="直属上司の会社コード")
+    boss_tenant_uuid = Column('boss_tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="直属上司のテナントUUID")
     boss_group_code = Column('boss_group_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="直属上司の部署コード")
     boss_user_uuid = Column('boss_user_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="直属上司のユーザーUUID")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
@@ -87,11 +84,10 @@ class Boss(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_boss_company_code_group_code_user_uuid_application_form_code', company_code, group_code, user_uuid, application_form_code),
-        Index('ix_m_boss', company_code),
-        UniqueConstraint(company_code, group_code, user_uuid, application_form_code)
+        Index('ix_m_boss_tenant_uuid_group_code_user_uuid_application_form_code', tenant_uuid, group_code, user_uuid, application_form_code),
+        Index('ix_m_boss', tenant_uuid),
+        UniqueConstraint(tenant_uuid, group_code, user_uuid, application_form_code)
     )
-
 
 class DeputyApprovel(Base):
     """
@@ -119,7 +115,6 @@ class DeputyApprovel(Base):
         UniqueConstraint(tenant_uuid, group_code, user_uuid)
     )
 
-
 class ApplicationClassificationFormat(Base):
     """
     　規定申請分類マスタ
@@ -140,7 +135,6 @@ class ApplicationClassificationFormat(Base):
         Index('ix_m_application_classification_format', application_classification_code),
         UniqueConstraint(application_classification_code)
     )
-
 
 class ApplicationFormFormat(Base):
     """
@@ -171,14 +165,13 @@ class ApplicationFormFormat(Base):
         UniqueConstraint(application_form_code)
     )
 
-
 class ApplicationForm(Base):
     """
     　申請書マスタ
     """
     __tablename__ = 'm_application_form'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
-    company_code = Column('company_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="会社コード")
+    tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="テナントUUID")
     application_form_code = Column('application_form_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="申請書コード")
     application_form_name = Column('application_form_name', String(30, collation='ja_JP.utf8'), nullable=False, comment="申請書名")
     application_classification_code = Column('application_classification_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="申請分類コード")
@@ -200,14 +193,13 @@ class ApplicationForm(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_application_form_company_code_application_form_code', company_code, application_form_code),
-        Index('ix_m_application_form', company_code),
+        Index('ix_m_application_form_tenant_uuid_application_form_code', tenant_uuid, application_form_code),
+        Index('ix_m_application_form', tenant_uuid),
         Index('ix_m_application_form', application_form_code),
-        UniqueConstraint(company_code, application_form_code),
-        UniqueConstraint(company_code, application_form_name),
-        UniqueConstraint(company_code, table_name)
+        UniqueConstraint(tenant_uuid, application_form_code),
+        UniqueConstraint(tenant_uuid, application_form_name),
+        UniqueConstraint(tenant_uuid, table_name)
     )
-
 
 class ApplicationFormRoute(Base):
     """
@@ -215,7 +207,7 @@ class ApplicationFormRoute(Base):
     """
     __tablename__ = 'm_application_form_route'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
-    company_code = Column('company_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="会社コード")
+    tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="テナントUUID")
     application_form_code = Column('application_form_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="申請書コード")
     group_code = Column('group_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="部署コード")
     individual_route_code = Column('individual_route_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="直接部門")
@@ -228,11 +220,10 @@ class ApplicationFormRoute(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_application_form_route_company_code_application_form_code_group_code', company_code, application_form_code, group_code),
-        Index('ix_m_application_form_route', company_code),
-        UniqueConstraint(company_code, application_form_code, group_code)
+        Index('ix_m_application_form_route_tenant_uuid_application_form_code_group_code', tenant_uuid, application_form_code, group_code),
+        Index('ix_m_application_form_route', tenant_uuid),
+        UniqueConstraint(tenant_uuid, application_form_code, group_code)
     )
-
 
 class IndividualRoute(Base):
     """
@@ -240,7 +231,7 @@ class IndividualRoute(Base):
     """
     __tablename__ = 'm_individual_route'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
-    company_code = Column('company_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="会社コード")
+    tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="テナントUUID")
     individual_route_code = Column('individual_route_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="直接部門")
     individual_route_name = Column('individual_route_name', String(30, collation='ja_JP.utf8'), nullable=False, comment="直接部門名")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
@@ -251,12 +242,11 @@ class IndividualRoute(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_individual_route_company_code_individual_route_code', company_code, individual_route_code),
-        Index('ix_m_individual_route', company_code),
-        UniqueConstraint(company_code, individual_route_code),
-        UniqueConstraint(company_code, individual_route_name)
+        Index('ix_m_individual_route_tenant_uuid_individual_route_code', tenant_uuid, individual_route_code),
+        Index('ix_m_individual_route', tenant_uuid),
+        UniqueConstraint(tenant_uuid, individual_route_code),
+        UniqueConstraint(tenant_uuid, individual_route_name)
     )
-
 
 class IndividualActivity(Base):
     """
@@ -264,13 +254,13 @@ class IndividualActivity(Base):
     """
     __tablename__ = 'm_individual_activity'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
-    company_code = Column('company_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="会社コード")
+    tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="テナントUUID")
     individual_route_code = Column('individual_route_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="直接部門コード")
     activity_code = Column('activity_code', Integer, nullable=False, comment="アクティビティコード")
-    approverl_company_code = Column('approverl_company_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者の会社コード")
+    approverl_ctenant_uuid = Column('approverl_ctenant_uuid', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者のテナントUUID")
     approverl_role_code = Column('approverl_role_code', String(30, collation='ja_JP.utf8'), nullable=True, comment="承認者の利用権限コード")
     approverl_group_code = Column('approverl_group_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者の部署コード")
-    approverl_employee_code = Column('approverl_employee_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者の従業員番号")
+    approverl_user_uuid = Column('approverl_user_uuid', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者のユーザーUUID")
     function = Column('function', EnumType(enum_class=ApprovalFunction), nullable=False, comment="承認画面の機能")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
@@ -280,13 +270,12 @@ class IndividualActivity(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_individual_activity_company_code_individual_route_code_activity_code', company_code, individual_route_code, activity_code),
-        Index('ix_m_individual_activity_company_code_individual_route_code', company_code, individual_route_code),
-        Index('ix_m_individual_activity_company_code_approverl_role_code', company_code, approverl_role_code),
-        Index('ix_m_individual_activity', company_code),
-        UniqueConstraint(company_code, individual_route_code, activity_code)
+        Index('ix_m_individual_activity_tenant_uuid_individual_route_code_activity_code', tenant_uuid, individual_route_code, activity_code),
+        Index('ix_m_individual_activity_tenant_uuid_individual_route_code', tenant_uuid, individual_route_code),
+        Index('ix_m_individual_activity_tenant_uuid_approverl_role_code', tenant_uuid, approverl_role_code),
+        Index('ix_m_individual_activity', tenant_uuid),
+        UniqueConstraint(tenant_uuid, individual_route_code, activity_code)
     )
-
 
 class CommonRoute(Base):
     """
@@ -294,7 +283,7 @@ class CommonRoute(Base):
     """
     __tablename__ = 'm_common_route'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
-    company_code = Column('company_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="会社コード")
+    tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="テナントUUID")
     common_route_code = Column('common_route_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="間接部門")
     common_route_name = Column('common_route_name', String(30, collation='ja_JP.utf8'), nullable=False, comment="間接部門名")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
@@ -305,12 +294,11 @@ class CommonRoute(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_common_route_company_code_common_route_code', company_code, common_route_code),
-        Index('ix_m_common_route', company_code),
-        UniqueConstraint(company_code, common_route_code),
-        UniqueConstraint(company_code, common_route_name)
+        Index('ix_m_common_route_tenant_uuid_common_route_code', tenant_uuid, common_route_code),
+        Index('ix_m_common_route', tenant_uuid),
+        UniqueConstraint(tenant_uuid, common_route_code),
+        UniqueConstraint(tenant_uuid, common_route_name)
     )
-
 
 class CommonActivity(Base):
     """
@@ -318,13 +306,13 @@ class CommonActivity(Base):
     """
     __tablename__ = 'm_common_activity'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
-    company_code = Column('company_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="会社コード")
+    tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="テナントUUID")
     common_route_code = Column('common_route_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="間接部門コード")
     activity_code = Column('activity_code', Integer, nullable=False, comment="アクティビティコード")
-    approverl_company_code = Column('approverl_company_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者の会社コード")
+    approverl_tenant_uuid = Column('approverl_tenant_uuid', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者のテナントUUID")
     approverl_role_code = Column('approverl_role_code', String(30, collation='ja_JP.utf8'), nullable=True, comment="承認者の利用権限コード")
     approverl_group_code = Column('approverl_group_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者の部署コード")
-    approverl_employee_code = Column('approverl_employee_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者の従業員番号")
+    approverl_user_uuid = Column('approverl_user_uuid', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者のユーザーUUID")
     function = Column('function', EnumType(enum_class=ApprovalFunction), nullable=False, comment="承認画面の機能")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
@@ -334,13 +322,12 @@ class CommonActivity(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_common_activity_company_code_common_route_code_activity_code', company_code, common_route_code, activity_code),
-        Index('ix_m_common_activity_company_code_common_route_code', company_code, common_route_code),
-        Index('ix_m_common_activity_company_code_approverl_role_code', company_code, approverl_role_code),
-        Index('ix_m_common_activity', company_code),
-        UniqueConstraint(company_code, common_route_code, activity_code)
+        Index('ix_m_common_activity_tenant_uuid_common_route_code_activity_code', tenant_uuid, common_route_code, activity_code),
+        Index('ix_m_common_activity_tenant_uuid_common_route_code', tenant_uuid, common_route_code),
+        Index('ix_m_common_activity_tenant_uuid_approverl_role_code', tenant_uuid, approverl_role_code),
+        Index('ix_m_common_activity', tenant_uuid),
+        UniqueConstraint(tenant_uuid, common_route_code, activity_code)
     )
-
 
 class ApplicationObject(Base):
     """
@@ -373,7 +360,6 @@ class ApplicationObject(Base):
         Index('ix_t_application_object', tenant_uuid),
         UniqueConstraint(tenant_uuid, application_number)
     )
-
 
 class ActivityObject(Base):
     """
@@ -414,7 +400,6 @@ class ActivityObject(Base):
         UniqueConstraint(tenant_uuid, application_number, route_type, route_number, approverl_tenant_uuid, approverl_group_code, approverl_user_uuid)
     )
 
-
 class Appended(Base):
     """
     　添付オブジェクト
@@ -445,7 +430,6 @@ class Appended(Base):
         Index('ix_t_appended_tenant_uuid_application_number', tenant_uuid, application_number),
         UniqueConstraint(tenant_uuid, application_number, route_type, route_number)
     )
-
 
 class RouteHistory(Base):
     """
@@ -505,7 +489,6 @@ class RouteHistory(Base):
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
         'version_id_col': "update_count"    }
-
 
 
 class ActivityTransit(Base):

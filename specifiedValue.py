@@ -1,5 +1,9 @@
 from enum import IntEnum
 
+class TransitionType(IntEnum):
+    AND = 1
+    OR = 2
+    CONDITION = 3
 
 class PrincipalType(IntEnum):
     ROLE = 1

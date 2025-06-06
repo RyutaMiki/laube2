@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import IndividualRoute
 
 from datetime import datetime
 
+
 class BaseIndividualRouteDao(BaseDao[IndividualRoute]):
     """
     Data Access Object for IndividualRoute.

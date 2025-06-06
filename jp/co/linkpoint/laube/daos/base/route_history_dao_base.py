@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import RouteHistory
 
 from datetime import datetime
 
+
 class BaseRouteHistoryDao(BaseDao[RouteHistory]):
     """
     Data Access Object for RouteHistory.

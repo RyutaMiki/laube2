@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import CommonActivity
 
 from datetime import datetime
 
+
 class BaseCommonActivityDao(BaseDao[CommonActivity]):
     """
     Data Access Object for CommonActivity.

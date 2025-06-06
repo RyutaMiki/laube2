@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import ActivityObject
 
 from datetime import datetime
 
+
 class BaseActivityObjectDao(BaseDao[ActivityObject]):
     """
     Data Access Object for ActivityObject.

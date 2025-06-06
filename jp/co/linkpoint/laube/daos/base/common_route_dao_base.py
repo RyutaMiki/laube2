@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import CommonRoute
 
 from datetime import datetime
 
+
 class BaseCommonRouteDao(BaseDao[CommonRoute]):
     """
     Data Access Object for CommonRoute.

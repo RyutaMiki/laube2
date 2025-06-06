@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import Boss
 
 from datetime import datetime
 
+
 class BaseBossDao(BaseDao[Boss]):
     """
     Data Access Object for Boss.

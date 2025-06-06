@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import ApplicationFormRoute
 
 from datetime import datetime
 
+
 class BaseApplicationFormRouteDao(BaseDao[ApplicationFormRoute]):
     """
     Data Access Object for ApplicationFormRoute.

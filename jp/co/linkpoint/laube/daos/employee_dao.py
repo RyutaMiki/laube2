@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from jp.co.linkpoint.laube.daos.base.employee_dao_base import BaseEmployeeDao
 
+
 class EmployeeDao(BaseEmployeeDao):
     """
     Employee に関するカスタムDAO処理を書く場所

@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import Users
 
 from datetime import datetime
 
+
 class BaseUsersDao(BaseDao[Users]):
     """
     Data Access Object for Users.

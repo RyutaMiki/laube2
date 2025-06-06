@@ -12,19 +12,21 @@ from jp.co.linkpoint.laube.daos.base.specifiedValue import *
 Base = declarative_base()
 
 
+
 class Users(Base):
     """
     　実在する利用者（人）を一意に管理するテーブル
     """
     __tablename__ = 'm_users'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
-    user_uuid = Column('user_uuid', String(36, collation='ja_JP.utf8'), nullable=False, unique=True, default="lambda: str(uuid.uuid4())", comment="ユーザーUUID")
+    user_uuid = Column('user_uuid', String(36, collation='ja_JP.utf8'), nullable=False, unique=True, default=uuid.uuid4, comment="ユーザーUUID")
     user_name = Column('user_name', String(50, collation='ja_JP.utf8'), nullable=False, comment="氏名")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now", comment="作成日時")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now, comment="作成日時")
     create_user_uuid = Column('create_user_uuid', String(10, collation='ja_JP.utf8'), nullable=False, comment="作成者ユーザーコード")
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now, comment="更新日時")
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment="更新日時")
     update_user_uuid = Column('update_user_uuid', String(10, collation='ja_JP.utf8'), nullable=False, comment="更新者ユーザーコード")
     update_count = Column('update_count', Integer, nullable=False, comment="更新回数")
+
 
 
 class Tenants(Base):
@@ -33,12 +35,13 @@ class Tenants(Base):
     """
     __tablename__ = 'm_tenants'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
-    tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, unique=True, default="lambda: str(uuid.uuid4())", comment="テナントUUID")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now", comment="作成日時")
+    tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, unique=True, default=uuid.uuid4, comment="テナントUUID")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now, comment="作成日時")
     create_user_uuid = Column('create_user_uuid', String(10, collation='ja_JP.utf8'), nullable=False, comment="作成者ユーザーコード")
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now, comment="更新日時")
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment="更新日時")
     update_user_uuid = Column('update_user_uuid', String(10, collation='ja_JP.utf8'), nullable=False, comment="更新者ユーザーコード")
     update_count = Column('update_count', Integer, nullable=False, comment="更新回数")
+
 
 
 class Employee(Base):
@@ -52,9 +55,9 @@ class Employee(Base):
     user_uuid = Column('user_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="ユーザーUUID")
     belong_start_date = Column('belong_start_date', Date, nullable=False, comment="所属開始日")
     belong_end_date = Column('belong_end_date', Date, nullable=True, comment="所属終了日（現役中はNULL）")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now", comment="作成日時")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now, comment="作成日時")
     create_user_uuid = Column('create_user_uuid', String(10, collation='ja_JP.utf8'), nullable=False, comment="作成者ユーザーコード")
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now, comment="更新日時")
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment="更新日時")
     update_user_uuid = Column('update_user_uuid', String(10, collation='ja_JP.utf8'), nullable=False, comment="更新者ユーザーコード")
     update_count = Column('update_count', Integer, nullable=False, comment="更新回数")
     __table_args__ = (
@@ -62,6 +65,7 @@ class Employee(Base):
         ForeignKeyConstraint(['tenant_uuid'], ['m_tenants.tenant_uuid']),
         UniqueConstraint('tenant_uuid', 'user_uuid', 'belong_start_date')
     )
+
 
 class Boss(Base):
     """
@@ -76,9 +80,9 @@ class Boss(Base):
     boss_tenant_uuid = Column('boss_tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="直属上司のテナントUUID")
     boss_group_code = Column('boss_group_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="直属上司の部署コード")
     boss_user_uuid = Column('boss_user_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="直属上司のユーザーUUID")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
@@ -88,6 +92,7 @@ class Boss(Base):
         Index('ix_m_boss', tenant_uuid),
         UniqueConstraint(tenant_uuid, group_code, user_uuid, application_form_code)
     )
+
 
 class DeputyApprovel(Base):
     """
@@ -102,9 +107,9 @@ class DeputyApprovel(Base):
     deputy_approverl_group_code = Column('deputy_approverl_group_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="代理承認者の部署コード")
     deputy_approverl_user_uuid = Column('deputy_approverl_user_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="代理承認者のユーザーUUID")
     deputy_contents = Column('deputy_contents', String(255, collation='ja_JP.utf8'), nullable=False, comment="依頼理由")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
@@ -115,6 +120,7 @@ class DeputyApprovel(Base):
         UniqueConstraint(tenant_uuid, group_code, user_uuid)
     )
 
+
 class ApplicationClassificationFormat(Base):
     """
     　規定申請分類マスタ
@@ -124,9 +130,9 @@ class ApplicationClassificationFormat(Base):
     application_classification_code = Column('application_classification_code', String(10, collation='ja_JP.utf8'), nullable=False, unique=True, comment="申請分類コード")
     application_classification_name = Column('application_classification_name', String(30, collation='ja_JP.utf8'), nullable=False, comment="申請分類名")
     sort_number = Column('sort_number', Integer, nullable=False, comment="ソート順")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
@@ -135,6 +141,7 @@ class ApplicationClassificationFormat(Base):
         Index('ix_m_application_classification_format', application_classification_code),
         UniqueConstraint(application_classification_code)
     )
+
 
 class ApplicationFormFormat(Base):
     """
@@ -153,9 +160,9 @@ class ApplicationFormFormat(Base):
     sort_number = Column('sort_number', Integer, nullable=False, comment="ソート順")
     table_name = Column('table_name', String(50, collation='ja_JP.utf8'), nullable=False, unique=True, comment="テーブル名")
     screen_code = Column('screen_code', String(6, collation='ja_JP.utf8'), nullable=False, comment="画面コード")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
@@ -164,6 +171,7 @@ class ApplicationFormFormat(Base):
         Index('ix_m_application_form_format', application_form_code),
         UniqueConstraint(application_form_code)
     )
+
 
 class ApplicationForm(Base):
     """
@@ -185,9 +193,9 @@ class ApplicationForm(Base):
     table_name = Column('table_name', String(50, collation='ja_JP.utf8'), nullable=False, comment="テーブル名")
     screen_code = Column('screen_code', String(6, collation='ja_JP.utf8'), nullable=False, comment="画面コード")
     job_title_code = Column('job_title_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="役職コード")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
@@ -201,6 +209,7 @@ class ApplicationForm(Base):
         UniqueConstraint(tenant_uuid, table_name)
     )
 
+
 class ApplicationFormRoute(Base):
     """
     　申請書別ルートマスタ
@@ -212,9 +221,9 @@ class ApplicationFormRoute(Base):
     group_code = Column('group_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="部署コード")
     individual_route_code = Column('individual_route_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="直接部門")
     common_route_code = Column('common_route_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="間接部門")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
@@ -225,6 +234,7 @@ class ApplicationFormRoute(Base):
         UniqueConstraint(tenant_uuid, application_form_code, group_code)
     )
 
+
 class IndividualRoute(Base):
     """
     　直接ルートマスタ
@@ -234,9 +244,9 @@ class IndividualRoute(Base):
     tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="テナントUUID")
     individual_route_code = Column('individual_route_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="直接部門")
     individual_route_name = Column('individual_route_name', String(30, collation='ja_JP.utf8'), nullable=False, comment="直接部門名")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
@@ -247,6 +257,7 @@ class IndividualRoute(Base):
         UniqueConstraint(tenant_uuid, individual_route_code),
         UniqueConstraint(tenant_uuid, individual_route_name)
     )
+
 
 class IndividualActivity(Base):
     """
@@ -262,9 +273,10 @@ class IndividualActivity(Base):
     approverl_group_code = Column('approverl_group_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者の部署コード")
     approverl_user_uuid = Column('approverl_user_uuid', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者のユーザーUUID")
     function = Column('function', EnumType(enum_class=ApprovalFunction), nullable=False, comment="承認画面の機能")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    is_terminal = Column('is_terminal', Boolean, nullable=False, default=False, comment="このアクティビティが終了ノードならTrue")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
@@ -277,6 +289,7 @@ class IndividualActivity(Base):
         UniqueConstraint(tenant_uuid, individual_route_code, activity_code)
     )
 
+
 class CommonRoute(Base):
     """
     　間接ルートマスタ
@@ -286,9 +299,9 @@ class CommonRoute(Base):
     tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="テナントUUID")
     common_route_code = Column('common_route_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="間接部門")
     common_route_name = Column('common_route_name', String(30, collation='ja_JP.utf8'), nullable=False, comment="間接部門名")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
@@ -299,6 +312,7 @@ class CommonRoute(Base):
         UniqueConstraint(tenant_uuid, common_route_code),
         UniqueConstraint(tenant_uuid, common_route_name)
     )
+
 
 class CommonActivity(Base):
     """
@@ -314,9 +328,9 @@ class CommonActivity(Base):
     approverl_group_code = Column('approverl_group_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者の部署コード")
     approverl_user_uuid = Column('approverl_user_uuid', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者のユーザーUUID")
     function = Column('function', EnumType(enum_class=ApprovalFunction), nullable=False, comment="承認画面の機能")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
@@ -329,15 +343,15 @@ class CommonActivity(Base):
         UniqueConstraint(tenant_uuid, common_route_code, activity_code)
     )
 
+
 class ApplicationObject(Base):
     """
-    　申請オブジェクト
+    　申請オブジェクト（申請全体の状態・多重インスタンス/マイルストーン/キャンセル等も管理）
     """
     __tablename__ = 't_application_object'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
     tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="テナントUUID")
     application_number = Column('application_number', Integer, nullable=False, comment="申請番号")
-    re_application_number = Column('re_application_number', Integer, nullable=True, comment="旧申請番号")
     application_form_code = Column('application_form_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="申請書コード")
     target_tenant_uuid = Column('target_tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=True, comment="対象者のテナントUUID")
     target_group_code = Column('target_group_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="対象者の部署コード")
@@ -348,22 +362,27 @@ class ApplicationObject(Base):
     apply_date = Column('apply_date', TIMESTAMP, nullable=False, comment="申請日")
     approval_date = Column('approval_date', TIMESTAMP, nullable=True, comment="承認日")
     application_status = Column('application_status', EnumType(enum_class=ApplicationStatus), nullable=False, comment="申請書状態")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    is_case_canceled = Column('is_case_canceled', Boolean, nullable=False, default=False, comment="ケース全体（申請全体）がキャンセルされた場合True")
+    case_cancel_reason = Column('case_cancel_reason', String(255, collation='ja_JP.utf8'), nullable=True, comment="ケースキャンセル理由")
+    case_canceled_by = Column('case_canceled_by', String(36, collation='ja_JP.utf8'), nullable=True, comment="キャンセル操作ユーザーUUID")
+    total_instance_count = Column('total_instance_count', Integer, nullable=True, comment="多重インスタンスの総数（全体制御用）")
+    milestone_count = Column('milestone_count', Integer, nullable=True, comment="マイルストーンの合計数")
+    reached_milestone_count = Column('reached_milestone_count', Integer, nullable=True, comment="到達済みマイルストーン数")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
-    __mapper_args__ = {
-        'version_id_col': "update_count"    }
     __table_args__ = (
         Index('ix_t_application_object_tenant_uuid_application_number', tenant_uuid, application_number),
         Index('ix_t_application_object', tenant_uuid),
         UniqueConstraint(tenant_uuid, application_number)
     )
 
+
 class ActivityObject(Base):
     """
-    　申請明細オブジェクト
+    　申請明細オブジェクト（全WFパターン対応・全状態管理フラグ入り）
     """
     __tablename__ = 't_activity_object'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
@@ -376,29 +395,44 @@ class ActivityObject(Base):
     approverl_role_code = Column('approverl_role_code', String(30, collation='ja_JP.utf8'), nullable=True, comment="承認者の利用権限コード")
     approverl_group_code = Column('approverl_group_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="承認者の部署コード")
     approverl_user_uuid = Column('approverl_user_uuid', String(36, collation='ja_JP.utf8'), nullable=True, comment="承認者のユーザーUUID")
-    deputy_approverl_tenant_uuid = Column('deputy_approverl_tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=True, comment="代理承認者のテナントUUID")
-    deputy_approverl_group_code = Column('deputy_approverl_group_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="代理承認者の部署コード")
-    deputy_approverl_user_uuid = Column('deputy_approverl_user_uuid', String(36, collation='ja_JP.utf8'), nullable=True, comment="代理承認者のユーザーUUID")
-    deputy_contents = Column('deputy_contents', String(255, collation='ja_JP.utf8'), nullable=True, comment="依頼理由")
     function = Column('function', EnumType(enum_class=ApprovalFunction), nullable=False, comment="承認画面の機能")
+    instance_group_id = Column('instance_group_id', String(collation='ja_JP.utf8'), nullable=True, comment="多重インスタンスグループID")
+    instance_index = Column('instance_index', Integer, nullable=True, comment="インスタンス内の番号")
+    total_instance_count = Column('total_instance_count', Integer, nullable=True, comment="インスタンスグループ全体の数（Activity単位で必要な場合）")
+    loop_count = Column('loop_count', Integer, nullable=False, default=0, comment="ループ通過回数")
+    max_loop = Column('max_loop', Integer, nullable=True, comment="ループ最大回数")
+    parent_activity_id = Column('parent_activity_id', Integer, nullable=True, comment="再帰元アクティビティID")
+    is_synchronized = Column('is_synchronized', Boolean, nullable=False, default=False, comment="同期必須ならTrue")
+    is_interleaved_locked = Column('is_interleaved_locked', Boolean, nullable=False, default=False, comment="並列経路で他が実行中ならTrue")
+    is_milestone = Column('is_milestone', Boolean, nullable=False, default=False, comment="マイルストーンならTrue")
+    is_milestone_reached = Column('is_milestone_reached', Boolean, nullable=False, default=False, comment="マイルストーン到達済み")
+    is_canceled = Column('is_canceled', Boolean, nullable=False, default=False, comment="アクティビティがキャンセル済みならTrue")
+    cancel_reason = Column('cancel_reason', String(255, collation='ja_JP.utf8'), nullable=True, comment="キャンセル理由")
+    canceled_by = Column('canceled_by', String(36, collation='ja_JP.utf8'), nullable=True, comment="キャンセル操作ユーザーUUID")
+    is_terminal = Column('is_terminal', Boolean, nullable=False, default=False, comment="終了ノードならTrue")
+    is_discriminator_loser = Column('is_discriminator_loser', Boolean, nullable=False, default=False, comment="Discriminator合流時に負けた経路ならTrue")
+    is_deferred_choice_winner = Column('is_deferred_choice_winner', Boolean, nullable=False, default=False, comment="Deferred Choiceで勝者ならTrue")
+    is_deferred_choice_loser = Column('is_deferred_choice_loser', Boolean, nullable=False, default=False, comment="Deferred Choiceで敗者ならTrue")
+    trigger_type = Column('trigger_type', String(50, collation='ja_JP.utf8'), nullable=True, comment="トリガー種別（イベント名や条件式）")
+    is_triggered = Column('is_triggered', Boolean, nullable=False, default=False, comment="トリガー発生済み")
+    triggered_at = Column('triggered_at', TIMESTAMP, nullable=True, comment="トリガー発生日時")
     reaching_date = Column('reaching_date', TIMESTAMP, nullable=True, comment="到達日")
     process_date = Column('process_date', TIMESTAMP, nullable=True, comment="処理日")
     activity_status = Column('activity_status', EnumType(enum_class=ActivityStatus), nullable=True, comment="承認者状態")
     approverl_comment = Column('approverl_comment', String(255, collation='ja_JP.utf8'), nullable=True, comment="承認者のコメント")
-    is_completed = Column('is_completed', Boolean, nullable=False, comment="アクティビティの完了状態（trueなら完了）")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    is_completed = Column('is_completed', Boolean, nullable=False, default=False, comment="アクティビティの完了状態")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
-    __mapper_args__ = {
-        'version_id_col': "update_count"    }
     __table_args__ = (
         Index('ix_t_activity_object_tenant_uuid_application_number_route_type_route_number_approverl_tenant_uuid_approverl_group_code_approverl_user_uuid', tenant_uuid, application_number, route_type, route_number, approverl_tenant_uuid, approverl_group_code, approverl_user_uuid),
         Index('ix_t_activity_object', tenant_uuid),
         Index('ix_t_activity_object_tenant_uuid_application_number', tenant_uuid, application_number),
         UniqueConstraint(tenant_uuid, application_number, route_type, route_number, approverl_tenant_uuid, approverl_group_code, approverl_user_uuid)
     )
+
 
 class Appended(Base):
     """
@@ -417,9 +451,9 @@ class Appended(Base):
     append_title = Column('append_title', String(255, collation='ja_JP.utf8'), nullable=False, comment="添付ファイルの説明")
     append_path = Column('append_path', String(255, collation='ja_JP.utf8'), nullable=False, comment="添付ファイルのパス")
     append_date = Column('append_date', TIMESTAMP, nullable=False, comment="添付ファイルの登録日")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
@@ -430,6 +464,7 @@ class Appended(Base):
         Index('ix_t_appended_tenant_uuid_application_number', tenant_uuid, application_number),
         UniqueConstraint(tenant_uuid, application_number, route_type, route_number)
     )
+
 
 class RouteHistory(Base):
     """
@@ -482,13 +517,14 @@ class RouteHistory(Base):
     process_date = Column('process_date', TIMESTAMP, nullable=True, comment="処理日")
     activity_status = Column('activity_status', EnumType(enum_class=ActivityStatus), nullable=True, comment="承認者状態")
     approverl_comment = Column('approverl_comment', String(255, collation='ja_JP.utf8'), nullable=True, comment="承認者のコメント")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {
         'version_id_col': "update_count"    }
+
 
 
 class ActivityTransit(Base):
@@ -506,12 +542,12 @@ class ActivityTransit(Base):
     transition_type = Column('transition_type', EnumType(enum_class=TransitionType), nullable=False, comment="遷移タイプ（AND/OR/CONDITION）")
     group_key = Column('group_key', String(20, collation='ja_JP.utf8'), nullable=True, comment="分岐グループキー")
     condition_expression = Column('condition_expression', String(255, collation='ja_JP.utf8'), nullable=True, comment="条件式（JSONやDSL）")
-    approval_condition_type = Column('approval_condition_type', EnumType(enum_class=ApprovalConditionType), nullable=False, default="ALL", comment="承認完了条件の種別（ALL=全員, MAJORITY=過半数, ANY=誰か1人）")
+    approval_condition_type = Column('approval_condition_type', EnumType(enum_class=ApprovalConditionType), nullable=False, default=ApprovalConditionType.ALL, comment="承認完了条件の種別（ALL=全員, MAJORITY=過半数, ANY=誰か1人）")
     approval_threshold = Column('approval_threshold', Integer, nullable=True, comment="任意人数承認で可とする場合の閾値（approval_condition_type='THRESHOLD'時）")
     sort_number = Column('sort_number', Integer, nullable=True, comment="並び順")
-    create_date = Column('create_date', TIMESTAMP, nullable=False, default="datetime.now")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, nullable=False, default="datetime.now", onupdate=datetime.now)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __mapper_args__ = {

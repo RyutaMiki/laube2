@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import DeputyApprovel
 
 from datetime import datetime
 
+
 class BaseDeputyApprovelDao(BaseDao[DeputyApprovel]):
     """
     Data Access Object for DeputyApprovel.

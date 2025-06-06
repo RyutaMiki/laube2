@@ -18,6 +18,7 @@ from jp.co.linkpoint.laube.daos.base.models import {{ model_class }}
 from datetime import {{ datetime_imports | join(', ') }}
 {% endif %}
 
+
 class {{ base_dao_class_name }}(BaseDao[{{ model_class }}]):
     """
     Data Access Object for {{ model_class }}.

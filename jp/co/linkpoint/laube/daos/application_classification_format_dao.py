@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from jp.co.linkpoint.laube.daos.base.application_classification_format_dao_base import BaseApplicationClassificationFormatDao
 
+
 class ApplicationClassificationFormatDao(BaseApplicationClassificationFormatDao):
     """
     ApplicationClassificationFormat に関するカスタムDAO処理を書く場所

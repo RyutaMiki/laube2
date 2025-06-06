@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import IndividualActivity
 
 from datetime import datetime
 
+
 class BaseIndividualActivityDao(BaseDao[IndividualActivity]):
     """
     Data Access Object for IndividualActivity.

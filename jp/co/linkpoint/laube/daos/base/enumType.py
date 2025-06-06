@@ -6,7 +6,6 @@ from typing import Any, Optional, Type, TypeVar
 from sqlalchemy import Integer
 from sqlalchemy.types import TypeDecorator
 
-# Generic type var so the type checker knows which Enum subclass we’re dealing with
 E = TypeVar("E", bound=Enum)
 
 
@@ -41,41 +40,35 @@ class EnumType(TypeDecorator):
     impl = Integer
     cache_ok = True
 
-    # ------------------------------------------------------------------ #
-    # Construction                                                       #
-    # ------------------------------------------------------------------ #
     def __init__(self, *, enum_class: Type[E], **kwargs: Any) -> None:
         """
-        Parameters
-        ----------
-        enum_class : Type[E]
-            Enum class to bind.
-        **kwargs
-            Forwarded to the TypeDecorator base class.
+        EnumTypeの初期化。
 
-        Raises
-        ------
-        TypeError
-            If *enum_class* is not a subclass of :class:`enum.Enum`.
+        Args:
+            enum_class (Type[E]): 利用するEnumクラス
+            **kwargs: TypeDecoratorへの追加パラメータ
+
+        Raises:
+            TypeError: enum_classがEnumのサブクラスでない場合に例外
         """
         if not (isinstance(enum_class, type) and issubclass(enum_class, Enum)):
             raise TypeError("enum_class must be a subclass of enum.Enum")
         self.enum_class: Type[E] = enum_class
         super().__init__(**kwargs)
 
-    # ------------------------------------------------------------------ #
-    # Bind parameter (Python ➜ DB)                                       #
-    # ------------------------------------------------------------------ #
-    def process_bind_param(self, value: Optional[E], dialect) -> Optional[int]:  # type: ignore[override]
+    def process_bind_param(self, value: Optional[E], dialect) -> Optional[int]:
         """
-        Convert an Enum value into the integer that will be written to the DB.
+        Enum値（Python側）をDB格納用の整数値に変換する。
 
-        SQLAlchemy calls this right before an INSERT / UPDATE.
+        Args:
+            value (Optional[E]): Enum値（Noneの場合はそのままNone）
+            dialect: SQLAlchemy Dialect（未使用）
 
-        Raises
-        ------
-        TypeError
-            If *value* is not ``None`` and not an instance of *enum_class*.
+        Returns:
+            Optional[int]: DBに書き込む整数値（またはNone）
+
+        Raises:
+            TypeError: valueがenum_class型でない場合
         """
         if value is None:
             return None
@@ -83,21 +76,20 @@ class EnumType(TypeDecorator):
             raise TypeError(f"Expected {self.enum_class.__name__}, got {type(value).__name__}")
         return int(value.value)
 
-    # ------------------------------------------------------------------ #
-    # Result processing (DB ➜ Python)                                    #
-    # ------------------------------------------------------------------ #
-    def process_result_value(self, value: Optional[int], dialect) -> Optional[E]:  # type: ignore[override]
+    def process_result_value(self, value: Optional[int], dialect) -> Optional[E]:
         """
-        Convert an integer fetched from the DB back into an Enum instance.
+        DBから取得した整数値をEnum値（Python）に変換する。
 
-        SQLAlchemy calls this after a SELECT.
+        Args:
+            value (Optional[int]): DBから返された整数値（またはNone）
+            dialect: SQLAlchemy Dialect（未使用）
 
-        Raises
-        ------
-        TypeError
-            If *value* is not ``None`` and not an ``int``.
-        ValueError
-            If *value* is an int but not a valid member of *enum_class*.
+        Returns:
+            Optional[E]: Enum値（またはNone）
+
+        Raises:
+            TypeError: valueがint型でない場合
+            ValueError: valueがenum_classに該当しない場合
         """
         if value is None:
             return None
@@ -110,8 +102,11 @@ class EnumType(TypeDecorator):
                 f"{value!r} is not a valid value for {self.enum_class.__name__}"
             ) from exc
 
-    # ------------------------------------------------------------------ #
-    # Convenience: nice repr for debugging                               #
-    # ------------------------------------------------------------------ #
-    def __repr__(self) -> str:  # pragma: no cover
+    def __repr__(self) -> str:
+        """
+        デバッグ用のrepr（列挙体クラス名を表示）。
+
+        Returns:
+            str: EnumType(class名)
+        """
         return f"EnumType({self.enum_class.__name__})"

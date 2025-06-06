@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import ApplicationForm
 
 from datetime import datetime
 
+
 class BaseApplicationFormDao(BaseDao[ApplicationForm]):
     """
     Data Access Object for ApplicationForm.

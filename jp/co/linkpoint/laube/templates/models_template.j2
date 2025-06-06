@@ -14,6 +14,22 @@ from jp.co.linkpoint.laube.daos.base.enumType import EnumType
 from jp.co.linkpoint.laube.daos.base.specifiedValue import *
 Base = declarative_base()
 
+{% macro py_default(val, enum_class=None) -%}
+    {%- if enum_class and val is string and val in enum_class.__members__.keys() -%}
+        {{ enum_class.__name__ }}.{{ val }}
+    {%- elif val is string and val in ['datetime.now', 'uuid.uuid4', 'uuid4', 'date.today', 'func.now'] -%}
+        {{- val -}}
+    {%- elif val is string and val|lower == "true" -%}
+        True
+    {%- elif val is string and val|lower == "false" -%}
+        False
+    {%- elif val is boolean -%}
+        {{- val | string | capitalize -}}
+    {%- else -%}
+        {{- val -}}
+    {%- endif -%}
+{%- endmacro %}
+
 {% macro render_sqla_type(col) -%}
 {%- set is_str = col.type.startswith("String") %}
 {%- set coll = col.collation if col.collation else ("ja_JP.utf8" if is_str else None) %}
@@ -39,8 +55,18 @@ class {{ model.class_name }}({{ model.inherits if model.inherits else "Base" }})
     {% if col.nullable in [True, False] %}{% set _ = parts.append("nullable=" ~ col.nullable) %}{% endif %}
     {% if col.unique        %}{% set _ = parts.append("unique=True")        %}{% endif %}
     {% if col.index         %}{% set _ = parts.append("index=True")         %}{% endif %}
-    {% if col.default       %}{% set _ = parts.append("default=" ~ col.default | tojson) %}{% endif %}
-    {% if col.onupdate      %}{% set _ = parts.append("onupdate=" ~ col.onupdate) %}{% endif %}
+    {% if col.default is defined and col.default is not none %}
+        {% if col.type == 'EnumType' and col.args %}
+            {# EnumTypeの場合、enum_class=をパースしてクラス名を渡す #}
+            {% set enum_class_name = col.args[0].split('=')[1] %}
+            {% set _ = parts.append("default=" ~ enum_class_name ~ "." ~ col.default) %}
+        {% else %}
+            {% set _ = parts.append("default=" ~ py_default(col.default)) %}
+        {% endif %}
+    {% endif %}
+    {% if col.onupdate is defined and col.onupdate is not none %}
+        {% set _ = parts.append("onupdate=" ~ py_default(col.onupdate)) %}
+    {% endif %}
     {% if col.server_default%}{% set _ = parts.append("server_default=" ~ col.server_default) %}{% endif %}
     {% if col.comment %}{% set _ = parts.append('comment="' ~ col.comment.replace('"', '\\\"') ~ '"') %}{% endif %}
     {{ col.name }} = Column({{ parts | join(", ") }})
@@ -91,6 +117,7 @@ class {{ model.class_name }}({{ model.inherits if model.inherits else "Base" }})
     )
 {%- endif %}
 {%- if not loop.last %}
+
 
 
 {% endif %}

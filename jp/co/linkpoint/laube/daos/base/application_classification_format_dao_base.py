@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import ApplicationClassificationForm
 
 from datetime import datetime
 
+
 class BaseApplicationClassificationFormatDao(BaseDao[ApplicationClassificationFormat]):
     """
     Data Access Object for ApplicationClassificationFormat.

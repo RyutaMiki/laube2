@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import Tenants
 
 from datetime import datetime
 
+
 class BaseTenantsDao(BaseDao[Tenants]):
     """
     Data Access Object for Tenants.

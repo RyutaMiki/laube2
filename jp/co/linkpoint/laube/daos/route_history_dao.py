@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from jp.co.linkpoint.laube.daos.base.route_history_dao_base import BaseRouteHistoryDao
 
+
 class RouteHistoryDao(BaseRouteHistoryDao):
     """
     RouteHistory に関するカスタムDAO処理を書く場所

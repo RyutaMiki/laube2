@@ -14,7 +14,7 @@ models:
         args: [36]
         unique: true
         nullable: false
-        default: "lambda: str(uuid.uuid4())"
+        default: uuid.uuid4
         comment: ユーザーUUID
       - name: user_name
         type: String
@@ -62,7 +62,7 @@ models:
         args: [36]
         unique: true
         nullable: false
-        default: "lambda: str(uuid.uuid4())"
+        default: uuid.uuid4
         comment: テナントUUID
       - name: create_date
         type: TIMESTAMP
@@ -772,6 +772,13 @@ models:
         args: [enum_class=ApprovalFunction]
         nullable: false
         comment: 承認画面の機能
+
+      - name: is_terminal
+        type: Boolean
+        default: false
+        nullable: false
+        comment: このアクティビティが終了ノードならTrue
+
       - name: create_date
         type: TIMESTAMP
         default: datetime.now
@@ -939,9 +946,7 @@ models:
 
   - class_name: ApplicationObject
     table_name: t_application_object
-    description: 申請オブジェクト
-    mapper_args:
-      version_id_col: update_count
+    description: 申請オブジェクト（申請全体の状態・多重インスタンス/マイルストーン/キャンセル等も管理）
     columns:
       - name: id
         type: Integer
@@ -961,11 +966,6 @@ models:
         type: Integer
         nullable: false
         comment: 申請番号
-
-      - name: re_application_number
-        type: Integer
-        nullable: true
-        comment: 旧申請番号
 
       - name: application_form_code
         type: String
@@ -1026,6 +1026,41 @@ models:
         nullable: false
         comment: 申請書状態
 
+      # --- WF全体拡張項目 ---
+      - name: is_case_canceled
+        type: Boolean
+        default: false
+        nullable: false
+        comment: ケース全体（申請全体）がキャンセルされた場合True
+
+      - name: case_cancel_reason
+        type: String
+        args: [255]
+        nullable: true
+        comment: ケースキャンセル理由
+
+      - name: case_canceled_by
+        type: String
+        args: [36]
+        nullable: true
+        comment: キャンセル操作ユーザーUUID
+
+      - name: total_instance_count
+        type: Integer
+        nullable: true
+        comment: 多重インスタンスの総数（全体制御用）
+
+      - name: milestone_count
+        type: Integer
+        nullable: true
+        comment: マイルストーンの合計数
+
+      - name: reached_milestone_count
+        type: Integer
+        nullable: true
+        comment: 到達済みマイルストーン数
+
+      # --- 基本・監査項目 ---
       - name: create_date
         type: TIMESTAMP
         default: datetime.now
@@ -1066,9 +1101,7 @@ models:
 
   - class_name: ActivityObject
     table_name: t_activity_object
-    description: 申請明細オブジェクト
-    mapper_args:
-      version_id_col: update_count
+    description: 申請明細オブジェクト（全WFパターン対応・全状態管理フラグ入り）
     columns:
       - name: id
         type: Integer
@@ -1129,36 +1162,133 @@ models:
         nullable: true
         comment: 承認者のユーザーUUID
 
-      - name: deputy_approverl_tenant_uuid
-        type: String
-        args: [36]
-        nullable: true
-        comment: 代理承認者のテナントUUID
-
-      - name: deputy_approverl_group_code
-        type: String
-        args: [10]
-        nullable: true
-        comment: 代理承認者の部署コード
-
-      - name: deputy_approverl_user_uuid
-        type: String
-        args: [36]
-        nullable: true
-        comment: 代理承認者のユーザーUUID
-
-      - name: deputy_contents
-        type: String
-        args: [255]
-        nullable: true
-        comment: 依頼理由
-
       - name: function
         type: EnumType
         args: [enum_class=ApprovalFunction]
         nullable: false
         comment: 承認画面の機能
 
+      # --- 多重インスタンス／ループ制御 ---
+      - name: instance_group_id
+        type: String
+        nullable: true
+        comment: 多重インスタンスグループID
+
+      - name: instance_index
+        type: Integer
+        nullable: true
+        comment: インスタンス内の番号
+
+      - name: total_instance_count
+        type: Integer
+        nullable: true
+        comment: インスタンスグループ全体の数（Activity単位で必要な場合）
+
+      - name: loop_count
+        type: Integer
+        default: 0
+        nullable: false
+        comment: ループ通過回数
+
+      - name: max_loop
+        type: Integer
+        nullable: true
+        comment: ループ最大回数
+
+      - name: parent_activity_id
+        type: Integer
+        nullable: true
+        comment: 再帰元アクティビティID
+
+      - name: is_synchronized
+        type: Boolean
+        default: false
+        nullable: false
+        comment: 同期必須ならTrue
+
+      # --- 排他進行系（交互並列など） ---
+      - name: is_interleaved_locked
+        type: Boolean
+        default: false
+        nullable: false
+        comment: 並列経路で他が実行中ならTrue
+
+      # --- マイルストーン系 ---
+      - name: is_milestone
+        type: Boolean
+        default: false
+        nullable: false
+        comment: マイルストーンならTrue
+
+      - name: is_milestone_reached
+        type: Boolean
+        default: false
+        nullable: false
+        comment: マイルストーン到達済み
+
+      # --- キャンセル・終了・制御 ---
+      - name: is_canceled
+        type: Boolean
+        default: false
+        nullable: false
+        comment: アクティビティがキャンセル済みならTrue
+
+      - name: cancel_reason
+        type: String
+        args: [255]
+        nullable: true
+        comment: キャンセル理由
+
+      - name: canceled_by
+        type: String
+        args: [36]
+        nullable: true
+        comment: キャンセル操作ユーザーUUID
+
+      - name: is_terminal
+        type: Boolean
+        default: false
+        nullable: false
+        comment: 終了ノードならTrue
+
+      # --- Discriminator, Deferred Choice等 ---
+      - name: is_discriminator_loser
+        type: Boolean
+        default: false
+        nullable: false
+        comment: Discriminator合流時に負けた経路ならTrue
+
+      - name: is_deferred_choice_winner
+        type: Boolean
+        default: false
+        nullable: false
+        comment: Deferred Choiceで勝者ならTrue
+
+      - name: is_deferred_choice_loser
+        type: Boolean
+        default: false
+        nullable: false
+        comment: Deferred Choiceで敗者ならTrue
+
+      # --- トリガー・イベント ---
+      - name: trigger_type
+        type: String
+        args: [50]
+        nullable: true
+        comment: トリガー種別（イベント名や条件式）
+
+      - name: is_triggered
+        type: Boolean
+        default: false
+        nullable: false
+        comment: トリガー発生済み
+
+      - name: triggered_at
+        type: TIMESTAMP
+        nullable: true
+        comment: トリガー発生日時
+
+      # --- 基本・監査項目 ---
       - name: reaching_date
         type: TIMESTAMP
         nullable: true
@@ -1185,7 +1315,7 @@ models:
         type: Boolean
         default: false
         nullable: false
-        comment: アクティビティの完了状態（trueなら完了）
+        comment: アクティビティの完了状態
 
       - name: create_date
         type: TIMESTAMP

@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import Appended
 
 from datetime import datetime
 
+
 class BaseAppendedDao(BaseDao[Appended]):
     """
     Data Access Object for Appended.

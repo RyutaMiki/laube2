@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import ApplicationObject
 
 from datetime import datetime
 
+
 class BaseApplicationObjectDao(BaseDao[ApplicationObject]):
     """
     Data Access Object for ApplicationObject.

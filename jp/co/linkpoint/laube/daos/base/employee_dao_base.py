@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import Employee
 
 from datetime import datetime, date
 
+
 class BaseEmployeeDao(BaseDao[Employee]):
     """
     Data Access Object for Employee.

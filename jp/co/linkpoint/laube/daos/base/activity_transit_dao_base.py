@@ -6,6 +6,7 @@ from jp.co.linkpoint.laube.daos.base.models import ActivityTransit
 
 from datetime import datetime
 
+
 class BaseActivityTransitDao(BaseDao[ActivityTransit]):
     """
     Data Access Object for ActivityTransit.

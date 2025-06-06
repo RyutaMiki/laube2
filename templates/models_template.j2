@@ -1,0 +1,98 @@
+{# =========================================================
+   models_template.j2   –  FINAL FINAL FINAL FIX FOR みき
+   ========================================================= #}
+
+from datetime import datetime
+from sqlalchemy import (
+    Column, String, Text, Integer, Float, Boolean, Date, TIMESTAMP, DECIMAL,
+    Index, UniqueConstraint, ForeignKey, ForeignKeyConstraint,
+    PrimaryKeyConstraint, CheckConstraint, text, func, SmallInteger
+)
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+import uuid
+from enumType import EnumType
+from specifiedValue import *
+Base = declarative_base()
+
+{% macro render_sqla_type(col) -%}
+{%- set is_str = col.type.startswith("String") %}
+{%- set coll = col.collation if col.collation else ("ja_JP.utf8" if is_str else None) %}
+{{ col.type }}{% if col.args or coll %}(
+    {%- if col.args %}{{ col.args | join(", ") }}{%- endif -%}
+    {%- if col.args and coll %}, {% endif -%}
+    {%- if coll %}collation='{{ coll }}'{%- endif -%}
+){% endif %}
+{%- endmacro %}
+
+{% for model in models %}
+class {{ model.class_name }}({{ model.inherits if model.inherits else "Base" }}):
+    """
+    {{ ('\u3000' + model.description.strip()).replace('\n', '\n    \u3000') }}
+    """
+    __tablename__ = '{{ model.table_name }}'
+{% for col in model.columns %}
+    {% set parts = [] %}
+    {% set _ = parts.append("'" ~ col.get('db_column', col.name) ~ "'") %}
+    {% set _ = parts.append(render_sqla_type(col)) %}
+    {% if col.primary_key   %}{% set _ = parts.append("primary_key=True")   %}{% endif %}
+    {% if col.autoincrement %}{% set _ = parts.append("autoincrement=True") %}{% endif %}
+    {% if col.nullable in [True, False] %}{% set _ = parts.append("nullable=" ~ col.nullable) %}{% endif %}
+    {% if col.unique        %}{% set _ = parts.append("unique=True")        %}{% endif %}
+    {% if col.index         %}{% set _ = parts.append("index=True")         %}{% endif %}
+    {% if col.default       %}{% set _ = parts.append("default=" ~ col.default | tojson) %}{% endif %}
+    {% if col.onupdate      %}{% set _ = parts.append("onupdate=" ~ col.onupdate) %}{% endif %}
+    {% if col.server_default%}{% set _ = parts.append("server_default=" ~ col.server_default) %}{% endif %}
+    {% if col.comment       %}{% set _ = parts.append("comment='" ~ col.comment ~ "'") %}{% endif %}
+    {{ col.name }} = Column({{ parts | join(", ") }})
+{% endfor %}
+{% if model.mapper_args %}
+    __mapper_args__ = {
+{%         for k, v in model.mapper_args.items() %}
+        '{{ k }}': {{ v | tojson }}{% if not loop.last %},{% endif %}
+{%         endfor %}
+    }
+{% endif %}
+{# ---- ここから __table_args__ をすべてカバー ---- #}
+{% set tbl_args = [] %}
+{%- if model.indexes %}
+    {%- for idx in model.indexes %}
+        {%- set idx_name = 'ix_' ~ model.table_name ~ ('' if idx|length == 1 else '_' ~ idx | join('_')) %}
+        {%- set cols = idx | map('string') | join(', ') %}
+        {%- set _ = tbl_args.append("Index('" ~ idx_name ~ "', " ~ cols ~ ")") %}
+    {%- endfor %}
+{%- endif %}
+{%- if model.uniques %}
+    {%- for uq in model.uniques %}
+        {%- set cols = uq | map('string') | join(', ') %}
+        {%- set _ = tbl_args.append("UniqueConstraint(" ~ cols ~ ")") %}
+    {%- endfor %}
+{%- endif %}
+{%- if model.constraints %}
+    {%- for c in model.constraints %}
+        {%- if c.type == 'unique' %}
+            {%- set cols = c.columns | join("', '") %}
+            {%- set cols = "'" ~ cols ~ "'" %}
+            {%- set _ = tbl_args.append("UniqueConstraint(" ~ cols ~ ")") %}
+        {%- elif c.type == 'foreign_key' %}
+            {%- set local_cols = c.columns | join("', '") %}
+            {%- set local_cols = "'" ~ local_cols ~ "'" %}
+            {%- set targets = [] %}
+            {%- for col in c.references.columns %}
+                {%- set _ = targets.append("'" ~ c.references.table ~ "." ~ col ~ "'") %}
+            {%- endfor %}
+            {%- set remote = targets | join(', ') %}
+            {%- set _ = tbl_args.append("ForeignKeyConstraint([" ~ local_cols ~ "], [" ~ remote ~ "])" ) %}
+        {%- endif %}
+    {%- endfor %}
+{%- endif %}
+{%- if tbl_args %}
+    __table_args__ = (
+        {{ tbl_args | join(",\n        ") }}
+    )
+{%- endif %}
+{%- if not loop.last %}
+
+
+
+{% endif %}
+{% endfor %}

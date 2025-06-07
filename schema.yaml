@@ -159,6 +159,97 @@ models:
       - type: unique
         columns: [tenant_uuid, user_uuid, belong_start_date]
 
+  - class_name: Group
+    table_name: m_group
+    description: 部署マスタ
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: tenant_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: テナントUUID
+
+      - name: group_code
+        type: String
+        args: [10]
+        collation: ja_JP.utf8
+        nullable: false
+        comment: 部署コード
+
+      - name: group_name
+        type: String
+        args: [50]
+        collation: ja_JP.utf8
+        nullable: false
+        comment: 部署名
+
+      - name: term_from
+        type: Date
+        nullable: false
+        comment: 有効開始日
+
+      - name: term_to
+        type: Date
+        nullable: true
+        comment: 有効終了日
+
+      - name: upper_group_code
+        type: String
+        args: [10]
+        collation: ja_JP.utf8
+        nullable: true
+        foreign_key:
+          reference: m_group.group_code
+          onupdate: CASCADE
+          ondelete: SET NULL
+        comment: 上位部署コード
+
+      - name: permission_range
+        type: EnumType
+        args: [enum_class=PermissionRange]
+        nullable: false
+        comment: 利用権限範囲
+
+      - name: create_date
+        type: TIMESTAMP
+        default: "lambda: datetime.now()"
+        nullable: false
+
+      - name: create_employee_code
+        type: String
+        args: [10]
+        collation: ja_JP.utf8
+        nullable: false
+
+      - name: update_date
+        type: TIMESTAMP
+        default: "lambda: datetime.now()"
+        onupdate: "lambda: datetime.now()"
+        nullable: false
+
+      - name: update_employee_code
+        type: String
+        args: [10]
+        collation: ja_JP.utf8
+        nullable: false
+
+      - name: update_count
+        type: Integer
+        nullable: false
+
+    indexes:
+      - [tenant_uuid, group_code]
+      - [tenant_uuid]
+    uniques:
+      - [tenant_uuid, group_code]
+    version_id_col: update_count
+
   - class_name: Boss
     table_name: m_boss
     description: 上司マスタ

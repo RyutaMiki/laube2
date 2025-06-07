@@ -67,6 +67,31 @@ class Employee(Base):
     )
 
 
+class Group(Base):
+    """
+    　部署マスタ
+    """
+    __tablename__ = 'm_group'
+    id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
+    tenant_uuid = Column('tenant_uuid', String(36, collation='ja_JP.utf8'), nullable=False, comment="テナントUUID")
+    group_code = Column('group_code', String(10, collation='ja_JP.utf8'), nullable=False, comment="部署コード")
+    group_name = Column('group_name', String(50, collation='ja_JP.utf8'), nullable=False, comment="部署名")
+    term_from = Column('term_from', Date, nullable=False, comment="有効開始日")
+    term_to = Column('term_to', Date, nullable=True, comment="有効終了日")
+    upper_group_code = Column('upper_group_code', String(10, collation='ja_JP.utf8'), nullable=True, comment="上位部署コード")
+    permission_range = Column('permission_range', EnumType(enum_class=PermissionRange), nullable=False, comment="利用権限範囲")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=lambda: datetime.now())
+    create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=lambda: datetime.now(), onupdate=lambda: datetime.now())
+    update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
+    update_count = Column('update_count', Integer, nullable=False)
+    __table_args__ = (
+        Index('ix_m_group_tenant_uuid_group_code', tenant_uuid, group_code),
+        Index('ix_m_group', tenant_uuid),
+        UniqueConstraint(tenant_uuid, group_code)
+    )
+
+
 class Boss(Base):
     """
     　上司マスタ

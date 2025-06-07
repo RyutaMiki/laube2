@@ -2202,31 +2202,6 @@ class Team(Base):
     }
     __table_args__ = (Index('ix_m_team', "company_code", "team_code"), Index('ix_m_team_1', "company_code"), Index('ix_m_team_2', "team_code"), UniqueConstraint("company_code", "team_code"), )
 
-
-class Group(Base):
-    """
-    部署マスタ
-    """
-    __tablename__ = "m_group"
-    id = Column('id', Integer, primary_key=True, autoincrement=True, comment='サロゲートキー')
-    company_code = Column('company_code', String(10, collation='ja_JP.utf8'), ForeignKey('m_company.company_code', onupdate='CASCADE', ondelete='CASCADE'), comment='会社コード')
-    group_code = Column('group_code', String(10, collation='ja_JP.utf8'), nullable=False, comment='部署コード')
-    group_name = Column('group_name', String(50, collation='ja_JP.utf8'), nullable=False, comment='部署名')
-    term_from = Column('term_from', Date, nullable=False, comment='有効開始日')
-    term_to = Column('term_to', Date, nullable=True, comment='有効終了日')
-    upper_group_code = Column('upper_group_code', String(10, collation='ja_JP.utf8'), nullable=True, comment='上位部署コード')
-    range = Column('range', EnumType(enum_class=Range), nullable=False, comment='利用権限範囲')
-    create_date = Column('create_date', TIMESTAMP, default=datetime.now, nullable=False)
-    create_employee_code = Column('create_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_date = Column('update_date', TIMESTAMP, default=datetime.now, nullable=False, onupdate=datetime.now)
-    update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False)
-    update_count = Column('update_count', Integer, nullable=False)
-    __mapper_args__ = {
-        'version_id_col': update_count
-    }
-    __table_args__ = (Index('ix_m_group', "company_code", "group_code"), Index('ix_m_group_1', "company_code"), Index('ix_m_group_2', "group_code"), UniqueConstraint("company_code", "group_code"), )
-
-
 class GroupApplication(Base):
     """
     部署申請マスタ

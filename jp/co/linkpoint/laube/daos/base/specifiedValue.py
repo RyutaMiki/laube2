@@ -117,3 +117,27 @@ class ApprovalConditionType(IntEnum):
     MAJORITY = 2   # 過半数
     ANY = 3        # 誰か1人
     THRESHOLD = 4  # 指定人数以上
+
+
+class StatusFlag(IntEnum):
+    """
+    状態フラグ
+    ENABLED: 有効
+    DISABLED: 無効
+    """
+    ENABLED = 1   # 有効
+    DISABLED = 2  # 無効
+
+
+class PermissionRange(IntEnum):
+    """
+    利用権限範囲を表すEnum
+
+    - ALL: すべて
+    - GROUP_ONLY: 部署のみ
+    - INDIVIDUAL: 個人のみ
+    """
+    ALL = 1            # すべて
+    GROUP_ONLY = 2     # 部署のみ
+    INDIVIDUAL = 3     # 個人のみ
+

@@ -1,11 +1,15 @@
 from app.models.models import ApplicationObject
 from sqlalchemy.orm import Session
-from typing import List, Optional
-from app.daos.base.application_object_dao_base import BaseApplicationObjectDao
+from typing import List, Optional, Any
+from app.daos.base.application_object_dao_base import ApplicationObjectDaoBase
 
-
-class ApplicationObjectDao(BaseApplicationObjectDao):
+class ApplicationObjectDao(ApplicationObjectDaoBase):
     """
     ApplicationObject に関するカスタムDAO処理を書く場所
+
+    - サンプルメソッドをここに追加できます。
+    - 例:
+        def custom_search(self, db_session: Session, keyword: str) -> List[ApplicationObject]:
+            return db_session.query(ApplicationObject).filter(ApplicationObject.name.like(f"%{keyword}%")).all()
     """
     pass  # 必要に応じてカスタムメソッドをここに追加してください

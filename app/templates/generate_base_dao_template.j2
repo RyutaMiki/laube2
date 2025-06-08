@@ -1,19 +1,13 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional, Union, Any
-from app.daos.base_dao import BaseDao
+from app.daos.base.base_dao import BaseDao
 from app.models.models import {{ model_class }}
 
 {% set datetime_imports = [] %}
-{% if 'datetime' in imports %}
-{% set _ = datetime_imports.append('datetime') %}
-{% endif %}
-{% if 'date' in imports %}
-{% set _ = datetime_imports.append('date') %}
-{% endif %}
-{% if 'time' in imports %}
-{% set _ = datetime_imports.append('time') %}
-{% endif %}
+{% if 'datetime' in imports %}{% set _ = datetime_imports.append('datetime') %}{% endif %}
+{% if 'date' in imports %}{% set _ = datetime_imports.append('date') %}{% endif %}
+{% if 'time' in imports %}{% set _ = datetime_imports.append('time') %}{% endif %}
 {% if datetime_imports %}
 from datetime import {{ datetime_imports | join(', ') }}
 {% endif %}
@@ -24,22 +18,16 @@ class {{ base_dao_class_name }}(BaseDao[{{ model_class }}]):
     """
     model = {{ model_class }}
 
-    def create(self, db_session: Session, data: Union[{{ model_class }}, dict]) -> {{ model_class }}:
+    def create(
+        self,
+        db_session: Session,
+        data: Union[{{ model_class }}, dict]
+    ) -> {{ model_class }}:
         """
         {{ model_class }} を登録します。
-
-        Args:
-            db_session (Session): DBセッション
-            data ({{ model_class }} or dict): 保存するインスタンスまたは dict
-
-        Returns:
-            {{ model_class }}: 保存後のインスタンス
         """
         try:
-            if isinstance(data, dict):
-                instance = {{ model_class }}(**data)
-            else:
-                instance = data
+            instance = {{ model_class }}(**data) if isinstance(data, dict) else data
             db_session.add(instance)
             db_session.flush()
             return instance
@@ -47,16 +35,13 @@ class {{ base_dao_class_name }}(BaseDao[{{ model_class }}]):
             db_session.rollback()
             raise RuntimeError(f"[DAO.create] 登録に失敗: {e}") from e
 
-    def delete(self, db_session: Session, instance: {{ model_class }}) -> None:
+    def delete(
+        self,
+        db_session: Session,
+        instance: {{ model_class }}
+    ) -> None:
         """
         {{ model_class }} を削除します。
-
-        Args:
-            db_session (Session): DBセッション
-            instance ({{ model_class }}): 削除するインスタンス
-
-        Returns:
-            None
         """
         try:
             db_session.delete(instance)
@@ -65,18 +50,17 @@ class {{ base_dao_class_name }}(BaseDao[{{ model_class }}]):
             db_session.rollback()
             raise RuntimeError(f"[DAO.delete] 削除に失敗: {e}") from e
 
-    def get_by_key(self, db_session: Session{% for pk in pk_fields %}, {{ pk.name }}: {{ pk.type }}{% endfor %}) -> List[{{ model_class }}]:
-        """
-        {{ model_class }} を指定された主キー条件で取得します。
-
-        Args:
-            db_session (Session): DBセッション
+    def get_by_key(
+        self,
+        db_session: Session,
+        {% if pk_fields|length > 0 %}
         {% for pk in pk_fields %}
-            {{ pk.name }} (Optional[{{ pk.type|default('str') }}]): {{ pk.comment }}
+        {{ pk.name }}: Optional[{{ pk.type|default('Any') }}]{% if not loop.last %}, {% endif %}
         {% endfor %}
-
-        Returns:
-            List[{{ model_class }}]: 条件に一致するレコードのリスト
+        {% endif %}
+    ) -> List[{{ model_class }}]:
+        """
+        {{ model_class }} を主キー条件で取得します。
         """
         query = db_session.query({{ model_class }})
         {% for pk in pk_fields %}
@@ -85,42 +69,61 @@ class {{ base_dao_class_name }}(BaseDao[{{ model_class }}]):
         {% endfor %}
         return query.all()
 
-    def get(self, db_session: Session{% for pk in pk_fields %}, {{ pk.name }}: {{ pk.type }}{% endfor %}) -> Optional[{{ model_class }}]:
+    def get(
+        self,
+        db_session: Session,
+        {% if pk_fields|length > 0 %}
+        {% for pk in pk_fields %}
+        {{ pk.name }}: Optional[{{ pk.type|default('Any') }}]{% if not loop.last %}, {% endif %}
+        {% endfor %}
+        {% endif %}
+    ) -> Optional[{{ model_class }}]:
         """
         主キーで単一取得。
-
-        Returns:
-            Optional[{{ model_class }}]: 該当するインスタンス or None
         """
-        result = self.get_by_key(db_session{% for pk in pk_fields %}, {{ pk.name }}={{ pk.name }}{% endfor %})
+        result = self.get_by_key(
+            db_session
+            {% for pk in pk_fields %}, {{ pk.name }}={{ pk.name }}{% endfor %}
+        )
         return result[0] if result else None
 
-    def get_all(self, db_session: Session, limit: int = 100, offset: int = 0) -> List[{{ model_class }}]:
+    def get_all(
+        self,
+        db_session: Session,
+        limit: int = 100,
+        offset: int = 0
+    ) -> List[{{ model_class }}]:
         """
         全件取得（ページング対応）
-
-        Returns:
-            List[{{ model_class }}]
         """
         return db_session.query({{ model_class }}).limit(limit).offset(offset).all()
 
-    def count(self, db_session: Session) -> int:
+    def count(
+        self,
+        db_session: Session
+    ) -> int:
         """
         総件数カウント
-
-        Returns:
-            int
         """
         return db_session.query(func.count()).select_from({{ model_class }}).scalar()
 
-    def update(self, db_session: Session{% for pk in pk_fields %}, {{ pk.name }}: {{ pk.type|default('str') }}{% endfor %}, update_data: dict) -> Optional[{{ model_class }}]:
+    def update(
+        self,
+        db_session: Session,
+        {% if pk_fields|length > 0 %}
+        {% for pk in pk_fields %}
+        {{ pk.name }}: Optional[{{ pk.type|default('Any') }}]{% if not loop.last %}, {% endif %}
+        {% endfor %}
+        {% endif %},
+        update_data: dict
+    ) -> Optional[{{ model_class }}]:
         """
         主キー一致した1件をupdate（更新フィールドはdict）
-
-        Returns:
-            Optional[{{ model_class }}]: 更新後インスタンス or None
         """
-        results = self.get_by_key(db_session{% for pk in pk_fields %}, {{ pk.name }}={{ pk.name }}{% endfor %})
+        results = self.get_by_key(
+            db_session
+            {% for pk in pk_fields %}, {{ pk.name }}={{ pk.name }}{% endfor %}
+        )
         instance = results[0] if results else None
         if instance:
             for key, value in update_data.items():

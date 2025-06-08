@@ -1,33 +1,27 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional, Union, Any
-from app.daos.base_dao import BaseDao
+from app.daos.base.base_dao import BaseDao
 from app.models.models import Tenants
 
 from datetime import datetime
 
-class BaseTenantsDao(BaseDao[Tenants]):
+class TenantsDaoBase(BaseDao[Tenants]):
     """
     Data Access Object for Tenants.
     """
     model = Tenants
 
-    def create(self, db_session: Session, data: Union[Tenants, dict]) -> Tenants:
+    def create(
+        self,
+        db_session: Session,
+        data: Union[Tenants, dict]
+    ) -> Tenants:
         """
         Tenants を登録します。
-
-        Args:
-            db_session (Session): DBセッション
-            data (Tenants or dict): 保存するインスタンスまたは dict
-
-        Returns:
-            Tenants: 保存後のインスタンス
         """
         try:
-            if isinstance(data, dict):
-                instance = Tenants(**data)
-            else:
-                instance = data
+            instance = Tenants(**data) if isinstance(data, dict) else data
             db_session.add(instance)
             db_session.flush()
             return instance
@@ -35,16 +29,13 @@ class BaseTenantsDao(BaseDao[Tenants]):
             db_session.rollback()
             raise RuntimeError(f"[DAO.create] 登録に失敗: {e}") from e
 
-    def delete(self, db_session: Session, instance: Tenants) -> None:
+    def delete(
+        self,
+        db_session: Session,
+        instance: Tenants
+    ) -> None:
         """
         Tenants を削除します。
-
-        Args:
-            db_session (Session): DBセッション
-            instance (Tenants): 削除するインスタンス
-
-        Returns:
-            None
         """
         try:
             db_session.delete(instance)
@@ -53,58 +44,62 @@ class BaseTenantsDao(BaseDao[Tenants]):
             db_session.rollback()
             raise RuntimeError(f"[DAO.delete] 削除に失敗: {e}") from e
 
-    def get_by_key(self, db_session: Session, id: int) -> List[Tenants]:
+    def get_by_key(
+        self,
+        db_session: Session,
+        id: Optional[int]    ) -> List[Tenants]:
         """
-        Tenants を指定された主キー条件で取得します。
-
-        Args:
-            db_session (Session): DBセッション
-            id (Optional[int]): サロゲートキー
-
-        Returns:
-            List[Tenants]: 条件に一致するレコードのリスト
+        Tenants を主キー条件で取得します。
         """
         query = db_session.query(Tenants)
         if id is not None:
             query = query.filter(Tenants.id == id)
         return query.all()
 
-    def get(self, db_session: Session, id: int) -> Optional[Tenants]:
+    def get(
+        self,
+        db_session: Session,
+        id: Optional[int]    ) -> Optional[Tenants]:
         """
         主キーで単一取得。
-
-        Returns:
-            Optional[Tenants]: 該当するインスタンス or None
         """
-        result = self.get_by_key(db_session, id=id)
+        result = self.get_by_key(
+            db_session
+, id=id        )
         return result[0] if result else None
 
-    def get_all(self, db_session: Session, limit: int = 100, offset: int = 0) -> List[Tenants]:
+    def get_all(
+        self,
+        db_session: Session,
+        limit: int = 100,
+        offset: int = 0
+    ) -> List[Tenants]:
         """
         全件取得（ページング対応）
-
-        Returns:
-            List[Tenants]
         """
         return db_session.query(Tenants).limit(limit).offset(offset).all()
 
-    def count(self, db_session: Session) -> int:
+    def count(
+        self,
+        db_session: Session
+    ) -> int:
         """
         総件数カウント
-
-        Returns:
-            int
         """
         return db_session.query(func.count()).select_from(Tenants).scalar()
 
-    def update(self, db_session: Session, id: int, update_data: dict) -> Optional[Tenants]:
+    def update(
+        self,
+        db_session: Session,
+        id: Optional[int],
+        update_data: dict
+    ) -> Optional[Tenants]:
         """
         主キー一致した1件をupdate（更新フィールドはdict）
-
-        Returns:
-            Optional[Tenants]: 更新後インスタンス or None
         """
-        results = self.get_by_key(db_session, id=id)
+        results = self.get_by_key(
+            db_session
+, id=id        )
         instance = results[0] if results else None
         if instance:
             for key, value in update_data.items():

@@ -6,6 +6,8 @@ import inspect
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -85,7 +87,7 @@ for original_name, model_cls in model_classes:
     model_snake = to_snake_case(original_name)
     model_pascal = original_name
 
-    base_dao_class_name = f"Base{model_pascal}Dao"
+    base_dao_class_name = f"{model_pascal}DaoBase"
     dao_class_name = f"{model_pascal}Dao"
 
     pk_fields = get_pk_fields_with_comments(model_cls)

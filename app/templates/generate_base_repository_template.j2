@@ -1,0 +1,11 @@
+from {{ dao_import_path }} import {{ dao_class_name }}
+from {{ model_import_path }} import {{ model_class_name }}
+from app.repositories.base.base_repository import BaseRepository
+
+class {{ repository_base_class_name }}(BaseRepository):
+    def __init__(self, dao: Optional[{{ dao_class_name }}] = None):
+        self.dao = dao or {{ dao_class_name }}()
+{% for method in dao_methods %}
+    def {{ method.name }}(self, {{ method.args|join(', ') }}):
+        return self.dao.{{ method.name }}({{ method.args|join(', ') }})
+{% endfor %}

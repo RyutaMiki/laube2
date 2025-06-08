@@ -86,7 +86,7 @@ class Group(Base):
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __table_args__ = (
-        Index('ix_m_group', tenant_uuid),
+        Index('ix_m_grouptenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, group_code)
     )
 
@@ -112,8 +112,8 @@ class Boss(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_boss_tenant_uuid_group_code_user_uuid_application_form_code', tenant_uuid, group_code, user_uuid, application_form_code),
-        Index('ix_m_boss', tenant_uuid),
+        Index('ix_m_bosstenant_uuid_group_code_user_uuid_application_form_code', tenant_uuid, group_code, user_uuid, application_form_code),
+        Index('ix_m_bosstenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, group_code, user_uuid, application_form_code)
     )
 
@@ -139,7 +139,7 @@ class DeputyApprovel(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_deputy_approvel', tenant_uuid),
+        Index('ix_m_deputy_approveltenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, group_code, user_uuid)
     )
 
@@ -218,8 +218,8 @@ class ApplicationForm(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_application_form', tenant_uuid),
-        Index('ix_m_application_form', application_form_code),
+        Index('ix_m_application_formtenant_uuid', tenant_uuid),
+        Index('ix_m_application_formapplication_form_code', application_form_code),
         UniqueConstraint(tenant_uuid, application_form_code),
         UniqueConstraint(tenant_uuid, application_form_name),
         UniqueConstraint(tenant_uuid, table_name)
@@ -245,7 +245,7 @@ class ApplicationFormRoute(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_application_form_route', tenant_uuid),
+        Index('ix_m_application_form_routetenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, application_form_code, group_code)
     )
 
@@ -267,8 +267,8 @@ class IndividualRoute(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_individual_route_tenant_uuid_individual_route_code', tenant_uuid, individual_route_code),
-        Index('ix_m_individual_route', tenant_uuid),
+        Index('ix_m_individual_routetenant_uuid_individual_route_code', tenant_uuid, individual_route_code),
+        Index('ix_m_individual_routetenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, individual_route_code),
         UniqueConstraint(tenant_uuid, individual_route_name)
     )
@@ -297,9 +297,9 @@ class IndividualActivity(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_individual_activity_tenant_uuid_individual_route_code', tenant_uuid, individual_route_code),
-        Index('ix_m_individual_activity_tenant_uuid_approverl_role_code', tenant_uuid, approverl_role_code),
-        Index('ix_m_individual_activity', tenant_uuid),
+        Index('ix_m_individual_activitytenant_uuid_individual_route_code', tenant_uuid, individual_route_code),
+        Index('ix_m_individual_activitytenant_uuid_approverl_role_code', tenant_uuid, approverl_role_code),
+        Index('ix_m_individual_activitytenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, individual_route_code, activity_code)
     )
 
@@ -321,8 +321,8 @@ class CommonRoute(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_common_route_tenant_uuid_common_route_code', tenant_uuid, common_route_code),
-        Index('ix_m_common_route', tenant_uuid),
+        Index('ix_m_common_routetenant_uuid_common_route_code', tenant_uuid, common_route_code),
+        Index('ix_m_common_routetenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, common_route_code),
         UniqueConstraint(tenant_uuid, common_route_name)
     )
@@ -350,10 +350,10 @@ class CommonActivity(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_m_common_activity_tenant_uuid_common_route_code_activity_code', tenant_uuid, common_route_code, activity_code),
-        Index('ix_m_common_activity_tenant_uuid_common_route_code', tenant_uuid, common_route_code),
-        Index('ix_m_common_activity_tenant_uuid_approverl_role_code', tenant_uuid, approverl_role_code),
-        Index('ix_m_common_activity', tenant_uuid),
+        Index('ix_m_common_activitytenant_uuid_common_route_code_activity_code', tenant_uuid, common_route_code, activity_code),
+        Index('ix_m_common_activitytenant_uuid_common_route_code', tenant_uuid, common_route_code),
+        Index('ix_m_common_activitytenant_uuid_approverl_role_code', tenant_uuid, approverl_role_code),
+        Index('ix_m_common_activitytenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, common_route_code, activity_code)
     )
 
@@ -388,7 +388,7 @@ class ApplicationObject(Base):
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __table_args__ = (
-        Index('ix_t_application_object', tenant_uuid),
+        Index('ix_t_application_objecttenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, application_number)
     )
 
@@ -440,8 +440,8 @@ class ActivityObject(Base):
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
     __table_args__ = (
-        Index('ix_t_activity_object_tenant_uuid_application_number', tenant_uuid, application_number),
-        Index('ix_t_activity_object', tenant_uuid),
+        Index('ix_t_activity_objecttenant_uuid_application_number', tenant_uuid, application_number),
+        Index('ix_t_activity_objecttenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, application_number, route_type, route_number, approverl_tenant_uuid, approverl_group_code, approverl_user_uuid)
     )
 
@@ -471,8 +471,8 @@ class Appended(Base):
     __mapper_args__ = {
         'version_id_col': "update_count"    }
     __table_args__ = (
-        Index('ix_t_appended_tenant_uuid_application_number', tenant_uuid, application_number),
-        Index('ix_t_appended', tenant_uuid),
+        Index('ix_t_appendedtenant_uuid_application_number', tenant_uuid, application_number),
+        Index('ix_t_appendedtenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, application_number, route_type, route_number)
     )
 

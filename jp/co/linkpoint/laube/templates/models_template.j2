@@ -82,8 +82,8 @@ class {{ model.class_name }}({{ model.inherits if model.inherits else "Base" }})
 {% set tbl_args = [] %}
 {%- if model.indexes %}
     {%- for idx in model.indexes %}
-        {%- set idx_name = 'ix_' ~ model.table_name ~ ('' if idx|length == 1 else '_' ~ idx | join('_')) %}
-        {%- set cols = idx | map('string') | join(', ') %}
+        {%- set idx_name = 'ix_' ~ model.table_name ~ (idx | join('_')) %}
+        {%- set cols = idx | join(', ') %}
         {%- set _ = tbl_args.append("Index('" ~ idx_name ~ "', " ~ cols ~ ")") %}
     {%- endfor %}
 {%- endif %}

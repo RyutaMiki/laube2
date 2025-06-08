@@ -63,7 +63,10 @@ def generate_base_repository_for_dao(dao_module_path, dao_class_name, model_impo
     dao_class = getattr(dao_module, dao_class_name)
     dao_methods = get_public_methods(dao_class)
 
-    repository_base_class_name = f"{dao_class_name.replace('Dao', 'RepositoryBase')}"
+    # ★ここで正規化して「BaseBase」にならないように！
+    repository_base_class_name = dao_class_name.replace("DaoBase", "RepositoryBase").replace("Dao", "RepositoryBase")
+    repository_base_class_name = repository_base_class_name.replace("BaseBase", "Base")
+
     repository_base_file_name = camel_to_snake(repository_base_class_name)
     params = {
         "dao_import_path": dao_module_path,
@@ -75,6 +78,10 @@ def generate_base_repository_for_dao(dao_module_path, dao_class_name, model_impo
         "dao_methods": dao_methods,
     }
     content = render_template("generate_base_repository_template.j2", params)
+
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(content)
+    print(f"[OK] BaseRepository生成: {output_file}")
 
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(content)

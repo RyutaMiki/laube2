@@ -1,10 +1,11 @@
-from app.daos.route_history_dao import RouteHistoryDao
+from typing import Optional
+from app.daos.base.route_history_dao_base import RouteHistoryDaoBase
 from app.models.models import RouteHistory
 from app.repositories.base.base_repository import BaseRepository
 
 class RouteHistoryRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[RouteHistoryDao] = None):
-        self.dao = dao or RouteHistoryDao()
+    def __init__(self, dao: Optional[RouteHistoryDaoBase] = None):
+        self.dao = dao or RouteHistoryDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

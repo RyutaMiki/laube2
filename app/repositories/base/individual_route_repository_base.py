@@ -1,10 +1,11 @@
-from app.daos.individual_route_dao import IndividualRouteDao
+from typing import Optional
+from app.daos.base.individual_route_dao_base import IndividualRouteDaoBase
 from app.models.models import IndividualRoute
 from app.repositories.base.base_repository import BaseRepository
 
 class IndividualRouteRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[IndividualRouteDao] = None):
-        self.dao = dao or IndividualRouteDao()
+    def __init__(self, dao: Optional[IndividualRouteDaoBase] = None):
+        self.dao = dao or IndividualRouteDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

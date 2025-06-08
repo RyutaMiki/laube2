@@ -1,10 +1,11 @@
-from app.daos.application_form_route_dao import ApplicationFormRouteDao
+from typing import Optional
+from app.daos.base.application_form_route_dao_base import ApplicationFormRouteDaoBase
 from app.models.models import ApplicationFormRoute
 from app.repositories.base.base_repository import BaseRepository
 
 class ApplicationFormRouteRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[ApplicationFormRouteDao] = None):
-        self.dao = dao or ApplicationFormRouteDao()
+    def __init__(self, dao: Optional[ApplicationFormRouteDaoBase] = None):
+        self.dao = dao or ApplicationFormRouteDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

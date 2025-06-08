@@ -1,10 +1,11 @@
-from app.daos.activity_object_dao import ActivityObjectDao
+from typing import Optional
+from app.daos.base.activity_object_dao_base import ActivityObjectDaoBase
 from app.models.models import ActivityObject
 from app.repositories.base.base_repository import BaseRepository
 
 class ActivityObjectRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[ActivityObjectDao] = None):
-        self.dao = dao or ActivityObjectDao()
+    def __init__(self, dao: Optional[ActivityObjectDaoBase] = None):
+        self.dao = dao or ActivityObjectDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

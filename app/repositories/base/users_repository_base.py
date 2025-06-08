@@ -1,10 +1,11 @@
-from app.daos.users_dao import UsersDao
+from typing import Optional
+from app.daos.base.users_dao_base import UsersDaoBase
 from app.models.models import Users
 from app.repositories.base.base_repository import BaseRepository
 
 class UsersRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[UsersDao] = None):
-        self.dao = dao or UsersDao()
+    def __init__(self, dao: Optional[UsersDaoBase] = None):
+        self.dao = dao or UsersDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

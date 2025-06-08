@@ -1,10 +1,11 @@
-from app.daos.common_route_dao import CommonRouteDao
+from typing import Optional
+from app.daos.base.common_route_dao_base import CommonRouteDaoBase
 from app.models.models import CommonRoute
 from app.repositories.base.base_repository import BaseRepository
 
 class CommonRouteRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[CommonRouteDao] = None):
-        self.dao = dao or CommonRouteDao()
+    def __init__(self, dao: Optional[CommonRouteDaoBase] = None):
+        self.dao = dao or CommonRouteDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

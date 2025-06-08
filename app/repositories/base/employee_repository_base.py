@@ -1,10 +1,11 @@
-from app.daos.employee_dao import EmployeeDao
+from typing import Optional
+from app.daos.base.employee_dao_base import EmployeeDaoBase
 from app.models.models import Employee
 from app.repositories.base.base_repository import BaseRepository
 
 class EmployeeRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[EmployeeDao] = None):
-        self.dao = dao or EmployeeDao()
+    def __init__(self, dao: Optional[EmployeeDaoBase] = None):
+        self.dao = dao or EmployeeDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

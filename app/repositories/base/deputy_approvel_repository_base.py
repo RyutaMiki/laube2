@@ -1,10 +1,11 @@
-from app.daos.deputy_approvel_dao import DeputyApprovelDao
+from typing import Optional
+from app.daos.base.deputy_approvel_dao_base import DeputyApprovelDaoBase
 from app.models.models import DeputyApprovel
 from app.repositories.base.base_repository import BaseRepository
 
 class DeputyApprovelRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[DeputyApprovelDao] = None):
-        self.dao = dao or DeputyApprovelDao()
+    def __init__(self, dao: Optional[DeputyApprovelDaoBase] = None):
+        self.dao = dao or DeputyApprovelDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

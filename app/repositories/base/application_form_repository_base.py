@@ -1,10 +1,11 @@
-from app.daos.application_form_dao import ApplicationFormDao
+from typing import Optional
+from app.daos.base.application_form_dao_base import ApplicationFormDaoBase
 from app.models.models import ApplicationForm
 from app.repositories.base.base_repository import BaseRepository
 
 class ApplicationFormRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[ApplicationFormDao] = None):
-        self.dao = dao or ApplicationFormDao()
+    def __init__(self, dao: Optional[ApplicationFormDaoBase] = None):
+        self.dao = dao or ApplicationFormDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

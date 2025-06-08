@@ -1,3 +1,4 @@
+from typing import Optional, Any, List
 from app.repositories.base.application_object_repository_base import ApplicationObjectRepositoryBase
 
 class ApplicationObjectRepository(ApplicationObjectRepositoryBase):

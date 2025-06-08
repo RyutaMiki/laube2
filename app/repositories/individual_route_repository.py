@@ -1,3 +1,4 @@
+from typing import Optional, Any, List
 from app.repositories.base.individual_route_repository_base import IndividualRouteRepositoryBase
 
 class IndividualRouteRepository(IndividualRouteRepositoryBase):

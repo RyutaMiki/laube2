@@ -1,10 +1,11 @@
-from app.daos.tenants_dao import TenantsDao
+from typing import Optional
+from app.daos.base.tenants_dao_base import TenantsDaoBase
 from app.models.models import Tenants
 from app.repositories.base.base_repository import BaseRepository
 
 class TenantsRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[TenantsDao] = None):
-        self.dao = dao or TenantsDao()
+    def __init__(self, dao: Optional[TenantsDaoBase] = None):
+        self.dao = dao or TenantsDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

@@ -1,3 +1,4 @@
+from typing import Optional, Any, List
 from app.repositories.base.common_activity_repository_base import CommonActivityRepositoryBase
 
 class CommonActivityRepository(CommonActivityRepositoryBase):

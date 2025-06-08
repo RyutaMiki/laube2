@@ -1,10 +1,11 @@
-from app.daos.common_activity_dao import CommonActivityDao
+from typing import Optional
+from app.daos.base.common_activity_dao_base import CommonActivityDaoBase
 from app.models.models import CommonActivity
 from app.repositories.base.base_repository import BaseRepository
 
 class CommonActivityRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[CommonActivityDao] = None):
-        self.dao = dao or CommonActivityDao()
+    def __init__(self, dao: Optional[CommonActivityDaoBase] = None):
+        self.dao = dao or CommonActivityDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

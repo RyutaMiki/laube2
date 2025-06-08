@@ -1,10 +1,11 @@
-from app.daos.application_classification_format_dao import ApplicationClassificationFormatDao
+from typing import Optional
+from app.daos.base.application_classification_format_dao_base import ApplicationClassificationFormatDaoBase
 from app.models.models import ApplicationClassificationFormat
 from app.repositories.base.base_repository import BaseRepository
 
 class ApplicationClassificationFormatRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[ApplicationClassificationFormatDao] = None):
-        self.dao = dao or ApplicationClassificationFormatDao()
+    def __init__(self, dao: Optional[ApplicationClassificationFormatDaoBase] = None):
+        self.dao = dao or ApplicationClassificationFormatDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

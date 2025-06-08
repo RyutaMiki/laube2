@@ -1,10 +1,11 @@
-from app.daos.boss_dao import BossDao
+from typing import Optional
+from app.daos.base.boss_dao_base import BossDaoBase
 from app.models.models import Boss
 from app.repositories.base.base_repository import BaseRepository
 
 class BossRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[BossDao] = None):
-        self.dao = dao or BossDao()
+    def __init__(self, dao: Optional[BossDaoBase] = None):
+        self.dao = dao or BossDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

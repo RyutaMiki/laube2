@@ -1,3 +1,4 @@
+from typing import Optional, Any, List
 from app.repositories.base.application_form_format_repository_base import ApplicationFormFormatRepositoryBase
 
 class ApplicationFormFormatRepository(ApplicationFormFormatRepositoryBase):

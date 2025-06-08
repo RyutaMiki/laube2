@@ -1,3 +1,4 @@
+from typing import Optional, Any, List
 from app.repositories.base.activity_transit_repository_base import ActivityTransitRepositoryBase
 
 class ActivityTransitRepository(ActivityTransitRepositoryBase):

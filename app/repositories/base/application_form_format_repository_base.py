@@ -1,10 +1,11 @@
-from app.daos.application_form_format_dao import ApplicationFormFormatDao
+from typing import Optional
+from app.daos.base.application_form_format_dao_base import ApplicationFormFormatDaoBase
 from app.models.models import ApplicationFormFormat
 from app.repositories.base.base_repository import BaseRepository
 
 class ApplicationFormFormatRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[ApplicationFormFormatDao] = None):
-        self.dao = dao or ApplicationFormFormatDao()
+    def __init__(self, dao: Optional[ApplicationFormFormatDaoBase] = None):
+        self.dao = dao or ApplicationFormFormatDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

@@ -1,10 +1,11 @@
-from app.daos.group_dao import GroupDao
+from typing import Optional
+from app.daos.base.group_dao_base import GroupDaoBase
 from app.models.models import Group
 from app.repositories.base.base_repository import BaseRepository
 
 class GroupRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[GroupDao] = None):
-        self.dao = dao or GroupDao()
+    def __init__(self, dao: Optional[GroupDaoBase] = None):
+        self.dao = dao or GroupDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

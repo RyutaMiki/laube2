@@ -1,10 +1,11 @@
-from app.daos.activity_transit_dao import ActivityTransitDao
+from typing import Optional
+from app.daos.base.activity_transit_dao_base import ActivityTransitDaoBase
 from app.models.models import ActivityTransit
 from app.repositories.base.base_repository import BaseRepository
 
 class ActivityTransitRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[ActivityTransitDao] = None):
-        self.dao = dao or ActivityTransitDao()
+    def __init__(self, dao: Optional[ActivityTransitDaoBase] = None):
+        self.dao = dao or ActivityTransitDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

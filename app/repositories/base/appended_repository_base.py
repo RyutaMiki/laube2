@@ -1,10 +1,11 @@
-from app.daos.appended_dao import AppendedDao
+from typing import Optional
+from app.daos.base.appended_dao_base import AppendedDaoBase
 from app.models.models import Appended
 from app.repositories.base.base_repository import BaseRepository
 
 class AppendedRepositoryBase(BaseRepository):
-    def __init__(self, dao: Optional[AppendedDao] = None):
-        self.dao = dao or AppendedDao()
+    def __init__(self, dao: Optional[AppendedDaoBase] = None):
+        self.dao = dao or AppendedDaoBase()
     def count(self, db_session):
         return self.dao.count(db_session)
     def create(self, db_session, data):

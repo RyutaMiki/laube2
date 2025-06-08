@@ -9,6 +9,7 @@ from datetime import datetime, date
 class EmployeeDaoBase(BaseDao[Employee]):
     """
     Data Access Object for Employee.
+    Provides CRUD operations and utility methods for Employee table.
     """
     model = Employee
 
@@ -18,7 +19,17 @@ class EmployeeDaoBase(BaseDao[Employee]):
         data: Union[Employee, dict]
     ) -> Employee:
         """
-        Employee を登録します。
+        Create a new Employee record in the database.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            data (Union[Employee, dict]): Data to create the record. Accepts model instance or dictionary.
+
+        Returns:
+            Employee: The created Employee instance.
+
+        Raises:
+            RuntimeError: If the creation fails.
         """
         try:
             instance = Employee(**data) if isinstance(data, dict) else data
@@ -27,7 +38,7 @@ class EmployeeDaoBase(BaseDao[Employee]):
             return instance
         except Exception as e:
             db_session.rollback()
-            raise RuntimeError(f"[DAO.create] 登録に失敗: {e}") from e
+            raise RuntimeError(f"[DAO.create] Failed to create: {e}") from e
 
     def delete(
         self,
@@ -35,21 +46,38 @@ class EmployeeDaoBase(BaseDao[Employee]):
         instance: Employee
     ) -> None:
         """
-        Employee を削除します。
+        Delete the specified Employee instance from the database.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            instance (Employee): The instance to be deleted.
+
+        Returns:
+            None
+
+        Raises:
+            RuntimeError: If the deletion fails.
         """
         try:
             db_session.delete(instance)
             db_session.flush()
         except Exception as e:
             db_session.rollback()
-            raise RuntimeError(f"[DAO.delete] 削除に失敗: {e}") from e
+            raise RuntimeError(f"[DAO.delete] Failed to delete: {e}") from e
 
     def get_by_key(
         self,
         db_session: Session,
         id: Optional[int]    ) -> List[Employee]:
         """
-        Employee を主キー条件で取得します。
+        Retrieve records matching the given primary key conditions.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            id (Optional[int]): Primary key field.
+
+        Returns:
+            List[Employee]: List of matching records.
         """
         query = db_session.query(Employee)
         if id is not None:
@@ -61,7 +89,14 @@ class EmployeeDaoBase(BaseDao[Employee]):
         db_session: Session,
         id: Optional[int]    ) -> Optional[Employee]:
         """
-        主キーで単一取得。
+        Retrieve a single record by primary key.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            id (Optional[int]): Primary key field.
+
+        Returns:
+            Optional[Employee]: The matched record, or None if not found.
         """
         result = self.get_by_key(
             db_session
@@ -75,7 +110,15 @@ class EmployeeDaoBase(BaseDao[Employee]):
         offset: int = 0
     ) -> List[Employee]:
         """
-        全件取得（ページング対応）
+        Retrieve all records with optional pagination.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            limit (int): Maximum number of records to retrieve.
+            offset (int): Starting position of the query.
+
+        Returns:
+            List[Employee]: List of retrieved records.
         """
         return db_session.query(Employee).limit(limit).offset(offset).all()
 
@@ -84,7 +127,13 @@ class EmployeeDaoBase(BaseDao[Employee]):
         db_session: Session
     ) -> int:
         """
-        総件数カウント
+        Count total number of records in the table.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+
+        Returns:
+            int: Total number of records.
         """
         return db_session.query(func.count()).select_from(Employee).scalar()
 
@@ -95,7 +144,15 @@ class EmployeeDaoBase(BaseDao[Employee]):
         update_data: dict
     ) -> Optional[Employee]:
         """
-        主キー一致した1件をupdate（更新フィールドはdict）
+        Update a record matching the given primary key with provided data.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            id (Optional[int]): Primary key field.
+            update_data (dict): Fields to update and their new values.
+
+        Returns:
+            Optional[Employee]: The updated instance, or None if not found.
         """
         results = self.get_by_key(
             db_session

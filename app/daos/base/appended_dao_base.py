@@ -9,6 +9,7 @@ from datetime import datetime
 class AppendedDaoBase(BaseDao[Appended]):
     """
     Data Access Object for Appended.
+    Provides CRUD operations and utility methods for Appended table.
     """
     model = Appended
 
@@ -18,7 +19,17 @@ class AppendedDaoBase(BaseDao[Appended]):
         data: Union[Appended, dict]
     ) -> Appended:
         """
-        Appended を登録します。
+        Create a new Appended record in the database.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            data (Union[Appended, dict]): Data to create the record. Accepts model instance or dictionary.
+
+        Returns:
+            Appended: The created Appended instance.
+
+        Raises:
+            RuntimeError: If the creation fails.
         """
         try:
             instance = Appended(**data) if isinstance(data, dict) else data
@@ -27,7 +38,7 @@ class AppendedDaoBase(BaseDao[Appended]):
             return instance
         except Exception as e:
             db_session.rollback()
-            raise RuntimeError(f"[DAO.create] 登録に失敗: {e}") from e
+            raise RuntimeError(f"[DAO.create] Failed to create: {e}") from e
 
     def delete(
         self,
@@ -35,21 +46,38 @@ class AppendedDaoBase(BaseDao[Appended]):
         instance: Appended
     ) -> None:
         """
-        Appended を削除します。
+        Delete the specified Appended instance from the database.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            instance (Appended): The instance to be deleted.
+
+        Returns:
+            None
+
+        Raises:
+            RuntimeError: If the deletion fails.
         """
         try:
             db_session.delete(instance)
             db_session.flush()
         except Exception as e:
             db_session.rollback()
-            raise RuntimeError(f"[DAO.delete] 削除に失敗: {e}") from e
+            raise RuntimeError(f"[DAO.delete] Failed to delete: {e}") from e
 
     def get_by_key(
         self,
         db_session: Session,
         id: Optional[int]    ) -> List[Appended]:
         """
-        Appended を主キー条件で取得します。
+        Retrieve records matching the given primary key conditions.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            id (Optional[int]): Primary key field.
+
+        Returns:
+            List[Appended]: List of matching records.
         """
         query = db_session.query(Appended)
         if id is not None:
@@ -61,7 +89,14 @@ class AppendedDaoBase(BaseDao[Appended]):
         db_session: Session,
         id: Optional[int]    ) -> Optional[Appended]:
         """
-        主キーで単一取得。
+        Retrieve a single record by primary key.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            id (Optional[int]): Primary key field.
+
+        Returns:
+            Optional[Appended]: The matched record, or None if not found.
         """
         result = self.get_by_key(
             db_session
@@ -75,7 +110,15 @@ class AppendedDaoBase(BaseDao[Appended]):
         offset: int = 0
     ) -> List[Appended]:
         """
-        全件取得（ページング対応）
+        Retrieve all records with optional pagination.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            limit (int): Maximum number of records to retrieve.
+            offset (int): Starting position of the query.
+
+        Returns:
+            List[Appended]: List of retrieved records.
         """
         return db_session.query(Appended).limit(limit).offset(offset).all()
 
@@ -84,7 +127,13 @@ class AppendedDaoBase(BaseDao[Appended]):
         db_session: Session
     ) -> int:
         """
-        総件数カウント
+        Count total number of records in the table.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+
+        Returns:
+            int: Total number of records.
         """
         return db_session.query(func.count()).select_from(Appended).scalar()
 
@@ -95,7 +144,15 @@ class AppendedDaoBase(BaseDao[Appended]):
         update_data: dict
     ) -> Optional[Appended]:
         """
-        主キー一致した1件をupdate（更新フィールドはdict）
+        Update a record matching the given primary key with provided data.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            id (Optional[int]): Primary key field.
+            update_data (dict): Fields to update and their new values.
+
+        Returns:
+            Optional[Appended]: The updated instance, or None if not found.
         """
         results = self.get_by_key(
             db_session

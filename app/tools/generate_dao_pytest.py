@@ -6,10 +6,10 @@ from pathlib import Path
 from jinja2 import Template as JinjaTemplate
 
 # === パス・env設定 ===
-sys.path.insert(0, os.getenv("PROJECT_DIR") or "d:/git/laube2")
+sys.path.insert(0, os.getenv("PROJECT_DIR") or "c:/git/laube2")
 from dotenv import load_dotenv
 load_dotenv()
-PROJECT_DIR = Path(os.getenv("PROJECT_DIR") or "d:/git/laube2")
+PROJECT_DIR = Path(os.getenv("PROJECT_DIR") or "c:/git/laube2")
 MODELS_FILE = PROJECT_DIR / "models" / "models.py"
 
 # models.pyをimport

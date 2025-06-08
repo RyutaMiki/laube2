@@ -9,12 +9,12 @@ print("Python version:", sys.version)
 print("SQLAlchemy version:", sqlalchemy.__version__)
 
 # ==== プロジェクトのパスを設定 ====
-sys.path.insert(0, os.getenv("PROJECT_DIR") or "d:/git/laube2")
+sys.path.insert(0, os.getenv("PROJECT_DIR") or "c:/git/laube2")
 
 # ==== models.py のパス設定 ====
 from dotenv import load_dotenv
 load_dotenv()
-PROJECT_DIR = Path(os.getenv("PROJECT_DIR") or "d:/git/laube2")
+PROJECT_DIR = Path(os.getenv("PROJECT_DIR") or "c:/git/laube2")
 MODELS_FILE = PROJECT_DIR / "jp" / "co" / "linkpoint" / "laube" / "daos" / "base" / "models.py"
 
 # ==== models.py 読み込み ====

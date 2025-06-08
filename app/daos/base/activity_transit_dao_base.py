@@ -9,6 +9,7 @@ from datetime import datetime
 class ActivityTransitDaoBase(BaseDao[ActivityTransit]):
     """
     Data Access Object for ActivityTransit.
+    Provides CRUD operations and utility methods for ActivityTransit table.
     """
     model = ActivityTransit
 
@@ -18,7 +19,17 @@ class ActivityTransitDaoBase(BaseDao[ActivityTransit]):
         data: Union[ActivityTransit, dict]
     ) -> ActivityTransit:
         """
-        ActivityTransit を登録します。
+        Create a new ActivityTransit record in the database.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            data (Union[ActivityTransit, dict]): Data to create the record. Accepts model instance or dictionary.
+
+        Returns:
+            ActivityTransit: The created ActivityTransit instance.
+
+        Raises:
+            RuntimeError: If the creation fails.
         """
         try:
             instance = ActivityTransit(**data) if isinstance(data, dict) else data
@@ -27,7 +38,7 @@ class ActivityTransitDaoBase(BaseDao[ActivityTransit]):
             return instance
         except Exception as e:
             db_session.rollback()
-            raise RuntimeError(f"[DAO.create] 登録に失敗: {e}") from e
+            raise RuntimeError(f"[DAO.create] Failed to create: {e}") from e
 
     def delete(
         self,
@@ -35,21 +46,38 @@ class ActivityTransitDaoBase(BaseDao[ActivityTransit]):
         instance: ActivityTransit
     ) -> None:
         """
-        ActivityTransit を削除します。
+        Delete the specified ActivityTransit instance from the database.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            instance (ActivityTransit): The instance to be deleted.
+
+        Returns:
+            None
+
+        Raises:
+            RuntimeError: If the deletion fails.
         """
         try:
             db_session.delete(instance)
             db_session.flush()
         except Exception as e:
             db_session.rollback()
-            raise RuntimeError(f"[DAO.delete] 削除に失敗: {e}") from e
+            raise RuntimeError(f"[DAO.delete] Failed to delete: {e}") from e
 
     def get_by_key(
         self,
         db_session: Session,
         id: Optional[int]    ) -> List[ActivityTransit]:
         """
-        ActivityTransit を主キー条件で取得します。
+        Retrieve records matching the given primary key conditions.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            id (Optional[int]): Primary key field.
+
+        Returns:
+            List[ActivityTransit]: List of matching records.
         """
         query = db_session.query(ActivityTransit)
         if id is not None:
@@ -61,7 +89,14 @@ class ActivityTransitDaoBase(BaseDao[ActivityTransit]):
         db_session: Session,
         id: Optional[int]    ) -> Optional[ActivityTransit]:
         """
-        主キーで単一取得。
+        Retrieve a single record by primary key.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            id (Optional[int]): Primary key field.
+
+        Returns:
+            Optional[ActivityTransit]: The matched record, or None if not found.
         """
         result = self.get_by_key(
             db_session
@@ -75,7 +110,15 @@ class ActivityTransitDaoBase(BaseDao[ActivityTransit]):
         offset: int = 0
     ) -> List[ActivityTransit]:
         """
-        全件取得（ページング対応）
+        Retrieve all records with optional pagination.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            limit (int): Maximum number of records to retrieve.
+            offset (int): Starting position of the query.
+
+        Returns:
+            List[ActivityTransit]: List of retrieved records.
         """
         return db_session.query(ActivityTransit).limit(limit).offset(offset).all()
 
@@ -84,7 +127,13 @@ class ActivityTransitDaoBase(BaseDao[ActivityTransit]):
         db_session: Session
     ) -> int:
         """
-        総件数カウント
+        Count total number of records in the table.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+
+        Returns:
+            int: Total number of records.
         """
         return db_session.query(func.count()).select_from(ActivityTransit).scalar()
 
@@ -95,7 +144,15 @@ class ActivityTransitDaoBase(BaseDao[ActivityTransit]):
         update_data: dict
     ) -> Optional[ActivityTransit]:
         """
-        主キー一致した1件をupdate（更新フィールドはdict）
+        Update a record matching the given primary key with provided data.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            id (Optional[int]): Primary key field.
+            update_data (dict): Fields to update and their new values.
+
+        Returns:
+            Optional[ActivityTransit]: The updated instance, or None if not found.
         """
         results = self.get_by_key(
             db_session

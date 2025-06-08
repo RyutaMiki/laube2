@@ -9,6 +9,7 @@ from datetime import datetime
 class ApplicationFormFormatDaoBase(BaseDao[ApplicationFormFormat]):
     """
     Data Access Object for ApplicationFormFormat.
+    Provides CRUD operations and utility methods for ApplicationFormFormat table.
     """
     model = ApplicationFormFormat
 
@@ -18,7 +19,17 @@ class ApplicationFormFormatDaoBase(BaseDao[ApplicationFormFormat]):
         data: Union[ApplicationFormFormat, dict]
     ) -> ApplicationFormFormat:
         """
-        ApplicationFormFormat を登録します。
+        Create a new ApplicationFormFormat record in the database.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            data (Union[ApplicationFormFormat, dict]): Data to create the record. Accepts model instance or dictionary.
+
+        Returns:
+            ApplicationFormFormat: The created ApplicationFormFormat instance.
+
+        Raises:
+            RuntimeError: If the creation fails.
         """
         try:
             instance = ApplicationFormFormat(**data) if isinstance(data, dict) else data
@@ -27,7 +38,7 @@ class ApplicationFormFormatDaoBase(BaseDao[ApplicationFormFormat]):
             return instance
         except Exception as e:
             db_session.rollback()
-            raise RuntimeError(f"[DAO.create] 登録に失敗: {e}") from e
+            raise RuntimeError(f"[DAO.create] Failed to create: {e}") from e
 
     def delete(
         self,
@@ -35,21 +46,38 @@ class ApplicationFormFormatDaoBase(BaseDao[ApplicationFormFormat]):
         instance: ApplicationFormFormat
     ) -> None:
         """
-        ApplicationFormFormat を削除します。
+        Delete the specified ApplicationFormFormat instance from the database.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            instance (ApplicationFormFormat): The instance to be deleted.
+
+        Returns:
+            None
+
+        Raises:
+            RuntimeError: If the deletion fails.
         """
         try:
             db_session.delete(instance)
             db_session.flush()
         except Exception as e:
             db_session.rollback()
-            raise RuntimeError(f"[DAO.delete] 削除に失敗: {e}") from e
+            raise RuntimeError(f"[DAO.delete] Failed to delete: {e}") from e
 
     def get_by_key(
         self,
         db_session: Session,
         id: Optional[int]    ) -> List[ApplicationFormFormat]:
         """
-        ApplicationFormFormat を主キー条件で取得します。
+        Retrieve records matching the given primary key conditions.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            id (Optional[int]): Primary key field.
+
+        Returns:
+            List[ApplicationFormFormat]: List of matching records.
         """
         query = db_session.query(ApplicationFormFormat)
         if id is not None:
@@ -61,7 +89,14 @@ class ApplicationFormFormatDaoBase(BaseDao[ApplicationFormFormat]):
         db_session: Session,
         id: Optional[int]    ) -> Optional[ApplicationFormFormat]:
         """
-        主キーで単一取得。
+        Retrieve a single record by primary key.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            id (Optional[int]): Primary key field.
+
+        Returns:
+            Optional[ApplicationFormFormat]: The matched record, or None if not found.
         """
         result = self.get_by_key(
             db_session
@@ -75,7 +110,15 @@ class ApplicationFormFormatDaoBase(BaseDao[ApplicationFormFormat]):
         offset: int = 0
     ) -> List[ApplicationFormFormat]:
         """
-        全件取得（ページング対応）
+        Retrieve all records with optional pagination.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            limit (int): Maximum number of records to retrieve.
+            offset (int): Starting position of the query.
+
+        Returns:
+            List[ApplicationFormFormat]: List of retrieved records.
         """
         return db_session.query(ApplicationFormFormat).limit(limit).offset(offset).all()
 
@@ -84,7 +127,13 @@ class ApplicationFormFormatDaoBase(BaseDao[ApplicationFormFormat]):
         db_session: Session
     ) -> int:
         """
-        総件数カウント
+        Count total number of records in the table.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+
+        Returns:
+            int: Total number of records.
         """
         return db_session.query(func.count()).select_from(ApplicationFormFormat).scalar()
 
@@ -95,7 +144,15 @@ class ApplicationFormFormatDaoBase(BaseDao[ApplicationFormFormat]):
         update_data: dict
     ) -> Optional[ApplicationFormFormat]:
         """
-        主キー一致した1件をupdate（更新フィールドはdict）
+        Update a record matching the given primary key with provided data.
+
+        Args:
+            db_session (Session): SQLAlchemy database session.
+            id (Optional[int]): Primary key field.
+            update_data (dict): Fields to update and their new values.
+
+        Returns:
+            Optional[ApplicationFormFormat]: The updated instance, or None if not found.
         """
         results = self.get_by_key(
             db_session

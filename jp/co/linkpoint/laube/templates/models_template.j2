@@ -71,13 +71,17 @@ class {{ model.class_name }}({{ model.inherits if model.inherits else "Base" }})
     {% if col.comment %}{% set _ = parts.append('comment="' ~ col.comment.replace('"', '\\\"') ~ '"') %}{% endif %}
     {{ col.name }} = Column({{ parts | join(", ") }})
 {% endfor %}
+
+
+
 {% if model.mapper_args %}
     __mapper_args__ = {
 {%         for k, v in model.mapper_args.items() %}
-        '{{ k }}': {{ v | tojson }}{% if not loop.last %},{% endif %}
+        '{{ k }}': {{ v }}{% if not loop.last %},{% endif %}
 {%         endfor %}
     }
 {% endif %}
+
 {# ---- ここから __table_args__ をすべてカバー ---- #}
 {% set tbl_args = [] %}
 {%- if model.indexes %}

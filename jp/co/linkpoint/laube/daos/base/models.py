@@ -29,6 +29,10 @@ class Users(Base):
 
 
 
+
+
+
+
 class Tenants(Base):
     """
     　会社ごとのテナント情報
@@ -41,6 +45,10 @@ class Tenants(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment="更新日時")
     update_user_uuid = Column('update_user_uuid', String(10), nullable=False, comment="更新者ユーザーコード")
     update_count = Column('update_count', Integer, nullable=False, comment="更新回数")
+
+
+
+
 
 
 
@@ -60,6 +68,10 @@ class Employee(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment="更新日時")
     update_user_uuid = Column('update_user_uuid', String(10), nullable=False, comment="更新者ユーザーコード")
     update_count = Column('update_count', Integer, nullable=False, comment="更新回数")
+
+
+
+
     __table_args__ = (
         ForeignKeyConstraint(['user_uuid'], ['m_users.user_uuid']),
         ForeignKeyConstraint(['tenant_uuid'], ['m_tenants.tenant_uuid']),
@@ -85,6 +97,10 @@ class Group(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=lambda: datetime.now(), onupdate=lambda: datetime.now())
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
+
     __table_args__ = (
         Index('ix_m_grouptenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, group_code)
@@ -109,8 +125,12 @@ class Boss(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+
     __table_args__ = (
         Index('ix_m_bosstenant_uuid_group_code_user_uuid_application_form_code', tenant_uuid, group_code, user_uuid, application_form_code),
         Index('ix_m_bosstenant_uuid', tenant_uuid),
@@ -136,8 +156,12 @@ class DeputyApprovel(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+
     __table_args__ = (
         Index('ix_m_deputy_approveltenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, group_code, user_uuid)
@@ -158,8 +182,12 @@ class ApplicationClassificationFormat(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+
 
 
 
@@ -185,8 +213,12 @@ class ApplicationFormFormat(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+
 
 
 
@@ -215,8 +247,12 @@ class ApplicationForm(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+
     __table_args__ = (
         Index('ix_m_application_formtenant_uuid', tenant_uuid),
         Index('ix_m_application_formapplication_form_code', application_form_code),
@@ -242,8 +278,12 @@ class ApplicationFormRoute(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+
     __table_args__ = (
         Index('ix_m_application_form_routetenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, application_form_code, group_code)
@@ -264,8 +304,12 @@ class IndividualRoute(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+
     __table_args__ = (
         Index('ix_m_individual_routetenant_uuid_individual_route_code', tenant_uuid, individual_route_code),
         Index('ix_m_individual_routetenant_uuid', tenant_uuid),
@@ -294,8 +338,12 @@ class IndividualActivity(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+
     __table_args__ = (
         Index('ix_m_individual_activitytenant_uuid_individual_route_code', tenant_uuid, individual_route_code),
         Index('ix_m_individual_activitytenant_uuid_approverl_role_code', tenant_uuid, approverl_role_code),
@@ -318,8 +366,12 @@ class CommonRoute(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+
     __table_args__ = (
         Index('ix_m_common_routetenant_uuid_common_route_code', tenant_uuid, common_route_code),
         Index('ix_m_common_routetenant_uuid', tenant_uuid),
@@ -347,8 +399,12 @@ class CommonActivity(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+
     __table_args__ = (
         Index('ix_m_common_activitytenant_uuid_common_route_code_activity_code', tenant_uuid, common_route_code, activity_code),
         Index('ix_m_common_activitytenant_uuid_common_route_code', tenant_uuid, common_route_code),
@@ -387,6 +443,10 @@ class ApplicationObject(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
+
     __table_args__ = (
         Index('ix_t_application_objecttenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, application_number)
@@ -439,6 +499,10 @@ class ActivityObject(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
+
     __table_args__ = (
         Index('ix_t_activity_objecttenant_uuid_application_number', tenant_uuid, application_number),
         Index('ix_t_activity_objecttenant_uuid', tenant_uuid),
@@ -468,8 +532,12 @@ class Appended(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+
     __table_args__ = (
         Index('ix_t_appendedtenant_uuid_application_number', tenant_uuid, application_number),
         Index('ix_t_appendedtenant_uuid', tenant_uuid),
@@ -533,8 +601,12 @@ class RouteHistory(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+
 
 
 
@@ -561,5 +633,9 @@ class ActivityTransit(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     update_employee_code = Column('update_employee_code', String(10), nullable=False)
     update_count = Column('update_count', Integer, nullable=False)
+
+
+
     __mapper_args__ = {
-        'version_id_col': "update_count"    }
+        'version_id_col': update_count    }
+

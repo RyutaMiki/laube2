@@ -123,6 +123,7 @@ for name, model_cls in model_classes:
         enums_csv = ', '.join(sorted(used_enums))
         enum_imports = f'from jp.co.linkpoint.laube.daos.base.specifiedValue import {enums_csv}'
 
+    # 複合PK対応
     pk_fields = [col for col in model_cls.__table__.primary_key.columns]
     pk_args = ", ".join([f"obj.{col.name}" for col in pk_fields])
 

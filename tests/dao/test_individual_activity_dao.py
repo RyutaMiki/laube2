@@ -2,6 +2,8 @@ import pytest
 from sqlalchemy.orm import Session
 from jp.co.linkpoint.laube.daos.base.models import IndividualActivity
 from jp.co.linkpoint.laube.daos.individual_activity_dao import IndividualActivityDao
+from datetime import datetime, date, time
+from jp.co.linkpoint.laube.daos.base.specifiedValue import ApprovalFunction
 
 @pytest.fixture
 def individual_activity_dict():
@@ -14,14 +16,13 @@ def individual_activity_dict():
         "approverl_role_code": 'dummy',
         "approverl_group_code": 'dummy',
         "approverl_user_uuid": 'dummy',
-        "function": 1,
+        "function": ApprovalFunction.EXAMINATION,
         "is_terminal": True,
-        "create_date": '2024-01-01T00:00:00',
+        "create_date": datetime(2024, 1, 1, 0, 0, 0),
         "create_employee_code": 'dummy',
-        "update_date": '2024-01-01T00:00:00',
+        "update_date": datetime(2024, 1, 1, 0, 0, 0),
         "update_employee_code": 'dummy',
-        "update_count": 1,
-        
+        "update_count": 1
     }
 
 def test_create_and_get_individual_activity(db_session: Session, individual_activity_dict):
@@ -40,6 +41,6 @@ def test_update_individual_activity(db_session: Session, individual_activity_dic
 def test_delete_individual_activity(db_session: Session, individual_activity_dict):
     dao = IndividualActivityDao()
     obj = dao.create(db_session, individual_activity_dict)
-    dao.delete(db_session, obj.id)
+    dao.delete(db_session, obj)
     deleted = dao.get(db_session, obj.id)
     assert deleted is None

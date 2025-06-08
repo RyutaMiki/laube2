@@ -2,6 +2,8 @@ import pytest
 from sqlalchemy.orm import Session
 from jp.co.linkpoint.laube.daos.base.models import Employee
 from jp.co.linkpoint.laube.daos.employee_dao import EmployeeDao
+from datetime import datetime, date, time
+
 
 @pytest.fixture
 def employee_dict():
@@ -9,14 +11,13 @@ def employee_dict():
         "id": 1,
         "tenant_uuid": 'dummy',
         "user_uuid": 'dummy',
-        "belong_start_date": '2024-01-01',
-        "belong_end_date": '2024-01-01',
-        "create_date": '2024-01-01T00:00:00',
+        "belong_start_date": date(2024, 1, 1),
+        "belong_end_date": date(2024, 1, 1),
+        "create_date": datetime(2024, 1, 1, 0, 0, 0),
         "create_user_uuid": 'dummy',
-        "update_date": '2024-01-01T00:00:00',
+        "update_date": datetime(2024, 1, 1, 0, 0, 0),
         "update_user_uuid": 'dummy',
-        "update_count": 1,
-        
+        "update_count": 1
     }
 
 def test_create_and_get_employee(db_session: Session, employee_dict):
@@ -35,6 +36,6 @@ def test_update_employee(db_session: Session, employee_dict):
 def test_delete_employee(db_session: Session, employee_dict):
     dao = EmployeeDao()
     obj = dao.create(db_session, employee_dict)
-    dao.delete(db_session, obj.id)
+    dao.delete(db_session, obj)
     deleted = dao.get(db_session, obj.id)
     assert deleted is None

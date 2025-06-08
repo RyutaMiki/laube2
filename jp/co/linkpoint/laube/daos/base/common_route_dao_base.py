@@ -1,11 +1,10 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from typing import List, Optional
+from typing import List, Optional, Union, Any
 from jp.co.linkpoint.laube.daos.base.base_dao import BaseDao
 from jp.co.linkpoint.laube.daos.base.models import CommonRoute
 
 from datetime import datetime
-
 
 class BaseCommonRouteDao(BaseDao[CommonRoute]):
     """
@@ -13,36 +12,28 @@ class BaseCommonRouteDao(BaseDao[CommonRoute]):
     """
     model = CommonRoute
 
-    def get_by_key(self, db_session: Session, id: int) -> List[CommonRoute]:
-        """
-        CommonRoute を指定された主キー条件であいまい取得します。
-
-        Args:
-            db_session (Session): DBセッション
-            id (Optional[int]): サロゲートキー（指定された場合のみ条件に含めます）
-
-        Returns:
-            List[CommonRoute]: 条件に一致するレコードのリスト
-        """
-        query = db_session.query(CommonRoute)
-        if id is not None:
-            query = query.filter(CommonRoute.id == id)
-        return query.all()
-
-    def insert(self, db_session: Session, instance: CommonRoute) -> CommonRoute:
+    def create(self, db_session: Session, data: Union[CommonRoute, dict]) -> CommonRoute:
         """
         CommonRoute を登録します。
 
         Args:
             db_session (Session): DBセッション
-            instance (CommonRoute): 保存するインスタンス
+            data (CommonRoute or dict): 保存するインスタンスまたは dict
 
         Returns:
             CommonRoute: 保存後のインスタンス
         """
-        db_session.add(instance)
-        db_session.flush()
-        return instance
+        try:
+            if isinstance(data, dict):
+                instance = CommonRoute(**data)
+            else:
+                instance = data
+            db_session.add(instance)
+            db_session.flush()
+            return instance
+        except Exception as e:
+            db_session.rollback()
+            raise RuntimeError(f"[DAO.create] 登録に失敗: {e}") from e
 
     def delete(self, db_session: Session, instance: CommonRoute) -> None:
         """
@@ -55,54 +46,69 @@ class BaseCommonRouteDao(BaseDao[CommonRoute]):
         Returns:
             None
         """
-        db_session.delete(instance)
-        db_session.flush()
+        try:
+            db_session.delete(instance)
+            db_session.flush()
+        except Exception as e:
+            db_session.rollback()
+            raise RuntimeError(f"[DAO.delete] 削除に失敗: {e}") from e
 
-    def get_all(self, db_session: Session, limit: int = 100, offset: int = 0) -> List[CommonRoute]:
+    def get_by_key(self, db_session: Session, id: int) -> List[CommonRoute]:
         """
-        CommonRoute を全件取得します（ページング対応）。
+        CommonRoute を指定された主キー条件で取得します。
 
         Args:
             db_session (Session): DBセッション
-            limit (int): 最大取得件数
-            offset (int): 取得開始位置
+            id (Optional[int]): サロゲートキー
 
         Returns:
-            List[CommonRoute]: 取得されたインスタンスのリスト
+            List[CommonRoute]: 条件に一致するレコードのリスト
+        """
+        query = db_session.query(CommonRoute)
+        if id is not None:
+            query = query.filter(CommonRoute.id == id)
+        return query.all()
+
+    def get(self, db_session: Session, id: int) -> Optional[CommonRoute]:
+        """
+        主キーで単一取得。
+
+        Returns:
+            Optional[CommonRoute]: 該当するインスタンス or None
+        """
+        result = self.get_by_key(db_session, id=id)
+        return result[0] if result else None
+
+    def get_all(self, db_session: Session, limit: int = 100, offset: int = 0) -> List[CommonRoute]:
+        """
+        全件取得（ページング対応）
+
+        Returns:
+            List[CommonRoute]
         """
         return db_session.query(CommonRoute).limit(limit).offset(offset).all()
 
     def count(self, db_session: Session) -> int:
         """
-        CommonRoute の総件数を取得します。
-
-        Args:
-            db_session (Session): DBセッション
+        総件数カウント
 
         Returns:
-            int: 件数
+            int
         """
         return db_session.query(func.count()).select_from(CommonRoute).scalar()
 
     def update(self, db_session: Session, id: int, update_data: dict) -> Optional[CommonRoute]:
         """
-        指定された主キーに一致する CommonRoute を更新します。
-
-        Args:
-            db_session (Session): DBセッション
-            id (int): サロゲートキー
-            update_data (dict): 更新内容の辞書
+        主キー一致した1件をupdate（更新フィールドはdict）
 
         Returns:
-            Optional[CommonRoute]: 更新後のインスタンスまたは None
+            Optional[CommonRoute]: 更新後インスタンス or None
         """
         results = self.get_by_key(db_session, id=id)
         instance = results[0] if results else None
-
         if instance:
             for key, value in update_data.items():
                 setattr(instance, key, value)
             db_session.add(instance)
-
-        db_session.flush()
+            db_session.flush()
         return instance

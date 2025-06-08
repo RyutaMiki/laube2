@@ -2,6 +2,8 @@ import pytest
 from sqlalchemy.orm import Session
 from jp.co.linkpoint.laube.daos.base.models import RouteHistory
 from jp.co.linkpoint.laube.daos.route_history_dao import RouteHistoryDao
+from datetime import datetime, date, time
+from jp.co.linkpoint.laube.daos.base.specifiedValue import ActivityStatus, ApplicantStatus, ApplicationStatus, ApprovalFunction
 
 @pytest.fixture
 def route_history_dict():
@@ -26,10 +28,10 @@ def route_history_dict():
         "applicant_group_name": 'dummy',
         "applicant_user_uuid": 'dummy',
         "applicant_employee_name": 'dummy',
-        "apply_date": '2024-01-01T00:00:00',
-        "approval_date": '2024-01-01T00:00:00',
-        "application_status": 1,
-        "applicant_status": 1,
+        "apply_date": datetime(2024, 1, 1, 0, 0, 0),
+        "approval_date": datetime(2024, 1, 1, 0, 0, 0),
+        "application_status": ApplicationStatus.DRAFT,
+        "applicant_status": ApplicantStatus.NEW,
         "route_type": 1,
         "route_number": 1,
         "approverl_tenant_uuid": 'dummy',
@@ -47,17 +49,16 @@ def route_history_dict():
         "deputy_approverl_user_uuid": 'dummy',
         "deputy_approverl_employee_name": 'dummy',
         "deputy_contents": 'dummy',
-        "function": 1,
-        "reaching_date": '2024-01-01T00:00:00',
-        "process_date": '2024-01-01T00:00:00',
-        "activity_status": 1,
+        "function": ApprovalFunction.EXAMINATION,
+        "reaching_date": datetime(2024, 1, 1, 0, 0, 0),
+        "process_date": datetime(2024, 1, 1, 0, 0, 0),
+        "activity_status": ActivityStatus.IN_PROGRESS,
         "approverl_comment": 'dummy',
-        "create_date": '2024-01-01T00:00:00',
+        "create_date": datetime(2024, 1, 1, 0, 0, 0),
         "create_employee_code": 'dummy',
-        "update_date": '2024-01-01T00:00:00',
+        "update_date": datetime(2024, 1, 1, 0, 0, 0),
         "update_employee_code": 'dummy',
-        "update_count": 1,
-        
+        "update_count": 1
     }
 
 def test_create_and_get_route_history(db_session: Session, route_history_dict):
@@ -76,6 +77,6 @@ def test_update_route_history(db_session: Session, route_history_dict):
 def test_delete_route_history(db_session: Session, route_history_dict):
     dao = RouteHistoryDao()
     obj = dao.create(db_session, route_history_dict)
-    dao.delete(db_session, obj.id)
+    dao.delete(db_session, obj)
     deleted = dao.get(db_session, obj.id)
     assert deleted is None

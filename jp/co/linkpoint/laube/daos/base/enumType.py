@@ -110,3 +110,7 @@ class EnumType(TypeDecorator):
             str: EnumType(class名)
         """
         return f"EnumType({self.enum_class.__name__})"
+
+    def copy(self, **kw):
+        # for schema migrations (Alembicなど)
+        return EnumType(enum_class=self.enum_class)

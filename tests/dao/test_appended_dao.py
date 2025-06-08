@@ -2,6 +2,8 @@ import pytest
 from sqlalchemy.orm import Session
 from jp.co.linkpoint.laube.daos.base.models import Appended
 from jp.co.linkpoint.laube.daos.appended_dao import AppendedDao
+from datetime import datetime, date, time
+
 
 @pytest.fixture
 def appended_dict():
@@ -17,13 +19,12 @@ def appended_dict():
         "approverl_user_uuid": 'dummy',
         "append_title": 'dummy',
         "append_path": 'dummy',
-        "append_date": '2024-01-01T00:00:00',
-        "create_date": '2024-01-01T00:00:00',
+        "append_date": datetime(2024, 1, 1, 0, 0, 0),
+        "create_date": datetime(2024, 1, 1, 0, 0, 0),
         "create_employee_code": 'dummy',
-        "update_date": '2024-01-01T00:00:00',
+        "update_date": datetime(2024, 1, 1, 0, 0, 0),
         "update_employee_code": 'dummy',
-        "update_count": 1,
-        
+        "update_count": 1
     }
 
 def test_create_and_get_appended(db_session: Session, appended_dict):
@@ -42,6 +43,6 @@ def test_update_appended(db_session: Session, appended_dict):
 def test_delete_appended(db_session: Session, appended_dict):
     dao = AppendedDao()
     obj = dao.create(db_session, appended_dict)
-    dao.delete(db_session, obj.id)
+    dao.delete(db_session, obj)
     deleted = dao.get(db_session, obj.id)
     assert deleted is None

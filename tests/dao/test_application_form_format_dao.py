@@ -2,6 +2,8 @@ import pytest
 from sqlalchemy.orm import Session
 from jp.co.linkpoint.laube.daos.base.models import ApplicationFormFormat
 from jp.co.linkpoint.laube.daos.application_form_format_dao import ApplicationFormFormatDao
+from datetime import datetime, date, time
+from jp.co.linkpoint.laube.daos.base.specifiedValue import AutoApproverlFlag, PullingFlag, RouteFlag, WithdrawalFlag
 
 @pytest.fixture
 def application_form_format_dict():
@@ -11,19 +13,18 @@ def application_form_format_dict():
         "application_form_name": 'dummy',
         "application_classification_code": 'dummy',
         "skip_apply_employee": True,
-        "auto_approverl_flag": 1,
-        "pulling_flag": 1,
-        "withdrawal_flag": 1,
-        "route_flag": 1,
+        "auto_approverl_flag": AutoApproverlFlag.AUTOMATIC_APPROVAL,
+        "pulling_flag": PullingFlag.A,
+        "withdrawal_flag": WithdrawalFlag.ENABLED,
+        "route_flag": RouteFlag.DIRECT,
         "sort_number": 1,
         "table_name": 'dummy',
         "screen_code": 'dummy',
-        "create_date": '2024-01-01T00:00:00',
+        "create_date": datetime(2024, 1, 1, 0, 0, 0),
         "create_employee_code": 'dummy',
-        "update_date": '2024-01-01T00:00:00',
+        "update_date": datetime(2024, 1, 1, 0, 0, 0),
         "update_employee_code": 'dummy',
-        "update_count": 1,
-        
+        "update_count": 1
     }
 
 def test_create_and_get_application_form_format(db_session: Session, application_form_format_dict):
@@ -42,6 +43,6 @@ def test_update_application_form_format(db_session: Session, application_form_fo
 def test_delete_application_form_format(db_session: Session, application_form_format_dict):
     dao = ApplicationFormFormatDao()
     obj = dao.create(db_session, application_form_format_dict)
-    dao.delete(db_session, obj.id)
+    dao.delete(db_session, obj)
     deleted = dao.get(db_session, obj.id)
     assert deleted is None

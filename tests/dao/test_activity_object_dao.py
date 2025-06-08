@@ -2,6 +2,8 @@ import pytest
 from sqlalchemy.orm import Session
 from jp.co.linkpoint.laube.daos.base.models import ActivityObject
 from jp.co.linkpoint.laube.daos.activity_object_dao import ActivityObjectDao
+from datetime import datetime, date, time
+from jp.co.linkpoint.laube.daos.base.specifiedValue import ActivityStatus, ApprovalFunction
 
 @pytest.fixture
 def activity_object_dict():
@@ -16,7 +18,7 @@ def activity_object_dict():
         "approverl_role_code": 'dummy',
         "approverl_group_code": 'dummy',
         "approverl_user_uuid": 'dummy',
-        "function": 1,
+        "function": ApprovalFunction.EXAMINATION,
         "instance_group_id": 'dummy',
         "instance_index": 1,
         "total_instance_count": 1,
@@ -36,18 +38,17 @@ def activity_object_dict():
         "is_deferred_choice_loser": True,
         "trigger_type": 'dummy',
         "is_triggered": True,
-        "triggered_at": '2024-01-01T00:00:00',
-        "reaching_date": '2024-01-01T00:00:00',
-        "process_date": '2024-01-01T00:00:00',
-        "activity_status": 1,
+        "triggered_at": datetime(2024, 1, 1, 0, 0, 0),
+        "reaching_date": datetime(2024, 1, 1, 0, 0, 0),
+        "process_date": datetime(2024, 1, 1, 0, 0, 0),
+        "activity_status": ActivityStatus.IN_PROGRESS,
         "approverl_comment": 'dummy',
         "is_completed": True,
-        "create_date": '2024-01-01T00:00:00',
+        "create_date": datetime(2024, 1, 1, 0, 0, 0),
         "create_employee_code": 'dummy',
-        "update_date": '2024-01-01T00:00:00',
+        "update_date": datetime(2024, 1, 1, 0, 0, 0),
         "update_employee_code": 'dummy',
-        "update_count": 1,
-        
+        "update_count": 1
     }
 
 def test_create_and_get_activity_object(db_session: Session, activity_object_dict):
@@ -66,6 +67,6 @@ def test_update_activity_object(db_session: Session, activity_object_dict):
 def test_delete_activity_object(db_session: Session, activity_object_dict):
     dao = ActivityObjectDao()
     obj = dao.create(db_session, activity_object_dict)
-    dao.delete(db_session, obj.id)
+    dao.delete(db_session, obj)
     deleted = dao.get(db_session, obj.id)
     assert deleted is None

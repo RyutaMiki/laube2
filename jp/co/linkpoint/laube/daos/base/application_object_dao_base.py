@@ -1,11 +1,10 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from typing import List, Optional
+from typing import List, Optional, Union, Any
 from jp.co.linkpoint.laube.daos.base.base_dao import BaseDao
 from jp.co.linkpoint.laube.daos.base.models import ApplicationObject
 
 from datetime import datetime
-
 
 class BaseApplicationObjectDao(BaseDao[ApplicationObject]):
     """
@@ -13,36 +12,28 @@ class BaseApplicationObjectDao(BaseDao[ApplicationObject]):
     """
     model = ApplicationObject
 
-    def get_by_key(self, db_session: Session, id: int) -> List[ApplicationObject]:
-        """
-        ApplicationObject を指定された主キー条件であいまい取得します。
-
-        Args:
-            db_session (Session): DBセッション
-            id (Optional[int]): サロゲートキー（指定された場合のみ条件に含めます）
-
-        Returns:
-            List[ApplicationObject]: 条件に一致するレコードのリスト
-        """
-        query = db_session.query(ApplicationObject)
-        if id is not None:
-            query = query.filter(ApplicationObject.id == id)
-        return query.all()
-
-    def insert(self, db_session: Session, instance: ApplicationObject) -> ApplicationObject:
+    def create(self, db_session: Session, data: Union[ApplicationObject, dict]) -> ApplicationObject:
         """
         ApplicationObject を登録します。
 
         Args:
             db_session (Session): DBセッション
-            instance (ApplicationObject): 保存するインスタンス
+            data (ApplicationObject or dict): 保存するインスタンスまたは dict
 
         Returns:
             ApplicationObject: 保存後のインスタンス
         """
-        db_session.add(instance)
-        db_session.flush()
-        return instance
+        try:
+            if isinstance(data, dict):
+                instance = ApplicationObject(**data)
+            else:
+                instance = data
+            db_session.add(instance)
+            db_session.flush()
+            return instance
+        except Exception as e:
+            db_session.rollback()
+            raise RuntimeError(f"[DAO.create] 登録に失敗: {e}") from e
 
     def delete(self, db_session: Session, instance: ApplicationObject) -> None:
         """
@@ -55,54 +46,69 @@ class BaseApplicationObjectDao(BaseDao[ApplicationObject]):
         Returns:
             None
         """
-        db_session.delete(instance)
-        db_session.flush()
+        try:
+            db_session.delete(instance)
+            db_session.flush()
+        except Exception as e:
+            db_session.rollback()
+            raise RuntimeError(f"[DAO.delete] 削除に失敗: {e}") from e
 
-    def get_all(self, db_session: Session, limit: int = 100, offset: int = 0) -> List[ApplicationObject]:
+    def get_by_key(self, db_session: Session, id: int) -> List[ApplicationObject]:
         """
-        ApplicationObject を全件取得します（ページング対応）。
+        ApplicationObject を指定された主キー条件で取得します。
 
         Args:
             db_session (Session): DBセッション
-            limit (int): 最大取得件数
-            offset (int): 取得開始位置
+            id (Optional[int]): サロゲートキー
 
         Returns:
-            List[ApplicationObject]: 取得されたインスタンスのリスト
+            List[ApplicationObject]: 条件に一致するレコードのリスト
+        """
+        query = db_session.query(ApplicationObject)
+        if id is not None:
+            query = query.filter(ApplicationObject.id == id)
+        return query.all()
+
+    def get(self, db_session: Session, id: int) -> Optional[ApplicationObject]:
+        """
+        主キーで単一取得。
+
+        Returns:
+            Optional[ApplicationObject]: 該当するインスタンス or None
+        """
+        result = self.get_by_key(db_session, id=id)
+        return result[0] if result else None
+
+    def get_all(self, db_session: Session, limit: int = 100, offset: int = 0) -> List[ApplicationObject]:
+        """
+        全件取得（ページング対応）
+
+        Returns:
+            List[ApplicationObject]
         """
         return db_session.query(ApplicationObject).limit(limit).offset(offset).all()
 
     def count(self, db_session: Session) -> int:
         """
-        ApplicationObject の総件数を取得します。
-
-        Args:
-            db_session (Session): DBセッション
+        総件数カウント
 
         Returns:
-            int: 件数
+            int
         """
         return db_session.query(func.count()).select_from(ApplicationObject).scalar()
 
     def update(self, db_session: Session, id: int, update_data: dict) -> Optional[ApplicationObject]:
         """
-        指定された主キーに一致する ApplicationObject を更新します。
-
-        Args:
-            db_session (Session): DBセッション
-            id (int): サロゲートキー
-            update_data (dict): 更新内容の辞書
+        主キー一致した1件をupdate（更新フィールドはdict）
 
         Returns:
-            Optional[ApplicationObject]: 更新後のインスタンスまたは None
+            Optional[ApplicationObject]: 更新後インスタンス or None
         """
         results = self.get_by_key(db_session, id=id)
         instance = results[0] if results else None
-
         if instance:
             for key, value in update_data.items():
                 setattr(instance, key, value)
             db_session.add(instance)
-
-        db_session.flush()
+            db_session.flush()
         return instance

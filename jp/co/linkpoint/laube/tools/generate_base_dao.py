@@ -5,21 +5,28 @@ import importlib.util
 import inspect
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
+
 sys.path.insert(0, os.getenv("PROJECT_DIR") or "d:/git/laube2")
 
-# === パス設定 ===
 from dotenv import load_dotenv
-
-load_dotenv()  # .env を読み込む
+load_dotenv()
 
 PROJECT_DIR = Path(os.getenv("PROJECT_DIR"))
-MODELS_FILE = PROJECT_DIR / "jp"/ "co"/ "linkpoint" / "laube" / "daos"/ "base"/ "models.py"
-TEMPLATE_DIR = PROJECT_DIR / "jp"/ "co"/ "linkpoint" / "laube"/ "templates"
-DAO_DIR = PROJECT_DIR / "jp"/ "co"/ "linkpoint" / "laube"/ "daos"
+MODELS_FILE = PROJECT_DIR / "jp" / "co" / "linkpoint" / "laube" / "daos" / "base" / "models.py"
+TEMPLATE_DIR = PROJECT_DIR / "jp" / "co" / "linkpoint" / "laube" / "templates"
+DAO_DIR = PROJECT_DIR / "jp" / "co" / "linkpoint" / "laube" / "daos"
 DAO_BASE_DIR = DAO_DIR / "base"
 
 DAO_DIR.mkdir(parents=True, exist_ok=True)
 DAO_BASE_DIR.mkdir(parents=True, exist_ok=True)
+
+# === Base DAO全削除（自動生成分だけ消す。他は絶対消さない！） ===
+for file in DAO_BASE_DIR.glob("*_dao_base.py"):
+    try:
+        file.unlink()
+        print(f"[Base DAO削除] {file}")
+    except Exception as e:
+        print(f"[Base DAO削除失敗] {file}: {e}")
 
 # === Jinja2環境構築 ===
 env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)), trim_blocks=True, lstrip_blocks=True)
@@ -58,6 +65,8 @@ model_classes = [
     (name, cls) for name, cls in inspect.getmembers(models, inspect.isclass)
     if hasattr(cls, "__table__") and not name.startswith("_")
 ]
+
+print(f"[INFO] モデルクラス数: {len(model_classes)}")
 
 # === DAOファイル自動生成 ===
 for original_name, model_cls in model_classes:
@@ -104,3 +113,5 @@ for original_name, model_cls in model_classes:
         print(f"[Stub DAO初回作成] {stub_path}")
     else:
         print(f"[スキップ] {stub_path} は既に存在（独自コード保持）")
+
+print("[INFO] DAO自動生成 完了！")

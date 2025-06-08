@@ -1,0 +1,38 @@
+import pytest
+from sqlalchemy.orm import Session
+from jp.co.linkpoint.laube.daos.base.models import Users
+from jp.co.linkpoint.laube.daos.users_dao import UsersDao
+
+@pytest.fixture
+def users_dict():
+    return {
+        "id": 1,
+        "user_uuid": 'dummy',
+        "user_name": 'dummy',
+        "create_date": '2024-01-01T00:00:00',
+        "create_user_uuid": 'dummy',
+        "update_date": '2024-01-01T00:00:00',
+        "update_user_uuid": 'dummy',
+        "update_count": 1,
+        
+    }
+
+def test_create_and_get_users(db_session: Session, users_dict):
+    dao = UsersDao()
+    obj = dao.create(db_session, users_dict)
+    found = dao.get(db_session, obj.id)
+    assert found is not None
+
+def test_update_users(db_session: Session, users_dict):
+    dao = UsersDao()
+    obj = dao.create(db_session, users_dict)
+    dao.update(db_session, obj.id, {"user_uuid": "updated"})
+    updated = dao.get(db_session, obj.id)
+    assert updated.user_uuid == "updated"
+
+def test_delete_users(db_session: Session, users_dict):
+    dao = UsersDao()
+    obj = dao.create(db_session, users_dict)
+    dao.delete(db_session, obj.id)
+    deleted = dao.get(db_session, obj.id)
+    assert deleted is None

@@ -111,10 +111,12 @@ BASE_DAO_DIR = Path(__file__).parent.parent / "daos" / "base"
 BASE_DAO_DIR.mkdir(parents=True, exist_ok=True)
 
 output_file = BASE_DAO_DIR / "models.py"
+if output_file.exists():
+    output_file.unlink()   # ← ここを追加
+
 try:
     output_file.write_text(rendered, encoding="utf-8")
     print(f"生成完了: {output_file.resolve()}")
 except Exception as e:
     traceback.print_exc()
     sys.exit(f"[ERROR] 書き込み失敗: {e}")
-

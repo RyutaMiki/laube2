@@ -178,14 +178,12 @@ models:
       - name: group_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: false
         comment: 部署コード
 
       - name: group_name
         type: String
         args: [50]
-        collation: ja_JP.utf8
         nullable: false
         comment: 部署名
 
@@ -202,7 +200,6 @@ models:
       - name: upper_group_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: true
         foreign_key:
           reference: m_group.group_code
@@ -224,7 +221,6 @@ models:
       - name: create_employee_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: false
 
       - name: update_date
@@ -236,7 +232,6 @@ models:
       - name: update_employee_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: false
 
       - name: update_count
@@ -244,11 +239,12 @@ models:
         nullable: false
 
     indexes:
-      - [tenant_uuid, group_code]
       - [tenant_uuid]
     uniques:
       - [tenant_uuid, group_code]
-    version_id_col: update_count
+    foreign_keys:
+      - columns: [tenant_uuid]
+        references: [m_tenants.tenant_uuid]
 
   - class_name: Boss
     table_name: m_boss
@@ -271,21 +267,18 @@ models:
       - name: user_uuid
         type: String
         args: [36]
-        collation: ja_JP.utf8
         nullable: false
         comment: ユーザーUUID
 
       - name: group_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: true
         comment: 部署コード
 
       - name: application_form_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: true
         comment: 申請書コード
 
@@ -298,14 +291,12 @@ models:
       - name: boss_group_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: false
         comment: 直属上司の部署コード
 
       - name: boss_user_uuid
         type: String
         args: [36]
-        collation: ja_JP.utf8
         nullable: false
         comment: 直属上司のユーザーUUID
 
@@ -317,7 +308,6 @@ models:
       - name: create_employee_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: false
 
       - name: update_date
@@ -329,7 +319,6 @@ models:
       - name: update_employee_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: false
 
       - name: update_count
@@ -362,7 +351,6 @@ models:
       - name: tenant_uuid
         type: String
         args: [36]
-        collation: ja_JP.utf8
         nullable: false
         foreign_key: m_tenants.tenant_uuid
         comment: テナントUUID
@@ -370,42 +358,36 @@ models:
       - name: group_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: false
         comment: 部署コード
 
       - name: user_uuid
         type: String
         args: [36]
-        collation: ja_JP.utf8
         nullable: false
         comment: ユーザーUUID
 
       - name: deputy_approverl_tenant_uuid
         type: String
         args: [36]
-        collation: ja_JP.utf8
         nullable: true
         comment: 代理承認者のテナントUUID
 
       - name: deputy_approverl_group_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: false
         comment: 代理承認者の部署コード
 
       - name: deputy_approverl_user_uuid
         type: String
         args: [36]
-        collation: ja_JP.utf8
         nullable: false
         comment: 代理承認者のユーザーUUID
 
       - name: deputy_contents
         type: String
         args: [255]
-        collation: ja_JP.utf8
         nullable: false
         comment: 依頼理由
 
@@ -417,7 +399,6 @@ models:
       - name: create_employee_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: false
 
       - name: update_date
@@ -429,7 +410,6 @@ models:
       - name: update_employee_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: false
 
       - name: update_count
@@ -437,12 +417,9 @@ models:
         nullable: false
 
     indexes:
-      - [tenant_uuid, group_code, user_uuid]
       - [tenant_uuid]
-
     uniques:
       - [tenant_uuid, group_code, user_uuid]
-
     foreign_keys:
       - columns: [tenant_uuid, user_uuid]
         references: [m_employee.tenant_uuid, m_employee.user_uuid]
@@ -493,10 +470,6 @@ models:
       - name: update_count
         type: Integer
         nullable: false
-    indexes:
-      - [application_classification_code]
-    uniques:
-      - [application_classification_code]
 
   - class_name: ApplicationFormFormat
     table_name: m_application_form_format
@@ -584,10 +557,6 @@ models:
       - name: update_count
         type: Integer
         nullable: false
-    indexes:
-      - [application_form_code]
-    uniques:
-      - [application_form_code]
 
   - class_name: ApplicationForm
     table_name: m_application_form
@@ -690,7 +659,6 @@ models:
         type: Integer
         nullable: false
     indexes:
-      - [tenant_uuid, application_form_code]
       - [tenant_uuid]
       - [application_form_code]
     uniques:
@@ -755,7 +723,6 @@ models:
         type: Integer
         nullable: false
     indexes:
-      - [tenant_uuid, application_form_code, group_code]
       - [tenant_uuid]
     uniques:
       - [tenant_uuid, application_form_code, group_code]
@@ -808,7 +775,7 @@ models:
         nullable: false
     indexes:
       - [tenant_uuid, individual_route_code]
-      - [tenant_uuid]
+      - [tenant_uuid]  # ← これだけでOK！
     uniques:
       - [tenant_uuid, individual_route_code]
       - [tenant_uuid, individual_route_name]
@@ -891,7 +858,6 @@ models:
         type: Integer
         nullable: false
     indexes:
-      - [tenant_uuid, individual_route_code, activity_code]
       - [tenant_uuid, individual_route_code]
       - [tenant_uuid, approverl_role_code]
       - [tenant_uuid]
@@ -953,6 +919,9 @@ models:
     uniques:
       - [tenant_uuid, common_route_code]
       - [tenant_uuid, common_route_name]
+    foreign_keys:
+      - columns: [tenant_uuid, common_route_code]
+        references: [m_common_route.tenant_uuid, m_common_route.common_route_code]
 
   - class_name: CommonActivity
     table_name: m_common_activity
@@ -1048,7 +1017,6 @@ models:
       - name: tenant_uuid
         type: String
         args: [36]
-        collation: ja_JP.utf8
         nullable: false
         foreign_key: m_tenants.tenant_uuid
         comment: テナントUUID
@@ -1061,7 +1029,6 @@ models:
       - name: application_form_code
         type: String
         args: [10]
-        collation: ja_JP.utf8
         nullable: false
         comment: 申請書コード
 
@@ -1178,12 +1145,9 @@ models:
         nullable: false
 
     indexes:
-      - [tenant_uuid, application_number]
       - [tenant_uuid]
-
     uniques:
       - [tenant_uuid, application_number]
-
     foreign_keys:
       - columns: [tenant_uuid, applicant_user_uuid]
         references: [m_employee.tenant_uuid, m_employee.user_uuid]
@@ -1203,7 +1167,6 @@ models:
       - name: tenant_uuid
         type: String
         args: [36]
-        collation: ja_JP.utf8
         nullable: false
         foreign_key: m_tenants.tenant_uuid
         comment: テナントUUID
@@ -1434,13 +1397,10 @@ models:
         nullable: false
 
     indexes:
-      - [tenant_uuid, application_number, route_type, route_number, approverl_tenant_uuid, approverl_group_code, approverl_user_uuid]
-      - [tenant_uuid]
       - [tenant_uuid, application_number]
-
+      - [tenant_uuid]
     uniques:
       - [tenant_uuid, application_number, route_type, route_number, approverl_tenant_uuid, approverl_group_code, approverl_user_uuid]
-
     foreign_keys:
       - columns: [tenant_uuid, approverl_user_uuid]
         references: [m_employee.tenant_uuid, m_employee.user_uuid]
@@ -1548,13 +1508,10 @@ models:
         nullable: false
 
     indexes:
-      - [tenant_uuid, application_number, route_type, route_number]
-      - [tenant_uuid]
       - [tenant_uuid, application_number]
-
+      - [tenant_uuid]
     uniques:
       - [tenant_uuid, application_number, route_type, route_number]
-
     foreign_keys:
       - columns: [tenant_uuid, approverl_user_uuid]
         references: [m_employee.tenant_uuid, m_employee.user_uuid]

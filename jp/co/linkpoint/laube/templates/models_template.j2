@@ -32,7 +32,7 @@ Base = declarative_base()
 
 {% macro render_sqla_type(col) -%}
 {%- set is_str = col.type.startswith("String") %}
-{%- set coll = col.collation if col.collation else ("ja_JP.utf8" if is_str else None) %}
+{%- set coll = col.collation if col.collation else None %}
 {{ col.type }}{% if col.args or coll %}(
     {%- if col.args %}{{ col.args | join(", ") }}{%- endif -%}
     {%- if col.args and coll %}, {% endif -%}

@@ -567,6 +567,11 @@ models:
         type: Integer
         nullable: false
         comment: ソート順
+      - name: individual_route_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: 直接部門
       - name: create_date
         type: TIMESTAMP
         nullable: false
@@ -870,6 +875,17 @@ models:
         args: [30]
         nullable: false
         comment: 直接部門名
+
+      - name: total_instance_count
+        type: Integer
+        nullable: true
+        comment: 多重インスタンスの総数（全体制御用）
+
+      - name: milestone_count
+        type: Integer
+        nullable: true
+        comment: マイルストーンの合計数
+
       - name: create_date
         type: TIMESTAMP
         default: datetime.now
@@ -948,11 +964,73 @@ models:
         nullable: false
         comment: 承認画面の機能
 
+      - name: instance_group_id
+        type: String
+        nullable: true
+        comment: 多重インスタンスグループID
+
+      - name: instance_index
+        type: Integer
+        nullable: true
+        comment: インスタンス内の番号
+
+      - name: total_instance_count
+        type: Integer
+        nullable: true
+        comment: インスタンスグループ全体の数
+
+      - name: max_loop
+        type: Integer
+        nullable: true
+        comment: ループ最大回数
+
+      - name: is_synchronized
+        type: Boolean
+        default: false
+        nullable: false
+        comment: 同期必須ならTrue
+
+      - name: is_interleaved_locked
+        type: Boolean
+        default: false
+        nullable: false
+        comment: 並列経路で他が実行中ならTrue
+
+      - name: is_milestone
+        type: Boolean
+        default: false
+        nullable: false
+        comment: マイルストーンとして設定されているか
+
       - name: is_terminal
         type: Boolean
         default: false
         nullable: false
-        comment: このアクティビティが終了ノードならTrue
+        comment: 終了ノードとして設定されているか
+
+      - name: is_discriminator_loser
+        type: Boolean
+        default: false
+        nullable: false
+        comment: Discriminatorで負ける側の経路に設定されているか
+
+      - name: is_deferred_choice_winner
+        type: Boolean
+        default: false
+        nullable: false
+        comment: Deferred Choiceで勝者となる条件に設定されているか
+
+      - name: is_deferred_choice_loser
+        type: Boolean
+        default: false
+        nullable: false
+        comment: Deferred Choiceで敗者となる経路に設定されているか
+
+      - name: trigger_type
+        type: String
+        args: [50]
+        nullable: true
+        comment: トリガー種別（イベント名や条件式）
 
       - name: create_date
         type: TIMESTAMP
@@ -1010,6 +1088,17 @@ models:
         args: [30]
         nullable: false
         comment: 間接部門名
+
+      - name: total_instance_count
+        type: Integer
+        nullable: true
+        comment: 多重インスタンスの総数（全体制御用）
+
+      - name: milestone_count
+        type: Integer
+        nullable: true
+        comment: マイルストーンの合計数
+
       - name: create_date
         type: TIMESTAMP
         default: datetime.now
@@ -1090,6 +1179,75 @@ models:
         args: [enum_class=ApprovalFunction]
         nullable: false
         comment: 承認画面の機能
+
+      - name: instance_group_id
+        type: String
+        nullable: true
+        comment: 多重インスタンスグループID
+
+      - name: instance_index
+        type: Integer
+        nullable: true
+        comment: インスタンス内の番号
+
+      - name: total_instance_count
+        type: Integer
+        nullable: true
+        comment: インスタンスグループ全体の数
+
+      - name: max_loop
+        type: Integer
+        nullable: true
+        comment: ループ最大回数
+
+      - name: is_synchronized
+        type: Boolean
+        default: false
+        nullable: false
+        comment: 同期必須ならTrue
+
+      - name: is_interleaved_locked
+        type: Boolean
+        default: false
+        nullable: false
+        comment: 並列経路で他が実行中ならTrue
+
+      - name: is_milestone
+        type: Boolean
+        default: false
+        nullable: false
+        comment: マイルストーンとして設定されているか
+
+      - name: is_terminal
+        type: Boolean
+        default: false
+        nullable: false
+        comment: 終了ノードとして設定されているか
+
+      - name: is_discriminator_loser
+        type: Boolean
+        default: false
+        nullable: false
+        comment: Discriminatorで負ける側の経路に設定されているか
+
+      - name: is_deferred_choice_winner
+        type: Boolean
+        default: false
+        nullable: false
+        comment: Deferred Choiceで勝者となる条件に設定されているか
+
+      - name: is_deferred_choice_loser
+        type: Boolean
+        default: false
+        nullable: false
+        comment: Deferred Choiceで敗者となる経路に設定されているか
+
+      - name: trigger_type
+        type: String
+        args: [50]
+        nullable: true
+        comment: トリガー種別（イベント名や条件式）
+
       - name: create_date
         type: TIMESTAMP
         default: datetime.now
@@ -1142,6 +1300,12 @@ models:
         type: Integer
         nullable: false
         comment: 申請番号
+
+
+      - name: re_application_number
+        type: Integer
+        nullable: false
+        comment: 旧_申請番号
 
       - name: application_form_code
         type: String
@@ -1338,6 +1502,30 @@ models:
         args: [enum_class=ApprovalFunction]
         nullable: false
         comment: 承認画面の機能
+
+      - name: deputy_approverl_tenant_uuid
+        type: String
+        args: [10]
+        nullable: true
+        comment: 代理承認者のテナントUUID
+
+      - name: deputy_approverl_group_code
+        type: String
+        args: [10]
+        nullable: true
+        comment: 代理承認者の部署コード
+
+      - name: deputy_approverl_user_uuid
+        type: String
+        args: [10]
+        nullable: true
+        comment: 代理承認者のユーザーUUID
+
+      - name: deputy_contents
+        type: String
+        args: [255]
+        nullable: true
+        comment: 依頼理由
 
       # --- 多重インスタンス／ループ制御 ---
       - name: instance_group_id
@@ -2036,3 +2224,175 @@ models:
       - name: update_count
         type: Integer
         nullable: false
+
+  - class_name: ApplicationComment
+    table_name: t_application_comment
+    description: 申請チャット／コメント情報（掲示板形式、スレッド対応）
+    mapper_args:
+      version_id_col: update_count
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: tenant_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: テナントUUID
+
+      - name: application_number
+        type: Integer
+        nullable: false
+        comment: 紐づく申請番号
+
+      - name: parent_comment_id
+        type: Integer
+        nullable: true
+        comment: 親コメントID（返信先がある場合）
+
+      - name: route_type
+        type: Integer
+        nullable: true
+        comment: 書き込んだ人のルートタイプ（明細とリンク）
+
+      - name: route_number
+        type: Integer
+        nullable: true
+        comment: 書き込んだ人のルートナンバー（明細とリンク）
+
+      - name: poster_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 投稿者のユーザーUUID
+
+      - name: poster_group_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: 投稿者の部署コード
+
+      - name: comment_text
+        type: String
+        args: [2000]
+        nullable: false
+        comment: コメント内容
+
+      - name: posted_at
+        type: TIMESTAMP
+        default: datetime.now
+        nullable: false
+        comment: 投稿日時
+
+      - name: is_deleted
+        type: Boolean
+        default: false
+        nullable: false
+        comment: ソフト削除フラグ
+
+      - name: create_date
+        type: TIMESTAMP
+        default: datetime.now
+        nullable: false
+
+      - name: create_employee_code
+        type: String
+        args: [10]
+        nullable: false
+
+      - name: update_date
+        type: TIMESTAMP
+        default: datetime.now
+        onupdate: datetime.now
+        nullable: false
+
+      - name: update_employee_code
+        type: String
+        args: [10]
+        nullable: false
+
+      - name: update_count
+        type: Integer
+        nullable: false
+
+    indexes:
+      - [tenant_uuid, application_number]
+      - [parent_comment_id]
+      - [poster_user_uuid]
+
+    foreign_keys:
+      - columns: [tenant_uuid, application_number]
+        references: [t_application_object.tenant_uuid, t_application_object.application_number]
+
+      - columns: [tenant_uuid, poster_user_uuid]
+        references: [m_employee.tenant_uuid, m_employee.user_u]
+
+  - class_name: ApplicationCommentReadStatus
+    table_name: t_application_comment_read_status
+    description: 申請チャットコメント既読ステータス
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: comment_id
+        type: Integer
+        nullable: false
+        comment: コメントID（t_application_comment.idへの外部キー）
+
+      - name: user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 既読したユーザーのUUID
+
+      - name: read_at
+        type: TIMESTAMP
+        nullable: true
+        comment: 既読日時
+
+    table_args:
+      - index: [comment_id]
+      - index: [user_uuid]
+      - foreign_key:
+          columns: [comment_id]
+          references: [t_application_comment.id]
+
+  - class_name: ApplicationCommentAttachment
+    table_name: t_application_comment_attachment
+    description: 申請チャットコメントの添付ファイル情報
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: comment_id
+        type: Integer
+        nullable: false
+        comment: 対象のコメントID（t_application_comment.idへの外部キー）
+
+      - name: file_name
+        type: String
+        args: [255]
+        nullable: false
+        comment: 添付ファイル名
+
+      - name: file_path
+        type: String
+        args: [255]
+        nullable: false
+        comment: 添付ファイルパス
+
+    table_args:
+      - index: [comment_id]
+      - foreign_key:
+          columns: [comment_id]
+          references: [t_application_comment.id]
+

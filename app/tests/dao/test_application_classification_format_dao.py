@@ -12,6 +12,7 @@ def application_classification_format_dict():
         "application_classification_code": 'dummy',
         "application_classification_name": 'dummy',
         "sort_number": 1,
+        "individual_route_code": 'dummy',
         "create_date": datetime(2024, 1, 1, 0, 0, 0),
         "create_employee_code": 'dummy',
         "update_date": datetime(2024, 1, 1, 0, 0, 0),

@@ -12,6 +12,8 @@ def common_route_dict():
         "tenant_uuid": 'dummy',
         "common_route_code": 'dummy',
         "common_route_name": 'dummy',
+        "total_instance_count": 1,
+        "milestone_count": 1,
         "create_date": datetime(2024, 1, 1, 0, 0, 0),
         "create_employee_code": 'dummy',
         "update_date": datetime(2024, 1, 1, 0, 0, 0),

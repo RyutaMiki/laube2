@@ -217,6 +217,7 @@ class ApplicationClassificationFormat(Base):
     application_classification_code = Column('application_classification_code', String(10), nullable=False, unique=True, comment="申請分類コード")
     application_classification_name = Column('application_classification_name', String(30), nullable=False, comment="申請分類名")
     sort_number = Column('sort_number', Integer, nullable=False, comment="ソート順")
+    individual_route_code = Column('individual_route_code', String(10), nullable=False, comment="直接部門")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10), nullable=False)
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
@@ -343,6 +344,8 @@ class IndividualRoute(Base):
     tenant_uuid = Column('tenant_uuid', String(36), nullable=False, comment="テナントUUID")
     individual_route_code = Column('individual_route_code', String(10), nullable=False, comment="直接部門")
     individual_route_name = Column('individual_route_name', String(30), nullable=False, comment="直接部門名")
+    total_instance_count = Column('total_instance_count', Integer, nullable=True, comment="多重インスタンスの総数（全体制御用）")
+    milestone_count = Column('milestone_count', Integer, nullable=True, comment="マイルストーンの合計数")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10), nullable=False)
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
@@ -377,7 +380,18 @@ class IndividualActivity(Base):
     approverl_group_code = Column('approverl_group_code', String(10), nullable=True, comment="承認者の部署コード")
     approverl_user_uuid = Column('approverl_user_uuid', String(10), nullable=True, comment="承認者のユーザーUUID")
     function = Column('function', EnumType(enum_class=ApprovalFunction), nullable=False, comment="承認画面の機能")
-    is_terminal = Column('is_terminal', Boolean, nullable=False, default=False, comment="このアクティビティが終了ノードならTrue")
+    instance_group_id = Column('instance_group_id', String, nullable=True, comment="多重インスタンスグループID")
+    instance_index = Column('instance_index', Integer, nullable=True, comment="インスタンス内の番号")
+    total_instance_count = Column('total_instance_count', Integer, nullable=True, comment="インスタンスグループ全体の数")
+    max_loop = Column('max_loop', Integer, nullable=True, comment="ループ最大回数")
+    is_synchronized = Column('is_synchronized', Boolean, nullable=False, default=False, comment="同期必須ならTrue")
+    is_interleaved_locked = Column('is_interleaved_locked', Boolean, nullable=False, default=False, comment="並列経路で他が実行中ならTrue")
+    is_milestone = Column('is_milestone', Boolean, nullable=False, default=False, comment="マイルストーンとして設定されているか")
+    is_terminal = Column('is_terminal', Boolean, nullable=False, default=False, comment="終了ノードとして設定されているか")
+    is_discriminator_loser = Column('is_discriminator_loser', Boolean, nullable=False, default=False, comment="Discriminatorで負ける側の経路に設定されているか")
+    is_deferred_choice_winner = Column('is_deferred_choice_winner', Boolean, nullable=False, default=False, comment="Deferred Choiceで勝者となる条件に設定されているか")
+    is_deferred_choice_loser = Column('is_deferred_choice_loser', Boolean, nullable=False, default=False, comment="Deferred Choiceで敗者となる経路に設定されているか")
+    trigger_type = Column('trigger_type', String(50), nullable=True, comment="トリガー種別（イベント名や条件式）")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10), nullable=False)
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
@@ -407,6 +421,8 @@ class CommonRoute(Base):
     tenant_uuid = Column('tenant_uuid', String(36), nullable=False, comment="テナントUUID")
     common_route_code = Column('common_route_code', String(10), nullable=False, comment="間接部門")
     common_route_name = Column('common_route_name', String(30), nullable=False, comment="間接部門名")
+    total_instance_count = Column('total_instance_count', Integer, nullable=True, comment="多重インスタンスの総数（全体制御用）")
+    milestone_count = Column('milestone_count', Integer, nullable=True, comment="マイルストーンの合計数")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10), nullable=False)
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
@@ -441,6 +457,18 @@ class CommonActivity(Base):
     approverl_group_code = Column('approverl_group_code', String(10), nullable=True, comment="承認者の部署コード")
     approverl_user_uuid = Column('approverl_user_uuid', String(10), nullable=True, comment="承認者のユーザーUUID")
     function = Column('function', EnumType(enum_class=ApprovalFunction), nullable=False, comment="承認画面の機能")
+    instance_group_id = Column('instance_group_id', String, nullable=True, comment="多重インスタンスグループID")
+    instance_index = Column('instance_index', Integer, nullable=True, comment="インスタンス内の番号")
+    total_instance_count = Column('total_instance_count', Integer, nullable=True, comment="インスタンスグループ全体の数")
+    max_loop = Column('max_loop', Integer, nullable=True, comment="ループ最大回数")
+    is_synchronized = Column('is_synchronized', Boolean, nullable=False, default=False, comment="同期必須ならTrue")
+    is_interleaved_locked = Column('is_interleaved_locked', Boolean, nullable=False, default=False, comment="並列経路で他が実行中ならTrue")
+    is_milestone = Column('is_milestone', Boolean, nullable=False, default=False, comment="マイルストーンとして設定されているか")
+    is_terminal = Column('is_terminal', Boolean, nullable=False, default=False, comment="終了ノードとして設定されているか")
+    is_discriminator_loser = Column('is_discriminator_loser', Boolean, nullable=False, default=False, comment="Discriminatorで負ける側の経路に設定されているか")
+    is_deferred_choice_winner = Column('is_deferred_choice_winner', Boolean, nullable=False, default=False, comment="Deferred Choiceで勝者となる条件に設定されているか")
+    is_deferred_choice_loser = Column('is_deferred_choice_loser', Boolean, nullable=False, default=False, comment="Deferred Choiceで敗者となる経路に設定されているか")
+    trigger_type = Column('trigger_type', String(50), nullable=True, comment="トリガー種別（イベント名や条件式）")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_employee_code = Column('create_employee_code', String(10), nullable=False)
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
@@ -470,6 +498,7 @@ class ApplicationObject(Base):
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
     tenant_uuid = Column('tenant_uuid', String(36), nullable=False, comment="テナントUUID")
     application_number = Column('application_number', Integer, nullable=False, comment="申請番号")
+    re_application_number = Column('re_application_number', Integer, nullable=False, comment="旧_申請番号")
     application_form_code = Column('application_form_code', String(10), nullable=False, comment="申請書コード")
     target_tenant_uuid = Column('target_tenant_uuid', String(36), nullable=True, comment="対象者のテナントUUID")
     target_group_code = Column('target_group_code', String(10), nullable=False, comment="対象者の部署コード")
@@ -517,6 +546,10 @@ class ActivityObject(Base):
     approverl_group_code = Column('approverl_group_code', String(10), nullable=True, comment="承認者の部署コード")
     approverl_user_uuid = Column('approverl_user_uuid', String(36), nullable=True, comment="承認者のユーザーUUID")
     function = Column('function', EnumType(enum_class=ApprovalFunction), nullable=False, comment="承認画面の機能")
+    deputy_approverl_tenant_uuid = Column('deputy_approverl_tenant_uuid', String(10), nullable=True, comment="代理承認者のテナントUUID")
+    deputy_approverl_group_code = Column('deputy_approverl_group_code', String(10), nullable=True, comment="代理承認者の部署コード")
+    deputy_approverl_user_uuid = Column('deputy_approverl_user_uuid', String(10), nullable=True, comment="代理承認者のユーザーUUID")
+    deputy_contents = Column('deputy_contents', String(255), nullable=True, comment="依頼理由")
     instance_group_id = Column('instance_group_id', String, nullable=True, comment="多重インスタンスグループID")
     instance_index = Column('instance_index', Integer, nullable=True, comment="インスタンス内の番号")
     total_instance_count = Column('total_instance_count', Integer, nullable=True, comment="インスタンスグループ全体の数（Activity単位で必要な場合）")
@@ -689,4 +722,71 @@ class ActivityTransit(Base):
     __mapper_args__ = {
         'version_id_col': update_count
     }
+
+
+
+class ApplicationComment(Base):
+    """
+    　申請チャット／コメント情報（掲示板形式、スレッド対応）
+    """
+
+    __tablename__ = 't_application_comment'
+    id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
+    tenant_uuid = Column('tenant_uuid', String(36), nullable=False, comment="テナントUUID")
+    application_number = Column('application_number', Integer, nullable=False, comment="紐づく申請番号")
+    parent_comment_id = Column('parent_comment_id', Integer, nullable=True, comment="親コメントID（返信先がある場合）")
+    route_type = Column('route_type', Integer, nullable=True, comment="書き込んだ人のルートタイプ（明細とリンク）")
+    route_number = Column('route_number', Integer, nullable=True, comment="書き込んだ人のルートナンバー（明細とリンク）")
+    poster_user_uuid = Column('poster_user_uuid', String(36), nullable=False, comment="投稿者のユーザーUUID")
+    poster_group_code = Column('poster_group_code', String(10), nullable=False, comment="投稿者の部署コード")
+    comment_text = Column('comment_text', String(2000), nullable=False, comment="コメント内容")
+    posted_at = Column('posted_at', TIMESTAMP, nullable=False, default=datetime.now, comment="投稿日時")
+    is_deleted = Column('is_deleted', Boolean, nullable=False, default=False, comment="ソフト削除フラグ")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
+    create_employee_code = Column('create_employee_code', String(10), nullable=False)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
+    update_employee_code = Column('update_employee_code', String(10), nullable=False)
+    update_count = Column('update_count', Integer, nullable=False)
+
+
+
+    __mapper_args__ = {
+        'version_id_col': update_count
+    }
+
+    __table_args__ = (
+        Index('ix_t_application_commenttenant_uuid_application_number', tenant_uuid, application_number),
+        Index('ix_t_application_commentparent_comment_id', parent_comment_id),
+        Index('ix_t_application_commentposter_user_uuid', poster_user_uuid)
+    )
+
+class ApplicationCommentReadStatus(Base):
+    """
+    　申請チャットコメント既読ステータス
+    """
+
+    __tablename__ = 't_application_comment_read_status'
+    id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
+    comment_id = Column('comment_id', Integer, nullable=False, comment="コメントID（t_application_comment.idへの外部キー）")
+    user_uuid = Column('user_uuid', String(36), nullable=False, comment="既読したユーザーのUUID")
+    read_at = Column('read_at', TIMESTAMP, nullable=True, comment="既読日時")
+
+
+
+
+
+
+class ApplicationCommentAttachment(Base):
+    """
+    　申請チャットコメントの添付ファイル情報
+    """
+
+    __tablename__ = 't_application_comment_attachment'
+    id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
+    comment_id = Column('comment_id', Integer, nullable=False, comment="対象のコメントID（t_application_comment.idへの外部キー）")
+    file_name = Column('file_name', String(255), nullable=False, comment="添付ファイル名")
+    file_path = Column('file_path', String(255), nullable=False, comment="添付ファイルパス")
+
+
+
 

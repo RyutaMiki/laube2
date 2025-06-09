@@ -11,6 +11,7 @@ def application_object_dict():
         "id": 1,
         "tenant_uuid": 'dummy',
         "application_number": 1,
+        "re_application_number": 1,
         "application_form_code": 'dummy',
         "target_tenant_uuid": 'dummy',
         "target_group_code": 'dummy',

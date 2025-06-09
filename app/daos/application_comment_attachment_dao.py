@@ -1,0 +1,15 @@
+from app.models.models import ApplicationCommentAttachment
+from sqlalchemy.orm import Session
+from typing import List, Optional, Any
+from app.daos.base.application_comment_attachment_dao_base import ApplicationCommentAttachmentDaoBase
+
+class ApplicationCommentAttachmentDao(ApplicationCommentAttachmentDaoBase):
+    """
+    ApplicationCommentAttachment に関するカスタムDAO処理を書く場所
+
+    - サンプルメソッドをここに追加できます。
+    - 例:
+        def custom_search(self, db_session: Session, keyword: str) -> List[ApplicationCommentAttachment]:
+            return db_session.query(ApplicationCommentAttachment).filter(ApplicationCommentAttachment.name.like(f"%{keyword}%")).all()
+    """
+    pass  # 必要に応じてカスタムメソッドをここに追加してください

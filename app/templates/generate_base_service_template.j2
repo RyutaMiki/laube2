@@ -1,6 +1,6 @@
 from typing import Optional, List
 from sqlalchemy.orm import Session
-from app.daos.{{ model_lower }}_dao_base import {{ base_dao_class_name }}
+from app.repositories.{{ model_lower }}_repository import {{ repository_class_name }}
 from app.models.models import {{ model_class }}
 from app.services.base.base_service import BaseService
 
@@ -9,20 +9,20 @@ class {{ base_service_class_name }}(BaseService):
     """
     {{ model_class }} に関する基本的なサービス処理（BaseService継承）
     """
-    def __init__(self, dao: Optional[{{ base_dao_class_name }}] = None):
-        self.dao = dao or {{ base_dao_class_name }}()
+    def __init__(self, repository: Optional[{{ repository_class_name }}] = None):
+        self.repository = repository or {{ repository_class_name }}()
 
     def get(self, db: Session, id: int) -> Optional[{{ model_class }}]:
-        return self.dao.get(db, id)
+        return self.repository.get(db, id)
 
     def get_all(self, db: Session, limit: int = 100, offset: int = 0) -> List[{{ model_class }}]:
-        return self.dao.get_all(db, limit, offset)
+        return self.repository.get_all(db, limit, offset)
 
     def create(self, db: Session, data: {{ model_class }}) -> {{ model_class }}:
-        return self.dao.create(db, data)
+        return self.repository.create(db, data)
 
     def update(self, db: Session, instance: {{ model_class }}, data: dict) -> {{ model_class }}:
-        return self.dao.update(db, instance, data)
+        return self.repository.update(db, instance, data)
 
     def delete(self, db: Session, instance: {{ model_class }}) -> None:
-        return self.dao.delete(db, instance)
+        return self.repository.delete(db, instance)

@@ -4,13 +4,14 @@ import sys
 import os
 from pathlib import Path
 from jinja2 import Template as JinjaTemplate
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 # === パス・env設定 ===
-sys.path.insert(0, os.getenv("PROJECT_DIR") or "c:/git/laube2")
+sys.path.insert(0, os.getenv("PROJECT_DIR"))
 from dotenv import load_dotenv
 load_dotenv()
-PROJECT_DIR = Path(os.getenv("PROJECT_DIR") or "c:/git/laube2")
-MODELS_FILE = PROJECT_DIR / "models" / "models.py"
+PROJECT_DIR = Path(os.getenv("PROJECT_DIR"))
+MODELS_FILE = "app/models/models.py"
 
 # models.pyをimport
 spec = importlib.util.spec_from_file_location("models", MODELS_FILE)
@@ -63,7 +64,7 @@ def test_delete_{{ model_lower }}(db_session: Session, {{ model_lower }}_dict):
     assert deleted is None
 '''
 
-output_dir = PROJECT_DIR / "tests" / "dao"
+output_dir = PROJECT_DIR / "app" / "tests" / "dao"
 output_dir.mkdir(parents=True, exist_ok=True)
 print("テスト出力先:", output_dir)
 

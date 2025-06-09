@@ -13,7 +13,7 @@ load_dotenv()
 
 # ====== パス定義 ======
 PROJECT_DIR = Path(os.getenv("PROJECT_DIR") or Path(__file__).resolve().parents[1])  # laube2/app/想定
-APP_DIR = PROJECT_DIR  # laube2/app/
+APP_DIR = PROJECT_DIR / "app" # laube2/app/
 
 MODELS_FILE = APP_DIR / "models" / "models.py"
 TEMPLATE_DIR = APP_DIR / "templates"

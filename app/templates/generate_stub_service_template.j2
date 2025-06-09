@@ -1,0 +1,14 @@
+from typing import Optional
+from app.services.base.{{ model_lower }}_service_base import {{ base_service_class_name }}
+
+
+class {{ service_class_name }}({{ base_service_class_name }}):
+    """
+    {{ service_class_name }}: {{ base_service_class_name }}を拡張し、カスタム処理を追加
+    """
+    def __init__(self, dao: Optional = None):
+        super().__init__(dao)
+
+    # ここにビジネスロジックを書く
+    # def custom_logic(self, ...):
+    #     pass

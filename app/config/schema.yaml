@@ -23,13 +23,6 @@ models:
         nullable: false
         comment: 氏名
 
-      - name: username
-        type: String
-        args: [100]
-        nullable: false
-        unique: true
-        comment: ログインID（メールなど）
-
       - name: hashed_password
         type: String
         args: [255]
@@ -276,6 +269,99 @@ models:
     foreign_keys:
       - columns: [tenant_uuid]
         references: [m_tenants.tenant_uuid]
+
+  - class_name: EmployeeGroup
+    table_name: m_employee_group
+    description: 従業員部署マスタ
+    mapper_args:
+      version_id_col: update_count
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: tenant_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: テナントUUID
+
+      - name: user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: ユーザーUUID
+
+      - name: group_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: 部署コード
+
+      - name: default_group_code
+        type: EnumType
+        args: [enum_class=DefaultGroupFlg]
+        nullable: true
+        comment: 規定部署コード
+
+      - name: term_from
+        type: Date
+        nullable: false
+        comment: 有効開始日
+
+      - name: term_to
+        type: Date
+        nullable: true
+        comment: 有効終了日
+
+      - name: range
+        type: EnumType
+        args: [enum_class=Range]
+        nullable: false
+        comment: 利用権限範囲
+
+      - name: create_date
+        type: TIMESTAMP
+        default: datetime.now
+        nullable: false
+
+      - name: create_employee_code
+        type: String
+        args: [10]
+        nullable: false
+
+      - name: update_date
+        type: TIMESTAMP
+        default: datetime.now
+        onupdate: datetime.now
+        nullable: false
+
+      - name: update_employee_code
+        type: String
+        args: [10]
+        nullable: false
+
+      - name: update_count
+        type: Integer
+        nullable: false
+
+    indexes:
+      - [tenant_uuid, user_uuid, group_code]
+      - [tenant_uuid]
+      - [user_uuid]
+      - [group_code]
+
+    uniques:
+      - [tenant_uuid, user_uuid, group_code]
+
+    foreign_keys:
+      - columns: [tenant_uuid]
+        references: [m_tenants.tenant_uuid]
+
+      - columns: [tenant_uuid, user_uuid]
+        references: [employees.tenant_uuid, employees.user_uuid]
 
   - class_name: Boss
     table_name: m_boss

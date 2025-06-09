@@ -85,4 +85,25 @@ class PermissionRange(IntEnum):
     GROUP_ONLY = 2     # 部署のみ / Group Only
     INDIVIDUAL = 3     # 個人のみ / Individual Only
 
+
+class DefaultGroupFlg(IntEnum):
+    """
+    Enum:デフォルト部署フラグ
+    ON デフォルト部署
+    OFF その他
+    """
+    ON = 1
+    OFF = 2
+
+
+class Range(IntEnum):
+    """
+    Enum:利用権限範囲
+    PERSONAL 個人
+    ALL 全員
+    """
+    PERSONAL = 1
+    ALL = 2
+
+
 # --- 必要に応じて追加可能 ---

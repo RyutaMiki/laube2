@@ -22,7 +22,6 @@ class Users(Base):
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
     user_uuid = Column('user_uuid', String(36), nullable=False, unique=True, default=uuid.uuid4, comment="ユーザーUUID")
     user_name = Column('user_name', String(50), nullable=False, comment="氏名")
-    username = Column('username', String(100), nullable=False, unique=True, comment="ログインID（メールなど）")
     hashed_password = Column('hashed_password', String(255), nullable=False, comment="ハッシュ化されたパスワード")
     is_active = Column('is_active', Boolean, nullable=False, default=True, comment="利用可能フラグ（無効化対応）")
     last_login_at = Column('last_login_at', TIMESTAMP, nullable=True, comment="最終ログイン日時")
@@ -109,6 +108,40 @@ class Group(Base):
     __table_args__ = (
         Index('ix_m_grouptenant_uuid', tenant_uuid),
         UniqueConstraint(tenant_uuid, group_code)
+    )
+
+class EmployeeGroup(Base):
+    """
+    　従業員部署マスタ
+    """
+
+    __tablename__ = 'm_employee_group'
+    id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
+    tenant_uuid = Column('tenant_uuid', String(36), nullable=False, comment="テナントUUID")
+    user_uuid = Column('user_uuid', String(36), nullable=False, comment="ユーザーUUID")
+    group_code = Column('group_code', String(10), nullable=False, comment="部署コード")
+    default_group_code = Column('default_group_code', EnumType(enum_class=DefaultGroupFlg), nullable=True, comment="規定部署コード")
+    term_from = Column('term_from', Date, nullable=False, comment="有効開始日")
+    term_to = Column('term_to', Date, nullable=True, comment="有効終了日")
+    range = Column('range', EnumType(enum_class=Range), nullable=False, comment="利用権限範囲")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
+    create_employee_code = Column('create_employee_code', String(10), nullable=False)
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
+    update_employee_code = Column('update_employee_code', String(10), nullable=False)
+    update_count = Column('update_count', Integer, nullable=False)
+
+
+
+    __mapper_args__ = {
+        'version_id_col': update_count
+    }
+
+    __table_args__ = (
+        Index('ix_m_employee_grouptenant_uuid_user_uuid_group_code', tenant_uuid, user_uuid, group_code),
+        Index('ix_m_employee_grouptenant_uuid', tenant_uuid),
+        Index('ix_m_employee_groupuser_uuid', user_uuid),
+        Index('ix_m_employee_groupgroup_code', group_code),
+        UniqueConstraint(tenant_uuid, user_uuid, group_code)
     )
 
 class Boss(Base):

@@ -29,9 +29,9 @@ def application_object_dict():
         "milestone_count": 1,
         "reached_milestone_count": 1,
         "create_date": datetime(2024, 1, 1, 0, 0, 0),
-        "create_employee_code": 'dummy',
+        "create_user_uuid": 'dummy',
         "update_date": datetime(2024, 1, 1, 0, 0, 0),
-        "update_employee_code": 'dummy',
+        "update_user_uuid": 'dummy',
         "update_count": 1
     }
 

@@ -20,9 +20,9 @@ def application_comment_dict():
         "posted_at": datetime(2024, 1, 1, 0, 0, 0),
         "is_deleted": True,
         "create_date": datetime(2024, 1, 1, 0, 0, 0),
-        "create_employee_code": 'dummy',
+        "create_user_uuid": 'dummy',
         "update_date": datetime(2024, 1, 1, 0, 0, 0),
-        "update_employee_code": 'dummy',
+        "update_user_uuid": 'dummy',
         "update_count": 1
     }
 

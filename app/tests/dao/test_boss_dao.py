@@ -17,9 +17,9 @@ def boss_dict():
         "boss_group_code": 'dummy',
         "boss_user_uuid": 'dummy',
         "create_date": datetime(2024, 1, 1, 0, 0, 0),
-        "create_employee_code": 'dummy',
+        "create_user_uuid": 'dummy',
         "update_date": datetime(2024, 1, 1, 0, 0, 0),
-        "update_employee_code": 'dummy',
+        "update_user_uuid": 'dummy',
         "update_count": 1
     }
 

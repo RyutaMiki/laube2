@@ -106,4 +106,50 @@ class Range(IntEnum):
     ALL = 2
 
 
+class InheritMode(IntEnum):
+    """
+    Enum:利用権限範囲
+    USER_ONLY ユーザーUUIDのみ引き継ぎ
+    GROUP 所属部署・ユーザー情報を引き継ぎ
+    FULL 申請内容まるごと（JSONで渡す）引き継ぎ
+    """
+    USER_ONLY = 1
+    GROUP = 2
+    FULL = 3
+
+
+class EscalationAction(IntEnum):
+    """タイムアウト時の自動処理アクション / Escalation Action"""
+    ESCALATE = 1   # 上位者へエスカレーション / Escalate to superior
+    SKIP = 2       # スキップして次へ進む / Skip to next
+    APPROVE = 3    # 自動で承認 / Auto approve
+    RETURN = 4     # 差し戻し（前段階または申請者へ）/ Return to previous or applicant
+
+
+class ConditionExpressionType(IntEnum):
+    """条件式の評価エンジン種別 / Condition Expression Type"""
+    DSL = 1          # 独自の簡易DSL（例：applicant_user_uuid == 'abc'）
+    JSONLOGIC = 2    # JSONLogic形式
+    JMESPATH = 3     # JMESPath形式
+
+
+class FieldVisibilityType(IntEnum):
+    """フィールドの表示制御種別 / Field Visibility Type"""
+    VISIBLE = 1    # 表示・編集可能
+    READONLY = 2   # 表示のみ
+    HIDDEN = 3     # 非表示
+
+
+class RouteType(IntEnum):
+    """ルート種別 / Route Type"""
+    INDIVIDUAL = 1  # 直接部門ルート
+    COMMON = 2      # 間接部門ルート
+
+
+class SkipMode(IntEnum):
+    """条件未成立時の制御モード / Skip Mode"""
+    SKIP = 1     # 条件が満たされない場合スキップする
+    BLOCK = 2    # 条件が満たされない場合処理を中断（エラー）
+    WARN = 3     # 条件が満たされない場合警告を出して進行
+
 # --- 必要に応じて追加可能 ---

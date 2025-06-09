@@ -48,7 +48,7 @@ models:
 
       - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
         comment: 作成者ユーザーコード
 
@@ -61,7 +61,7 @@ models:
 
       - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
         comment: 更新者ユーザーコード
 
@@ -95,7 +95,7 @@ models:
         comment: 作成日時
       - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
         comment: 作成者ユーザーコード
       - name: update_date
@@ -106,7 +106,7 @@ models:
         comment: 更新日時
       - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
         comment: 更新者ユーザーコード
       - name: update_count
@@ -150,7 +150,7 @@ models:
         comment: 作成日時
       - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
         comment: 作成者ユーザーコード
       - name: update_date
@@ -161,7 +161,7 @@ models:
         comment: 更新日時
       - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
         comment: 更新者ユーザーコード
       - name: update_count
@@ -242,9 +242,9 @@ models:
         default: "lambda: datetime.now()"
         nullable: false
 
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_date
@@ -253,9 +253,9 @@ models:
         onupdate: "lambda: datetime.now()"
         nullable: false
 
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_count
@@ -327,9 +327,9 @@ models:
         default: datetime.now
         nullable: false
 
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_date
@@ -338,9 +338,9 @@ models:
         onupdate: datetime.now
         nullable: false
 
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_count
@@ -422,9 +422,9 @@ models:
         default: datetime.now
         nullable: false
 
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_date
@@ -433,9 +433,9 @@ models:
         onupdate: datetime.now
         nullable: false
 
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_count
@@ -513,9 +513,9 @@ models:
         default: datetime.now
         nullable: false
 
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_date
@@ -524,9 +524,9 @@ models:
         onupdate: datetime.now
         nullable: false
 
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_count
@@ -576,18 +576,18 @@ models:
         type: TIMESTAMP
         nullable: false
         default: datetime.now
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_date
         type: TIMESTAMP
         nullable: false
         default: datetime.now
         onupdate: datetime.now
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_count
         type: Integer
@@ -663,18 +663,18 @@ models:
         type: TIMESTAMP
         default: datetime.now
         nullable: false
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_date
         type: TIMESTAMP
         default: datetime.now
         onupdate: datetime.now
         nullable: false
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_count
         type: Integer
@@ -764,18 +764,18 @@ models:
         type: TIMESTAMP
         default: datetime.now
         nullable: false
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_date
         type: TIMESTAMP
         default: datetime.now
         onupdate: datetime.now
         nullable: false
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_count
         type: Integer
@@ -828,18 +828,18 @@ models:
         type: TIMESTAMP
         default: datetime.now
         nullable: false
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_date
         type: TIMESTAMP
         default: datetime.now
         onupdate: datetime.now
         nullable: false
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_count
         type: Integer
@@ -890,18 +890,18 @@ models:
         type: TIMESTAMP
         default: datetime.now
         nullable: false
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_date
         type: TIMESTAMP
         default: datetime.now
         onupdate: datetime.now
         nullable: false
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_count
         type: Integer
@@ -938,9 +938,9 @@ models:
         type: Integer
         nullable: false
         comment: アクティビティコード
-      - name: approverl_ctenant_uuid
+      - name: approverl_tenant_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: true
         comment: 承認者のテナントUUID
       - name: approverl_role_code
@@ -955,7 +955,7 @@ models:
         comment: 承認者の部署コード
       - name: approverl_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: true
         comment: 承認者のユーザーUUID
       - name: function
@@ -1032,22 +1032,57 @@ models:
         nullable: true
         comment: トリガー種別（イベント名や条件式）
 
+      - name: timeout_hours
+        type: Integer
+        nullable: true
+        comment: 指定時間内に処理されない場合のタイムアウト時間（単位：時間）
+
+      - name: escalation_action
+        type: EnumType
+        args: [enum_class=EscalationAction]
+        nullable: true
+        comment: タイムアウト時に自動実行されるアクション（ESCALATE / SKIP / APPROVE / RETURN）
+
+      - name: escalation_target_user_uuid
+        type: String
+        args: [36]
+        nullable: true
+        comment: エスカレーション先のユーザーUUID（ESCALATE時のみ有効）
+
+      - name: condition_expression
+        type: String
+        args: [255]
+        nullable: true
+        comment: 実行条件式（申請情報などに基づくスキップ・有効判定式）
+
+      - name: condition_type
+        type: EnumType
+        args: [enum_class=ConditionExpressionType]
+        nullable: true
+        comment: 条件式の評価エンジン種別（DSL / JSONLOGIC / JMESPATHなど）
+
+      - name: skip_mode
+        type: EnumType
+        args: [enum_class=SkipMode]
+        nullable: true
+        comment: 条件を満たさないときの動作（SKIP=スキップ, BLOCK=中断, WARN=警告のみ）
+
       - name: create_date
         type: TIMESTAMP
         default: datetime.now
         nullable: false
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_date
         type: TIMESTAMP
         default: datetime.now
         onupdate: datetime.now
         nullable: false
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_count
         type: Integer
@@ -1103,18 +1138,18 @@ models:
         type: TIMESTAMP
         default: datetime.now
         nullable: false
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_date
         type: TIMESTAMP
         default: datetime.now
         onupdate: datetime.now
         nullable: false
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_count
         type: Integer
@@ -1156,7 +1191,7 @@ models:
         comment: アクティビティコード
       - name: approverl_tenant_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: true
         comment: 承認者のテナントUUID
       - name: approverl_role_code
@@ -1171,7 +1206,7 @@ models:
         comment: 承認者の部署コード
       - name: approverl_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: true
         comment: 承認者のユーザーUUID
       - name: function
@@ -1248,22 +1283,57 @@ models:
         nullable: true
         comment: トリガー種別（イベント名や条件式）
 
+      - name: timeout_hours
+        type: Integer
+        nullable: true
+        comment: 指定時間内に処理されない場合のタイムアウト時間（単位：時間）
+
+      - name: escalation_action
+        type: EnumType
+        args: [enum_class=EscalationAction]
+        nullable: true
+        comment: タイムアウト時に自動実行されるアクション（ESCALATE / SKIP / APPROVE / RETURN）
+
+      - name: escalation_target_user_uuid
+        type: String
+        args: [36]
+        nullable: true
+        comment: エスカレーション先のユーザーUUID（ESCALATE時のみ有効）
+
+      - name: condition_expression
+        type: String
+        args: [255]
+        nullable: true
+        comment: 実行条件式（申請情報などに基づくスキップ・有効判定式）
+
+      - name: condition_type
+        type: EnumType
+        args: [enum_class=ConditionExpressionType]
+        nullable: true
+        comment: 条件式の評価エンジン種別（DSL / JSONLOGIC / JMESPATHなど）
+
+      - name: skip_mode
+        type: EnumType
+        args: [enum_class=SkipMode]
+        nullable: true
+        comment: 条件を満たさないときの動作（SKIP=スキップ, BLOCK=中断, WARN=警告のみ）
+
       - name: create_date
         type: TIMESTAMP
         default: datetime.now
         nullable: false
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_date
         type: TIMESTAMP
         default: datetime.now
         onupdate: datetime.now
         nullable: false
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
       - name: update_count
         type: Integer
@@ -1405,9 +1475,9 @@ models:
         default: datetime.now
         nullable: false
 
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_date
@@ -1416,9 +1486,9 @@ models:
         onupdate: datetime.now
         nullable: false
 
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_count
@@ -1505,7 +1575,7 @@ models:
 
       - name: deputy_approverl_tenant_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: true
         comment: 代理承認者のテナントUUID
 
@@ -1517,7 +1587,7 @@ models:
 
       - name: deputy_approverl_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: true
         comment: 代理承認者のユーザーUUID
 
@@ -1681,9 +1751,9 @@ models:
         default: datetime.now
         nullable: false
 
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_date
@@ -1692,9 +1762,9 @@ models:
         onupdate: datetime.now
         nullable: false
 
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_count
@@ -1792,9 +1862,9 @@ models:
         default: datetime.now
         nullable: false
 
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_date
@@ -1803,9 +1873,9 @@ models:
         onupdate: datetime.now
         nullable: false
 
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_count
@@ -2101,9 +2171,9 @@ models:
         default: datetime.now
         nullable: false
 
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_date
@@ -2112,9 +2182,9 @@ models:
         onupdate: datetime.now
         nullable: false
 
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_count
@@ -2205,9 +2275,9 @@ models:
         default: datetime.now
         nullable: false
 
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_date
@@ -2216,9 +2286,9 @@ models:
         onupdate: datetime.now
         nullable: false
 
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_count
@@ -2298,9 +2368,9 @@ models:
         default: datetime.now
         nullable: false
 
-      - name: create_employee_code
+      - name: create_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_date
@@ -2309,9 +2379,9 @@ models:
         onupdate: datetime.now
         nullable: false
 
-      - name: update_employee_code
+      - name: update_user_uuid
         type: String
-        args: [10]
+        args: [36]
         nullable: false
 
       - name: update_count
@@ -2396,3 +2466,665 @@ models:
           columns: [comment_id]
           references: [t_application_comment.id]
 
+  - class_name: WorkflowTrigger
+    table_name: t_workflow_trigger
+    description: サブプロセス自動起動定義（申請間連携トリガー）
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: tenant_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: テナントUUID
+
+      - name: trigger_form_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: トリガー元の申請書コード（例：出張申請）
+
+      - name: trigger_activity_code
+        type: Integer
+        nullable: true
+        comment: トリガー元のアクティビティコード（例：課長承認）※NULLなら完了時
+
+      - name: target_form_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: 起動する申請書コード（例：出張報告申請）
+
+      - name: inherit_mode
+        type: EnumType
+        args: [enum_class=InheritMode]
+        nullable: false
+        comment: 引き継ぎモード（USER_ONLY / GROUP / FULL）
+
+      - name: trigger_condition
+        type: String
+        args: [255]
+        nullable: true
+        comment: 条件式（DSL or JSON）で実行条件を制限可能
+
+      - name: create_date
+        type: TIMESTAMP
+        default: datetime.now
+        nullable: false
+
+      - name: create_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_date
+        type: TIMESTAMP
+        default: datetime.now
+        onupdate: datetime.now
+        nullable: false
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_count
+        type: Integer
+        nullable: false
+
+    indexes:
+      - [tenant_uuid, trigger_form_code]
+    uniques:
+      - [tenant_uuid, trigger_form_code, trigger_activity_code, target_form_code]
+
+  - class_name: DynamicRouteNode
+    table_name: t_dynamic_route_node
+    description: 動的承認ルート定義（申請単位で承認者を指定）
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: tenant_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: テナントUUID
+
+      - name: application_number
+        type: Integer
+        nullable: false
+        comment: 紐づく申請番号
+
+      - name: route_type
+        type: Integer
+        nullable: false
+        comment: 紐づくルートタイプ
+
+      - name: route_number
+        type: Integer
+        nullable: false
+        comment: 紐づくルートナンバー
+
+      - name: approverl_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 承認者ユーザーUUID（動的に指定）
+
+      - name: approverl_group_code
+        type: String
+        args: [10]
+        nullable: true
+        comment: 承認者部署コード（オプション）
+
+      - name: function
+        type: EnumType
+        args: [enum_class=ApprovalFunction]
+        nullable: false
+        comment: 承認機能タイプ
+
+      - name: comment
+        type: String
+        args: [255]
+        nullable: true
+        comment: 動的指定の理由や説明
+
+      - name: create_date
+        type: TIMESTAMP
+        default: datetime.now
+        nullable: false
+
+      - name: create_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_date
+        type: TIMESTAMP
+        default: datetime.now
+        onupdate: datetime.now
+        nullable: false
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_count
+        type: Integer
+        nullable: false
+
+    indexes:
+      - [tenant_uuid, application_number, route_type, route_number]
+      - [approverl_user_uuid]
+    uniques:
+      - [tenant_uuid, application_number, route_type, route_number]
+    foreign_keys:
+      - columns: [tenant_uuid, approverl_user_uuid]
+        references: [m_employee.tenant_uuid, m_employee.user_uuid]
+
+  - class_name: ReworkRoute
+    table_name: t_rework_route
+    description: 差し戻しルート定義（特定アクティビティから戻るルートを明示的に定義）
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: tenant_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: テナントUUID
+
+      - name: application_form_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: 対象の申請書コード
+
+      - name: from_route_type
+        type: Integer
+        nullable: false
+        comment: 差し戻し元のルートタイプ
+
+      - name: from_route_number
+        type: Integer
+        nullable: false
+        comment: 差し戻し元のルートナンバー
+
+      - name: to_route_type
+        type: Integer
+        nullable: false
+        comment: 差し戻し先のルートタイプ
+
+      - name: to_route_number
+        type: Integer
+        nullable: false
+        comment: 差し戻し先のルートナンバー
+
+      - name: condition_expression
+        type: String
+        args: [255]
+        nullable: true
+        comment: 差し戻し条件式（DSL/JSONLogicなどで柔軟に指定可能）
+
+      - name: comment
+        type: String
+        args: [255]
+        nullable: true
+        comment: 差し戻しの説明・備考など
+
+      - name: create_date
+        type: TIMESTAMP
+        default: datetime.now
+        nullable: false
+
+      - name: create_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_date
+        type: TIMESTAMP
+        default: datetime.now
+        onupdate: datetime.now
+        nullable: false
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_count
+        type: Integer
+        nullable: false
+
+    indexes:
+      - [tenant_uuid, application_form_code]
+      - [tenant_uuid, from_route_type, from_route_number]
+
+    uniques:
+      - [tenant_uuid, application_form_code, from_route_type, from_route_number, to_route_type, to_route_number]
+
+  - class_name: FieldVisibility
+    table_name: t_field_visibility
+    description: フィールド可視性定義（アクティビティ単位でフォーム項目の表示制御を行う）
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: tenant_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: テナントUUID
+
+      - name: application_form_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: 対象の申請書コード
+
+      - name: activity_code
+        type: Integer
+        nullable: false
+        comment: 対象のアクティビティコード（m_individual_activity等と一致）
+
+      - name: field_name
+        type: String
+        args: [50]
+        nullable: false
+        comment: 対象フィールド名（テーブルカラムや画面項目名）
+
+      - name: visibility
+        type: EnumType
+        args: [enum_class=FieldVisibilityType]
+        nullable: false
+        comment: 表示制御種別（VISIBLE, READONLY, HIDDEN）
+
+      - name: editable_by_applicant
+        type: Boolean
+        nullable: false
+        default: false
+        comment: 申請者が編集可能かどうか
+
+      - name: editable_by_approver
+        type: Boolean
+        nullable: false
+        default: false
+        comment: 承認者が編集可能かどうか
+
+      - name: comment
+        type: String
+        args: [255]
+        nullable: true
+        comment: 補足・用途メモ
+
+      - name: label_key
+        type: String
+        args: [100]
+        nullable: true
+        comment: ラベルキー（m_message等と連携して多言語表示に使用）
+
+      - name: create_date
+        type: TIMESTAMP
+        default: datetime.now
+        nullable: false
+
+      - name: create_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_date
+        type: TIMESTAMP
+        default: datetime.now
+        onupdate: datetime.now
+        nullable: false
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_count
+        type: Integer
+        nullable: false
+    indexes:
+      - [tenant_uuid, application_form_code, activity_code]
+      - [tenant_uuid, field_name]
+
+    uniques:
+      - [tenant_uuid, application_form_code, activity_code, field_name]
+
+  - class_name: ApplicationSnapshot
+    table_name: t_application_snapshot
+    description: 申請スナップショット履歴（ロールバック対応用の状態保存）
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: tenant_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: テナントUUID
+
+      - name: application_number
+        type: Integer
+        nullable: false
+        comment: 対象申請番号
+
+      - name: version_number
+        type: Integer
+        nullable: false
+        comment: スナップショットのバージョン番号（連番）
+
+      - name: snapshot_data
+        type: String
+        args: [255]
+        nullable: false
+        comment: 申請全体の状態を保存したJSON（ApplicationObject＋ActivityObject群など）
+
+      - name: snapshot_reason
+        type: String
+        args: [255]
+        nullable: true
+        comment: スナップショット取得理由（手動 or 自動など）
+
+      - name: revert_to_version
+        type: Integer
+        nullable: true
+        comment: ロールバック時に戻した先のバージョン（NULL以外なら復元記録）
+
+      - name: create_date
+        type: TIMESTAMP
+        default: datetime.now
+        nullable: false
+
+      - name: create_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_date
+        type: TIMESTAMP
+        default: datetime.now
+        onupdate: datetime.now
+        nullable: false
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_count
+        type: Integer
+        nullable: false
+
+    indexes:
+      - [tenant_uuid, application_number, version_number]
+    uniques:
+      - [tenant_uuid, application_number, version_number]
+    foreign_keys:
+      - columns: [tenant_uuid, application_number]
+        references: [t_application_object.tenant_uuid, t_app]
+
+  - class_name: ApprovalPolicy
+    table_name: t_approval_policy
+    description: 承認ポリシー定義（金額・部署などの条件によってルート切替）
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: tenant_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: テナントUUID
+
+      - name: application_form_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: 対象の申請書コード
+
+      - name: policy_expression
+        type: String
+        args: [1000]
+        nullable: false
+        comment: 条件式（DSL / JSONLogicで申請内容に基づく分岐条件を記述）
+
+      - name: route_override_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: 条件を満たしたときに使うルートコード（個別または共通ルート）
+
+      - name: route_type
+        type: EnumType
+        args: [enum_class=RouteType]
+        nullable: false
+        comment: ルートの種別（INDIVIDUAL / COMMON）
+
+      - name: priority
+        type: Integer
+        nullable: false
+        default: 100
+        comment: 評価順（小さいほど優先）
+
+      - name: is_active
+        type: Boolean
+        nullable: false
+        default: true
+        comment: 有効フラグ
+
+      - name: comment
+        type: String
+        args: [255]
+        nullable: true
+        comment: 補足・条件の説明など
+
+      - name: create_date
+        type: TIMESTAMP
+        default: datetime.now
+        nullable: false
+
+      - name: create_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_date
+        type: TIMESTAMP
+        default: datetime.now
+        onupdate: datetime.now
+        nullable: false
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_count
+        type: Integer
+        nullable: false
+
+    indexes:
+      - [tenant_uuid, application_form_code, priority]
+
+    uniques:
+      - [tenant_uuid, application_form_code, policy_expression]
+
+  - class_name: Message
+    table_name: m_message
+    description: 多言語メッセージマスタ（UI文言・ラベル等を管理）
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+
+      - name: language_code
+        type: String
+        args: [5]
+        nullable: false
+        comment: 言語コード（例：ja-JP, en-US）
+
+      - name: message_key
+        type: String
+        args: [100]
+        nullable: false
+        comment: ラベル・エラー文等のキー
+
+      - name: message_text
+        type: String
+        args: [255]
+        nullable: false
+        comment: 表示メッセージ
+
+      - name: create_date
+        type: TIMESTAMP
+        default: datetime.now
+        nullable: false
+
+      - name: create_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_date
+        type: TIMESTAMP
+        default: datetime.now
+        onupdate: datetime.now
+        nullable: false
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_count
+        type: Integer
+        nullable: false
+
+    uniques:
+      - [language_code, message_key]
+
+  - class_name: WorkflowGraphView
+    table_name: t_workflow_graph_view
+    description: ワークフロー構造可視化用ビュー（Mermaid等の構成図出力元データ）
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+
+      - name: tenant_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: テナントUUID
+
+      - name: application_form_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: 申請書コード
+
+      - name: route_type
+        type: Integer
+        nullable: false
+        comment: ルートタイプ（1:個別, 2:共通）
+
+      - name: from_activity_code
+        type: Integer
+        nullable: false
+        comment: 遷移元アクティビティコード
+
+      - name: from_function
+        type: EnumType
+        args: [enum_class=ApprovalFunction]
+        nullable: false
+        comment: 遷移元の承認機能タイプ
+
+      - name: to_activity_code
+        type: Integer
+        nullable: false
+        comment: 遷移先アクティビティコード
+
+      - name: to_function
+        type: EnumType
+        args: [enum_class=ApprovalFunction]
+        nullable: false
+        comment: 遷移先の承認機能タイプ
+
+      - name: transition_type
+        type: EnumType
+        args: [enum_class=TransitionType]
+        nullable: false
+        comment: 遷移種別（AND / OR / CONDITION）
+
+      - name: condition_expression
+        type: String
+        args: [255]
+        nullable: true
+        comment: 条件式（JSONLogic/DSL等）
+
+      - name: group_key
+        type: String
+        args: [20]
+        nullable: true
+        comment: 分岐グループキー
+
+      - name: sort_number
+        type: Integer
+        nullable: true
+        comment: 並び順（図描画用）
+
+      - name: create_date
+        type: TIMESTAMP
+        default: datetime.now
+        nullable: false
+
+      - name: create_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_date
+        type: TIMESTAMP
+        default: datetime.now
+        onupdate: datetime.now
+        nullable: false
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+
+      - name: update_count
+        type: Integer
+        nullable: false
+
+    indexes:
+      - [tenant_uuid, application_form_code]

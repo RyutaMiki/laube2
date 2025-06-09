@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.models import CommonActivity
 from app.daos.common_activity_dao import CommonActivityDao
 from datetime import datetime, date, time
-from app.models.specifiedValue import ApprovalFunction
+from app.models.specifiedValue import ApprovalFunction, ConditionExpressionType, EscalationAction, SkipMode
 
 @pytest.fixture
 def common_activity_dict():
@@ -29,10 +29,16 @@ def common_activity_dict():
         "is_deferred_choice_winner": True,
         "is_deferred_choice_loser": True,
         "trigger_type": 'dummy',
+        "timeout_hours": 1,
+        "escalation_action": EscalationAction.ESCALATE,
+        "escalation_target_user_uuid": 'dummy',
+        "condition_expression": 'dummy',
+        "condition_type": ConditionExpressionType.DSL,
+        "skip_mode": SkipMode.SKIP,
         "create_date": datetime(2024, 1, 1, 0, 0, 0),
-        "create_employee_code": 'dummy',
+        "create_user_uuid": 'dummy',
         "update_date": datetime(2024, 1, 1, 0, 0, 0),
-        "update_employee_code": 'dummy',
+        "update_user_uuid": 'dummy',
         "update_count": 1
     }
 

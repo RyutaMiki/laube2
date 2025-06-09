@@ -121,7 +121,7 @@ class {{ model.class_name }}({{ model.inherits if model.inherits else "Base" }})
 {%- endif %}
 {%- if tbl_args %}
     __table_args__ = (
-        {{ tbl_args | join(",\n        ") }}
+        {{ tbl_args | join(",\n        ") }},
     )
 {%- endif %}
 {%- if not loop.last %}

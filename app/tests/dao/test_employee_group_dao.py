@@ -17,9 +17,9 @@ def employee_group_dict():
         "term_to": date(2024, 1, 1),
         "range": Range.PERSONAL,
         "create_date": datetime(2024, 1, 1, 0, 0, 0),
-        "create_employee_code": 'dummy',
+        "create_user_uuid": 'dummy',
         "update_date": datetime(2024, 1, 1, 0, 0, 0),
-        "update_employee_code": 'dummy',
+        "update_user_uuid": 'dummy',
         "update_count": 1
     }
 

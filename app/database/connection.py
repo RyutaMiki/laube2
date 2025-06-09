@@ -1,15 +1,16 @@
 import os
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from dotenv import load_dotenv
-from sqlalchemy.orm import Session
 from contextlib import contextmanager
 
-# .env読込
+# .envファイルを読み込み、環境変数に設定する
 load_dotenv()
 
+# 使用するデータベースエンジンを環境変数から取得
 db_engine = os.getenv("DB_ENGINE", "sqlite")
 
+# データベースURLを構築（PostgreSQL or SQLite）
 if db_engine == "postgres":
     DB_USER = os.getenv("POSTGRES_USER")
     DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
@@ -23,19 +24,32 @@ elif db_engine == "sqlite":
 else:
     raise ValueError(f"Unknown DB_ENGINE: {db_engine}")
 
-# エンジン生成
+# SQLAlchemyのエンジンを作成する
 engine = create_engine(
     DATABASE_URL,
-    echo=False,  # SQLログ出したいならTrue
-    future=True,  # SQLAlchemy 1.4以降推奨
-    pool_pre_ping=True,  # コネクション自動再接続
+    echo=False,          # Trueにすると実行されたSQLが出力される
+    future=True,         # SQLAlchemy 2.0互換モードを有効にする
+    pool_pre_ping=True,  # 接続確認を行い、切れた接続を自動で再接続
 )
 
-# セッション生成
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+# セッションファクトリを作成（FastAPI依存注入やORM操作で使用）
+SessionLocal = sessionmaker(
+    bind=engine,
+    autoflush=False,
+    autocommit=False,
+    future=True
+)
 
-# 使い方例
 def get_db():
+    """
+    データベースセッションを生成・クローズするための依存関数。
+
+    FastAPI のエンドポイントで `Depends(get_db)` として使用することで、
+    自動的にセッションを生成し、レスポンス後にクローズされる。
+
+    Yields:
+        Session: SQLAlchemy ORM セッションインスタンス
+    """
     db: Session = SessionLocal()
     try:
         yield db

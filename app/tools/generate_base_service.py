@@ -46,12 +46,12 @@ def render_stub_service(repo_class_name: str):
     output_path = os.path.join(OUTPUT_DIR, f"{model_lower}_service.py")
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(rendered)
-    print(f"✅ Generated stub service: {output_path}")
+    print(f"Generated stub service: {output_path}")
 
 if __name__ == "__main__":
-    print(f"📁 TEMPLATE_DIR:     {TEMPLATE_DIR}")
-    print(f"📁 REPOSITORY_DIR:   {REPOSITORY_DIR}")
-    print(f"📁 OUTPUT_DIR:       {OUTPUT_DIR}\n")
+    print(f"TEMPLATE_DIR:     {TEMPLATE_DIR}")
+    print(f"REPOSITORY_DIR:   {REPOSITORY_DIR}")
+    print(f"OUTPUT_DIR:       {OUTPUT_DIR}\n")
 
     for filename in os.listdir(REPOSITORY_DIR):
         if filename.endswith("_repository.py"):

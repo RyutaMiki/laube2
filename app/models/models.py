@@ -22,11 +22,15 @@ class Users(Base):
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
     user_uuid = Column('user_uuid', String(36), nullable=False, unique=True, default=uuid.uuid4, comment="ユーザーUUID")
     user_name = Column('user_name', String(50), nullable=False, comment="氏名")
+    username = Column('username', String(100), nullable=False, unique=True, comment="ログインID（メールなど）")
+    hashed_password = Column('hashed_password', String(255), nullable=False, comment="ハッシュ化されたパスワード")
+    is_active = Column('is_active', Boolean, nullable=False, default=True, comment="利用可能フラグ（無効化対応）")
+    last_login_at = Column('last_login_at', TIMESTAMP, nullable=True, comment="最終ログイン日時")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now, comment="作成日時")
     create_user_uuid = Column('create_user_uuid', String(10), nullable=False, comment="作成者ユーザーコード")
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment="更新日時")
     update_user_uuid = Column('update_user_uuid', String(10), nullable=False, comment="更新者ユーザーコード")
-    update_count = Column('update_count', Integer, nullable=False, comment="更新回数")
+    update_count = Column('update_count', Integer, nullable=False, default=0, comment="更新回数")
 
 
 

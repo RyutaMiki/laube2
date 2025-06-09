@@ -1,7 +1,6 @@
 from contextlib import contextmanager
 from typing import Generator
 from sqlalchemy.orm import Session
-from app.database import SessionLocal  # ※ 適宜インポート先は合わせてね
 import logging
 
 logger = logging.getLogger(__name__)

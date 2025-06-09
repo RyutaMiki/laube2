@@ -1,50 +1,81 @@
 models:
   - class_name: Users
     table_name: m_users
-    description: |
-      実在する利用者（人）を一意に管理するテーブル
+    description: 実在する利用者（人）を一意に管理するテーブル
     columns:
       - name: id
         type: Integer
         primary_key: true
         autoincrement: true
         comment: サロゲートキー
+
       - name: user_uuid
         type: String
         args: [36]
-        unique: true
         nullable: false
+        unique: true
         default: uuid.uuid4
         comment: ユーザーUUID
+
       - name: user_name
         type: String
         args: [50]
         nullable: false
         comment: 氏名
+
+      - name: username
+        type: String
+        args: [100]
+        nullable: false
+        unique: true
+        comment: ログインID（メールなど）
+
+      - name: hashed_password
+        type: String
+        args: [255]
+        nullable: false
+        comment: ハッシュ化されたパスワード
+
+      - name: is_active
+        type: Boolean
+        nullable: false
+        default: true
+        comment: 利用可能フラグ（無効化対応）
+
+      - name: last_login_at
+        type: TIMESTAMP
+        nullable: true
+        comment: 最終ログイン日時
+
       - name: create_date
         type: TIMESTAMP
         nullable: false
         default: datetime.now
         comment: 作成日時
+
       - name: create_user_uuid
         type: String
         args: [10]
         nullable: false
         comment: 作成者ユーザーコード
+
       - name: update_date
         type: TIMESTAMP
+        nullable: false
         default: datetime.now
         onupdate: datetime.now
-        nullable: false
         comment: 更新日時
+
       - name: update_user_uuid
         type: String
         args: [10]
         nullable: false
         comment: 更新者ユーザーコード
+
       - name: update_count
         type: Integer
         nullable: false
+        default: 0
         comment: 更新回数
 
   - class_name: Tenants

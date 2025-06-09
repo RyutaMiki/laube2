@@ -12,4 +12,16 @@ class BossDao(BossDaoBase):
         def custom_search(self, db_session: Session, keyword: str) -> List[Boss]:
             return db_session.query(Boss).filter(Boss.name.like(f"%{keyword}%")).all()
     """
+    def get_by_conditions(self, db: Session, conditions: dict) -> Optional[Boss]:
+        """
+        dictで渡された条件で単一レコードを検索する共通関数。
+        """
+        query = db.query(self.model)
+        for attr, value in conditions.items():
+            if value is None:
+                query = query.filter(getattr(self.model, attr) == None)
+            else:
+                query = query.filter(getattr(self.model, attr) == value)
+        return query.first()
+
     pass  # 必要に応じてカスタムメソッドをここに追加してください

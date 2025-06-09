@@ -97,23 +97,6 @@ class Laube():
         self.E011 = 'Laube-E011'  # 申請分類マスタが見つからなかった場合に発生します。このメソッドを呼び出したAPIを確認して下さい。
         self.E012 = 'Laube-E012'  # 承認ルート上に人事異動されている、または退職されている従業員が存在します。マスタ設定[ワークフロー]の承認経路画面でご確認下さい。
 
-    def __health_check(f):
-        """Laubeのヘルスチェックデコレーター"""
-
-        @wraps(f)
-        def wrapper(self, *args, **kwargs):
-            """
-            Laubeのヘルスチェックを実施します。
-
-            Raises:
-                LaubeException: [Laube-W001] エンジンが利用停止中の場合に発生します。
-            """
-            if self.engineUtility.is_mentenance(args[0], EngineName.Laube):
-                raise LaubeException(self.W001)
-            return f(self, *args, **kwargs)
-
-        return wrapper
-
     def __get_database(self, session, company_code):
         """
         データベースより処理実行に必要なレコードを取得します。

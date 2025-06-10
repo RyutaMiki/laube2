@@ -12,12 +12,9 @@ db_engine = os.getenv("DB_ENGINE", "sqlite")
 
 # データベースURLを構築（PostgreSQL or SQLite）
 if db_engine == "postgres":
-    DB_USER = os.getenv("POSTGRES_USER")
-    DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-    DB_HOST = os.getenv("POSTGRES_HOST")
-    DB_PORT = os.getenv("POSTGRES_PORT", "5432")
-    DB_NAME = os.getenv("POSTGRES_DB")
-    DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    DATABASE_URL = os.getenv("DATABASE_URL")
+    if not DATABASE_URL:
+        raise ValueError("DATABASE_URL is not set for Postgres")
 elif db_engine == "sqlite":
     SQLITE_PATH = os.getenv("SQLITE_PATH", "./laube2.sqlite3")
     DATABASE_URL = f"sqlite:///{SQLITE_PATH}"

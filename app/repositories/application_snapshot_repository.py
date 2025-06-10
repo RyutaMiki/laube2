@@ -6,11 +6,18 @@ from app.repositories.base.application_snapshot_repository_base import Applicati
 
 class ApplicationSnapshotRepository(ApplicationSnapshotRepositoryBase):
     """
-    ApplicationSnapshotRepositoryBase のカスタムメソッド追加用
+    ApplicationSnapshotRepositoryBase のカスタムメソッド追加用クラス。
+    申請に関するスナップショットの保存・復元・比較・差分適用などを提供する。
     """
 
     def take_workflow_snapshot(self, db_session, application_number: int) -> dict:
-        # 1. ヘッダ・明細・コメントなど全部dict化
+        """
+        現在の申請状態（ヘッダ・アクティビティ・コメント）を辞書形式で取得する。
+
+        :param db_session: データベースセッション
+        :param application_number: 対象の申請番号
+        :return: スナップショット辞書
+        """
         app_obj = db_session.query(ApplicationObject).filter_by(application_number=application_number).first()
         activities = db_session.query(ActivityObject).filter_by(application_number=application_number).all()
         comments = db_session.query(ApplicationComment).filter_by(application_number=application_number).all()
@@ -23,6 +30,13 @@ class ApplicationSnapshotRepository(ApplicationSnapshotRepositoryBase):
         return snapshot
 
     def get_next_version(self, db_session, application_number: int) -> int:
+        """
+        指定された申請の次のバージョン番号を取得する。
+
+        :param db_session: データベースセッション
+        :param application_number: 申請番号
+        :return: 次のバージョン番号（int）
+        """
         last = (
             db_session.query(ApplicationSnapshot)
             .filter_by(application_number=application_number)
@@ -32,6 +46,15 @@ class ApplicationSnapshotRepository(ApplicationSnapshotRepositoryBase):
         return (last.version_number + 1) if last else 1
 
     def save_snapshot(self, db_session, application_number: int, user_uuid: str, reason: str = "自動取得"):
+        """
+        現在の申請状態をスナップショットとして保存する。
+
+        :param db_session: データベースセッション
+        :param application_number: 申請番号
+        :param user_uuid: 操作ユーザーUUID
+        :param reason: スナップショット保存理由（デフォルト: "自動取得"）
+        :raises ValueError: ApplicationObjectが存在しない場合
+        """
         snapshot = self.take_workflow_snapshot(db_session, application_number)
         if not snapshot["application"]:
             raise ValueError("ApplicationObjectが存在しません")
@@ -50,6 +73,16 @@ class ApplicationSnapshotRepository(ApplicationSnapshotRepositoryBase):
         db_session.commit()
 
     def restore_workflow_snapshot(self, db_session, tenant_uuid, application_number, version_number, user_uuid):
+        """
+        指定したスナップショットバージョンへ完全復元を行う。
+
+        :param db_session: データベースセッション
+        :param tenant_uuid: テナントUUID
+        :param application_number: 申請番号
+        :param version_number: 復元対象バージョン番号
+        :param user_uuid: 復元操作を行うユーザーUUID
+        :raises Exception: スナップショットが存在しない場合
+        """
         snapshot_row = db_session.query(ApplicationSnapshot).filter_by(
             tenant_uuid=tenant_uuid,
             application_number=application_number,
@@ -90,7 +123,11 @@ class ApplicationSnapshotRepository(ApplicationSnapshotRepositoryBase):
 
     def compare_snapshots(self, snap1, snap2):
         """
-        snap1, snap2: dict or ApplicationSnapshot
+        2つのスナップショットの差分を比較する。
+
+        :param snap1: dict または ApplicationSnapshot
+        :param snap2: dict または ApplicationSnapshot
+        :return: DeepDiff オブジェクト
         """
         if isinstance(snap1, ApplicationSnapshot):
             snap1 = json.loads(snap1.snapshot_data)
@@ -101,8 +138,15 @@ class ApplicationSnapshotRepository(ApplicationSnapshotRepositoryBase):
 
     def partial_restore(self, db_session, tenant_uuid, application_number, version_number, user_uuid, restore_targets=None):
         """
-        restore_targets: list, 例 ['activities', 'comments']
-        指定しない場合は全部
+        指定項目（例: 'activities', 'comments'）のみを復元する部分復元を行う。
+
+        :param db_session: データベースセッション
+        :param tenant_uuid: テナントUUID
+        :param application_number: 申請番号
+        :param version_number: 対象スナップショットバージョン
+        :param user_uuid: 操作ユーザーUUID
+        :param restore_targets: 復元対象のキー名リスト（Noneの場合は全復元）
+        :raises Exception: スナップショットが見つからない場合
         """
         snapshot_row = db_session.query(ApplicationSnapshot).filter_by(
             tenant_uuid=tenant_uuid,
@@ -140,14 +184,24 @@ class ApplicationSnapshotRepository(ApplicationSnapshotRepositoryBase):
         db_session.commit()
 
     def create_patch(self, snapshot1_dict, snapshot2_dict):
+        """
+        2つのスナップショット辞書から差分（パッチ）を作成する。
+
+        :param snapshot1_dict: 比較元スナップショット（辞書）
+        :param snapshot2_dict: 比較先スナップショット（辞書）
+        :return: DeepDiff の差分データ
+        """
         diff = DeepDiff(snapshot1_dict, snapshot2_dict, ignore_order=True)
         return diff  # そのまま“パッチ”として扱う
 
     def apply_patch_to_activities(self, db_session, application_number, diff):
-        # 'values_changed', 'iterable_item_added', 'iterable_item_removed' など見る
-        # ここでは例として、'values_changed'だけ処理
+        """
+        差分データから activities 部分の変更をDBに適用する（現状は値変更のみ対応）。
 
-        # 例: activitiesのitem（index）が変更された場合のパス: "root['activities'][2]['activity_status']"
+        :param db_session: データベースセッション
+        :param application_number: 対象の申請番号
+        :param diff: DeepDiff による差分結果（values_changedのみ処理）
+        """
         if "values_changed" in diff:
             for k, v in diff["values_changed"].items():
                 # 例: k = "root['activities'][2]['activity_status']"

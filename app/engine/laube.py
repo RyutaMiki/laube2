@@ -6,8 +6,8 @@ from app.models.specifiedValue import ActivityStatus, ApprovalFunction, AutoAppr
 from app.repositories.boss_repository import BossRepository
 from app.repositories.application_form_repository import ApplicationFormRepository
 from app.repositories.application_form_route_repository import ApplicationFormRouteRepository
-from app.repositories.employee_repository import EmployeeRepository
-from app.repositories.employee_group_repository import EmployeeGroupRepository
+from app.repositories.tenant_user_repository import TenantUserRepository
+from app.repositories.user_group_repository import UserGroupRepository
 from app.repositories.individual_activity_repository import IndividualActivityRepository
 from app.repositories.role_repository import RoleRepository
 from app.common.utility import Utility
@@ -46,8 +46,8 @@ class Laube():
         self.boss_repository = BossRepository()
         self.application_form_repository = ApplicationFormRepository()
         self.application_form_route_repository = ApplicationFormRouteRepository()
-        self.employee_repository = EmployeeRepository()
-        self.employee_group_repository = EmployeeGroupRepository()
+        self.tenant_user_repository = TenantUserRepository()
+        self.user_group_repository = UserGroupRepository()
         self.individual_activity_repository = IndividualActivityRepository()
         self.role_repository = RoleRepository()
 
@@ -253,7 +253,7 @@ class Laube():
             for activity in activities:
                 # approverl_role_code が設定されていない＝個人指定
                 if not activity.approverl_role_code or not activity.approverl_role_code.strip():
-                    employee = self.employee_repository.find_active_employee(
+                    employee = self.tenant_user_repository.find_active_employee(
                         db_session,
                         tenant_uuid,
                         activity.approverl_company_code,
@@ -267,7 +267,7 @@ class Laube():
                     if employee.logical_deletion or (employee.retirement_date and employee.retirement_date < system_date):
                         continue
 
-                    emp_group = self.employee_group_repository.find_by_keys(
+                    emp_group = self.user_group_repository.find_by_keys(
                         db_session, tenant_uuid, activity.approverl_company_code,
                         activity.approverl_employee_code, activity.approverl_group_code
                     )

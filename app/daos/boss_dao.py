@@ -1,5 +1,6 @@
 from app.models.models import Boss
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 from typing import List, Optional, Any
 from app.daos.base.boss_dao_base import BossDaoBase
 

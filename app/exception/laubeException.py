@@ -15,16 +15,11 @@
 ##################################################################
 
 
-class LaubeException():
-
+class LaubeException(Exception):
     """
-    初期処理を行います。
-    Args:
-        None
-    Returns:
-        None
-    Raises:
-        None
+    Laube専用の業務例外クラス。
     """
-    def __init__(self, message):
-        super().__init__(message)
+    def __init__(self, code: str, message: str = ""):
+        self.code = code
+        self.message = message or code
+        super().__init__(f"[{code}] {self.message}")

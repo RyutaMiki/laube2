@@ -12,7 +12,7 @@ class AutoApproverlFlag(IntEnum):
 class PullingFlag(IntEnum):
     """引き戻し区分フラグ / Pulling back category"""
     A = 1  # 区分A / Category A
-    B = 2  # 区分B / Category B
+    B = 2  # 区分B / Category BRouteFlag
 
 
 class WithdrawalFlag(IntEnum):

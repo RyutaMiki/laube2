@@ -2,10 +2,15 @@ from datetime import date, datetime
 from functools import wraps
 from app.database.connection import get_db
 from sqlalchemy.orm import Session
-from app.models.specifiedValue import RouteFlag
+from app.models.specifiedValue import ActivityStatus, ApprovalFunction, AutoApproverlFlag, RouteFlag, RouteType
 from app.repositories.boss_repository import BossRepository
 from app.repositories.application_form_repository import ApplicationFormRepository
 from app.repositories.application_form_route_repository import ApplicationFormRouteRepository
+from app.repositories.employee_repository import EmployeeRepository
+from app.repositories.employee_group_repository import EmployeeGroupRepository
+from app.repositories.individual_activity_repository import IndividualActivityRepository
+from app.repositories.role_repository import RoleRepository
+from app.common.utility import Utility
 from app.common.error_message_loader import ErrorMessageLoader
 from app.exception.laubeException import LaubeException
 from datetime import datetime
@@ -41,6 +46,10 @@ class Laube():
         self.boss_repository = BossRepository()
         self.application_form_repository = ApplicationFormRepository()
         self.application_form_route_repository = ApplicationFormRouteRepository()
+        self.employee_repository = EmployeeRepository()
+        self.employee_group_repository = EmployeeGroupRepository()
+        self.individual_activity_repository = IndividualActivityRepository()
+        self.role_repository = RoleRepository()
 
     @staticmethod
     def health_check(f):
@@ -179,3 +188,131 @@ class Laube():
         except Exception as e:
             # その他想定外のエラーもラップして投げる
             raise LaubeException(e)
+
+    def get_individual_approverl_list(self, db_session, tenant_uuid, target_tenant_uuid, individual_route_code, application_form):
+        """
+        個別ルートに基づく承認者リストを取得します。
+
+        [利用想定]
+            - get_application_info() 内での呼び出しを前提としています。
+            - individual_route_code に設定された個別アクティビティを基に承認ルートを生成します。
+
+        [機能]
+            - 個別アクティビティを取得し、承認者情報（従業員またはロール）に変換。
+            - approverl_role_code が空の場合は、従業員情報と所属部署情報を検証。
+            - ロール名は別途 Role マスタから取得。
+            - 自動承認フラグ（application_form.auto_approverl_flag）が有効な場合は、ルート重複によって自動承認フラグを設定。
+
+        Args:
+            db_session (Session): SQLAlchemyのDBセッション
+            tenant_uuid (str): 呼び出し元テナントのUUID（共通情報・ログ用など）
+            target_tenant_uuid (str): 対象となる個別ルートの所属テナントUUID（データ取得対象）
+            individual_route_code (str): 個別ルートコード（個別アクティビティ紐付けキー）
+            application_form (ApplicationForm): 申請書マスタ情報（自動承認フラグなど参照）
+
+        Returns:
+            List[ApproverlDataInfoDto]: 個別アクティビティに基づく承認者DTOリスト
+
+        Raises:
+            LaubeException:
+                - Laube-E001: DBセッション未指定
+                - Laube-E002: tenant_uuid 未指定
+                - Laube-E006: application_form が None
+                - Laube-E012: 承認者の社員または部署情報が取得できない
+                - Laube-E013: ロール情報が取得できない
+                - UNEXPECTED: 上記以外の想定外エラー
+        """
+        try:
+            # 各引数のバリデーション
+            if not db_session:
+                msg = self.error_loader.get_message("Laube-E001")
+                raise LaubeException("Laube-E001", msg)
+
+            if not tenant_uuid:
+                msg = self.error_loader.get_message("Laube-E002")
+                raise LaubeException("Laube-E002", msg)
+
+            if not individual_route_code:
+                return []
+
+            if application_form is None:
+                msg = self.error_loader.get_message("Laube-E006")
+                raise LaubeException("Laube-E006", msg)
+
+            utility = Utility()
+            system_date = utility.convert_datetime_2_date(datetime.now())
+
+            activities = self.individual_activity_repository.find_by_tenant_and_route(db_session, tenant_uuid, target_tenant_uuid, individual_route_code)
+
+            if not activities:
+                return []
+
+            approver_list = []
+            route_employee_codes = set()
+
+            for activity in activities:
+                # approverl_role_code が設定されていない＝個人指定
+                if not activity.approverl_role_code or not activity.approverl_role_code.strip():
+                    employee = self.employee_repository.find_active_employee(
+                        db_session,
+                        tenant_uuid,
+                        activity.approverl_company_code,
+                        activity.approverl_employee_code
+                    )
+
+                    if not employee:
+                        msg = self.error_loader.get_message("Laube-E012")
+                        raise LaubeException("Laube-E012", msg)
+
+                    if employee.logical_deletion or (employee.retirement_date and employee.retirement_date < system_date):
+                        continue
+
+                    emp_group = self.employee_group_repository.find_by_keys(
+                        db_session, tenant_uuid, activity.approverl_company_code,
+                        activity.approverl_employee_code, activity.approverl_group_code
+                    )
+
+                    if not emp_group or (emp_group.term_to and emp_group.term_to < system_date):
+                        msg = self.error_loader.get_message("Laube-E012")
+                        raise LaubeException("Laube-E012", msg)
+
+                dto = ApproverlDataInfoDto()
+                dto.tenant_uuid = tenant_uuid
+                dto.company_code = activity.company_code
+                dto.company_name = self.__get_company_name(db_session, activity.company_code)
+                dto.route_type = RouteType.INDIVIDUAL_ROUTE
+                dto.route_number = activity.activity_code
+                dto.approverl_company_code = activity.approverl_company_code
+                dto.approverl_company_name = self.__get_company_name(db_session, activity.approverl_company_code)
+                dto.approverl_role_code = activity.approverl_role_code
+                dto.approverl_group_code = activity.approverl_group_code
+                dto.approverl_group_name = self.__get_group_name(db_session, activity.approverl_company_code, activity.approverl_group_code)
+                dto.approverl_employee_code = activity.approverl_employee_code
+                dto.approverl_employee_name = self.__get_employee_name(db_session, activity.approverl_company_code, activity.approverl_employee_code)
+                dto.activity_status = ActivityStatus.AUTHORIZER_UNTREATED
+                dto.approval_function = activity.function
+
+                # ロール名取得（ある場合）
+                if activity.approverl_role_code:
+                    role = self.role_repository.find_by_code(
+                        db_session, tenant_uuid, activity.approverl_company_code, activity.approverl_role_code
+                    )
+                    if not role:
+                        msg = self.error_loader.get_message("Laube-E013", activity.approverl_role_code)
+                        raise LaubeException("Laube-E013", msg)
+                    dto.approverl_role_name = role.role_name
+
+                # 自動承認フラグ判定（重複防止）
+                if AutoApproverlFlag.AUTOMATIC_APPROVAL == application_form.auto_approverl_flag:
+                    if activity.approverl_employee_code in route_employee_codes:
+                        dto.approval_function = ApprovalFunction.AUTHORIZER_AUTOMATIC_APPROVAL
+                    route_employee_codes.add(activity.approverl_employee_code)
+
+                approver_list.append(dto)
+
+            return approver_list
+
+        except LaubeException as e:
+            raise e
+        except Exception as e:
+            raise LaubeException("UNEXPECTED", str(e))

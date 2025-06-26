@@ -1,8 +1,8 @@
 import pytest
-from datetime import datetime
 from sqlalchemy.orm import Session
 from app.models.models import ApplicationForm
 from app.daos.application_form_dao import ApplicationFormDao
+from datetime import datetime, date, time
 from app.models.specifiedValue import AutoApproverlFlag, PullingFlag, RouteFlag, WithdrawalFlag
 
 @pytest.fixture
@@ -39,9 +39,9 @@ def test_create_and_get_application_form(db_session: Session, application_form_d
 def test_update_application_form(db_session: Session, application_form_dict):
     dao = ApplicationFormDao()
     obj = dao.create(db_session, application_form_dict)
-    dao.update(db_session, obj.id, {"application_form_code": "updated"})
+    dao.update(db_session, obj.id, {"tenant_uuid": "updated"})
     updated = dao.get(db_session, obj.id)
-    assert updated.application_form_code == "updated"
+    assert updated.tenant_uuid == "updated"
 
 def test_delete_application_form(db_session: Session, application_form_dict):
     dao = ApplicationFormDao()

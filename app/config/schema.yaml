@@ -1,6 +1,6 @@
 models:
-  - class_name: Users
-    table_name: m_users
+  - class_name: User
+    table_name: m_user
     description: 実在する利用者（人）を一意に管理するテーブル
     columns:
       - name: id
@@ -71,8 +71,325 @@ models:
         default: 0
         comment: 更新回数
 
-  - class_name: Tenants
-    table_name: m_tenants
+  - class_name: Role
+    table_name: m_role
+    description: ロールマスタ
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: role_id
+        type: String
+        args: [36]
+        nullable: false
+        comment: ロールID（UUID）
+
+      - name: role_name
+        type: String
+        args: [100]
+        nullable: false
+        comment: ロール名
+
+      - name: create_date
+        type: TIMESTAMP
+        nullable: false
+        default: datetime.now
+        comment: 作成日時
+
+      - name: create_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 作成者ユーザーコード
+
+      - name: update_date
+        type: TIMESTAMP
+        nullable: false
+        default: datetime.now
+        onupdate: datetime.now
+        comment: 更新日時
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 更新者ユーザーコード
+
+      - name: update_count
+        type: Integer
+        nullable: false
+        default: 0
+        comment: 更新回数
+
+  - class_name: UserRole
+    table_name: m_user_role
+    description: ユーザーとロールの関連
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: user_id
+        type: String
+        args: [36]
+        nullable: false
+        comment: ユーザーID（UUID）
+
+      - name: role_id
+        type: String
+        args: [36]
+        nullable: false
+        comment: ロールID
+
+      - name: create_date
+        type: TIMESTAMP
+        nullable: false
+        default: datetime.now
+        comment: 作成日時
+
+      - name: create_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 作成者ユーザーコード
+
+      - name: update_date
+        type: TIMESTAMP
+        nullable: false
+        default: datetime.now
+        onupdate: datetime.now
+        comment: 更新日時
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 更新者ユーザーコード
+
+      - name: update_count
+        type: Integer
+        nullable: false
+        default: 0
+        comment: 更新回数
+
+    uniques:
+      - ["user_id", "role_id"]
+
+  - class_name: Permission
+    table_name: m_permission
+    description: パーミッションマスタ
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: permission_id
+        type: String
+        args: [36]
+        nullable: false
+        comment: パーミッションID（UUID）
+
+      - name: permission_name
+        type: String
+        args: [100]
+        nullable: false
+        comment: "パーミッション名（例: read, write, delete）"
+  
+      - name: create_date
+        type: TIMESTAMP
+        nullable: false
+        default: datetime.now
+        comment: 作成日時
+
+      - name: create_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 作成者ユーザーコード
+
+      - name: update_date
+        type: TIMESTAMP
+        nullable: false
+        default: datetime.now
+        onupdate: datetime.now
+        comment: 更新日時
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 更新者ユーザーコード
+
+      - name: update_count
+        type: Integer
+        nullable: false
+        default: 0
+        comment: 更新回数
+
+  - class_name: RolePermission
+    table_name: m_role_permission
+    description: ロールとパーミッションの関連
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: role_id
+        type: String
+        args: [36]
+        nullable: false
+        comment: ロールID
+
+      - name: permission_id
+        type: String
+        args: [36]
+        nullable: false
+        comment: パーミッションID
+
+      - name: create_date
+        type: TIMESTAMP
+        nullable: false
+        default: datetime.now
+        comment: 作成日時
+
+      - name: create_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 作成者ユーザーコード
+
+      - name: update_date
+        type: TIMESTAMP
+        nullable: false
+        default: datetime.now
+        onupdate: datetime.now
+        comment: 更新日時
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 更新者ユーザーコード
+
+      - name: update_count
+        type: Integer
+        nullable: false
+        default: 0
+        comment: 更新回数
+
+    uniques:
+      - ["role_id", "permission_id"]
+
+  - class_name: Resource
+    table_name: m_resource
+    description: リソースマスタ
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: resource_id
+        type: String
+        args: [36]
+        nullable: false
+        comment: リソースID（UUID）
+
+      - name: resource_name
+        type: String
+        args: [100]
+        nullable: false
+        comment: "リソース名（例: \"/api/employees\"）"
+
+      - name: update_date
+        type: TIMESTAMP
+        nullable: false
+        default: datetime.now
+        onupdate: datetime.now
+        comment: 更新日時
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 更新者ユーザーコード
+
+      - name: update_count
+        type: Integer
+        nullable: false
+        default: 0
+        comment: 更新回数
+
+  - class_name: Policy
+    table_name: m_policy
+    description: アクセスポリシー定義
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+
+      - name: policy_id
+        type: String
+        args: [36]
+        nullable: false
+        comment: ポリシーID（UUID）
+
+      - name: role_id
+        type: String
+        args: [36]
+        nullable: false
+        comment: ロールID
+
+      - name: permission_id
+        type: String
+        args: [36]
+        nullable: false
+        comment: パーミッションID
+
+      - name: resource_id
+        type: String
+        args: [36]
+        nullable: false
+        comment: リソースID
+
+      - name: condition
+        type: Text
+        nullable: true
+        comment: アクセス条件（JSON形式 or 式）
+
+      - name: update_date
+        type: TIMESTAMP
+        nullable: false
+        default: datetime.now
+        onupdate: datetime.now
+        comment: 更新日時
+
+      - name: update_user_uuid
+        type: String
+        args: [36]
+        nullable: false
+        comment: 更新者ユーザーコード
+
+      - name: update_count
+        type: Integer
+        nullable: false
+        default: 0
+        comment: 更新回数
+
+  - class_name: Tenant
+    table_name: m_tenant
     description: |
       会社ごとのテナント情報
     columns:
@@ -114,8 +431,8 @@ models:
         nullable: false
         comment: 更新回数
 
-  - class_name: Employee
-    table_name: employees
+  - class_name: TenantUser
+    table_name: m_tenant_user
     description: |
       会社ごとにどのユーザーが所属しているか管理
       同じユーザーが再入社した場合は新しいレコードを追加し、履歴を保持する
@@ -173,12 +490,12 @@ models:
       - type: foreign_key
         columns: [user_uuid]
         references:
-          table: m_users
+          table: m_user
           columns: [user_uuid]
       - type: foreign_key
         columns: [tenant_uuid]
         references:
-          table: m_tenants
+          table: m_tenant
           columns: [tenant_uuid]
       - type: unique
         columns: [tenant_uuid, user_uuid, belong_start_date]
@@ -268,10 +585,10 @@ models:
       - [tenant_uuid, group_code]
     foreign_keys:
       - columns: [tenant_uuid]
-        references: [m_tenants.tenant_uuid]
+        references: [m_tenant.tenant_uuid]
 
-  - class_name: EmployeeGroup
-    table_name: m_employee_group
+  - class_name: UserGroup
+    table_name: m_user_group
     description: 従業員部署マスタ
     mapper_args:
       version_id_col: update_count
@@ -358,7 +675,7 @@ models:
 
     foreign_keys:
       - columns: [tenant_uuid]
-        references: [m_tenants.tenant_uuid]
+        references: [m_tenant.tenant_uuid]
 
       - columns: [tenant_uuid, user_uuid]
         references: [employees.tenant_uuid, employees.user_uuid]
@@ -469,7 +786,7 @@ models:
         type: String
         args: [36]
         nullable: false
-        foreign_key: m_tenants.tenant_uuid
+        foreign_key: m_tenant.tenant_uuid
         comment: テナントUUID
 
       - name: group_code
@@ -1363,7 +1680,7 @@ models:
         type: String
         args: [36]
         nullable: false
-        foreign_key: m_tenants.tenant_uuid
+        foreign_key: m_tenant.tenant_uuid
         comment: テナントUUID
 
       - name: application_number
@@ -1519,7 +1836,7 @@ models:
         type: String
         args: [36]
         nullable: false
-        foreign_key: m_tenants.tenant_uuid
+        foreign_key: m_tenant.tenant_uuid
         comment: テナントUUID
 
       - name: application_number
@@ -1798,7 +2115,7 @@ models:
         type: String
         args: [36]
         nullable: false
-        foreign_key: m_tenants.tenant_uuid
+        foreign_key: m_tenant.tenant_uuid
         comment: テナントUUID
 
       - name: application_number
@@ -1907,7 +2224,7 @@ models:
         type: String
         args: [36]
         nullable: false
-        foreign_key: m_tenants.tenant_uuid
+        foreign_key: m_tenant.tenant_uuid
         comment: テナントUUID
 
       - name: group_key
@@ -2207,7 +2524,7 @@ models:
         type: String
         args: [36]
         nullable: false
-        foreign_key: m_tenants.tenant_uuid
+        foreign_key: m_tenant.tenant_uuid
         comment: テナントUUID
 
       - name: application_number

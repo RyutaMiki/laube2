@@ -13,12 +13,12 @@ Base = declarative_base()
 
 
 
-class Users(Base):
+class User(Base):
     """
     　実在する利用者（人）を一意に管理するテーブル
     """
 
-    __tablename__ = 'm_users'
+    __tablename__ = 'm_user'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
     user_uuid = Column('user_uuid', String(36), nullable=False, unique=True, default=uuid.uuid4, comment="ユーザーUUID")
     user_name = Column('user_name', String(50), nullable=False, comment="氏名")
@@ -36,12 +36,135 @@ class Users(Base):
 
 
 
-class Tenants(Base):
+class Role(Base):
+    """
+    　ロールマスタ
+    """
+
+    __tablename__ = 'm_role'
+    id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
+    role_id = Column('role_id', String(36), nullable=False, comment="ロールID（UUID）")
+    role_name = Column('role_name', String(100), nullable=False, comment="ロール名")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now, comment="作成日時")
+    create_user_uuid = Column('create_user_uuid', String(36), nullable=False, comment="作成者ユーザーコード")
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment="更新日時")
+    update_user_uuid = Column('update_user_uuid', String(36), nullable=False, comment="更新者ユーザーコード")
+    update_count = Column('update_count', Integer, nullable=False, default=0, comment="更新回数")
+
+
+
+
+
+
+class UserRole(Base):
+    """
+    　ユーザーとロールの関連
+    """
+
+    __tablename__ = 'm_user_role'
+    id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
+    user_id = Column('user_id', String(36), nullable=False, comment="ユーザーID（UUID）")
+    role_id = Column('role_id', String(36), nullable=False, comment="ロールID")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now, comment="作成日時")
+    create_user_uuid = Column('create_user_uuid', String(36), nullable=False, comment="作成者ユーザーコード")
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment="更新日時")
+    update_user_uuid = Column('update_user_uuid', String(36), nullable=False, comment="更新者ユーザーコード")
+    update_count = Column('update_count', Integer, nullable=False, default=0, comment="更新回数")
+
+
+
+
+    __table_args__ = (
+        UniqueConstraint(user_id, role_id),
+    )
+
+class Permission(Base):
+    """
+    　パーミッションマスタ
+    """
+
+    __tablename__ = 'm_permission'
+    id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
+    permission_id = Column('permission_id', String(36), nullable=False, comment="パーミッションID（UUID）")
+    permission_name = Column('permission_name', String(100), nullable=False, comment="パーミッション名（例: read, write, delete）")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now, comment="作成日時")
+    create_user_uuid = Column('create_user_uuid', String(36), nullable=False, comment="作成者ユーザーコード")
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment="更新日時")
+    update_user_uuid = Column('update_user_uuid', String(36), nullable=False, comment="更新者ユーザーコード")
+    update_count = Column('update_count', Integer, nullable=False, default=0, comment="更新回数")
+
+
+
+
+
+
+class RolePermission(Base):
+    """
+    　ロールとパーミッションの関連
+    """
+
+    __tablename__ = 'm_role_permission'
+    id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
+    role_id = Column('role_id', String(36), nullable=False, comment="ロールID")
+    permission_id = Column('permission_id', String(36), nullable=False, comment="パーミッションID")
+    create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now, comment="作成日時")
+    create_user_uuid = Column('create_user_uuid', String(36), nullable=False, comment="作成者ユーザーコード")
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment="更新日時")
+    update_user_uuid = Column('update_user_uuid', String(36), nullable=False, comment="更新者ユーザーコード")
+    update_count = Column('update_count', Integer, nullable=False, default=0, comment="更新回数")
+
+
+
+
+    __table_args__ = (
+        UniqueConstraint(role_id, permission_id),
+    )
+
+class Resource(Base):
+    """
+    　リソースマスタ
+    """
+
+    __tablename__ = 'm_resource'
+    id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
+    resource_id = Column('resource_id', String(36), nullable=False, comment="リソースID（UUID）")
+    resource_name = Column('resource_name', String(100), nullable=False, comment="リソース名（例: \"/api/employees\"）")
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment="更新日時")
+    update_user_uuid = Column('update_user_uuid', String(36), nullable=False, comment="更新者ユーザーコード")
+    update_count = Column('update_count', Integer, nullable=False, default=0, comment="更新回数")
+
+
+
+
+
+
+class Policy(Base):
+    """
+    　アクセスポリシー定義
+    """
+
+    __tablename__ = 'm_policy'
+    id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
+    policy_id = Column('policy_id', String(36), nullable=False, comment="ポリシーID（UUID）")
+    role_id = Column('role_id', String(36), nullable=False, comment="ロールID")
+    permission_id = Column('permission_id', String(36), nullable=False, comment="パーミッションID")
+    resource_id = Column('resource_id', String(36), nullable=False, comment="リソースID")
+    condition = Column('condition', Text, nullable=True, comment="アクセス条件（JSON形式 or 式）")
+    update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment="更新日時")
+    update_user_uuid = Column('update_user_uuid', String(36), nullable=False, comment="更新者ユーザーコード")
+    update_count = Column('update_count', Integer, nullable=False, default=0, comment="更新回数")
+
+
+
+
+
+
+class Tenant(Base):
     """
     　会社ごとのテナント情報
     """
 
-    __tablename__ = 'm_tenants'
+    __tablename__ = 'm_tenant'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
     tenant_uuid = Column('tenant_uuid', String(36), nullable=False, unique=True, default=uuid.uuid4, comment="テナントUUID")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now, comment="作成日時")
@@ -55,13 +178,13 @@ class Tenants(Base):
 
 
 
-class Employee(Base):
+class TenantUser(Base):
     """
     　会社ごとにどのユーザーが所属しているか管理
     　同じユーザーが再入社した場合は新しいレコードを追加し、履歴を保持する
     """
 
-    __tablename__ = 'employees'
+    __tablename__ = 'm_tenant_user'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
     tenant_uuid = Column('tenant_uuid', String(36), nullable=False, comment="テナントUUID")
     user_uuid = Column('user_uuid', String(36), nullable=False, comment="ユーザーUUID")
@@ -77,8 +200,8 @@ class Employee(Base):
 
 
     __table_args__ = (
-        ForeignKeyConstraint(['user_uuid'], ['m_users.user_uuid']),
-        ForeignKeyConstraint(['tenant_uuid'], ['m_tenants.tenant_uuid']),
+        ForeignKeyConstraint(['user_uuid'], ['m_user.user_uuid']),
+        ForeignKeyConstraint(['tenant_uuid'], ['m_tenant.tenant_uuid']),
         UniqueConstraint('tenant_uuid', 'user_uuid', 'belong_start_date'),
     )
 
@@ -110,12 +233,12 @@ class Group(Base):
         UniqueConstraint(tenant_uuid, group_code),
     )
 
-class EmployeeGroup(Base):
+class UserGroup(Base):
     """
     　従業員部署マスタ
     """
 
-    __tablename__ = 'm_employee_group'
+    __tablename__ = 'm_user_group'
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment="サロゲートキー")
     tenant_uuid = Column('tenant_uuid', String(36), nullable=False, comment="テナントUUID")
     user_uuid = Column('user_uuid', String(36), nullable=False, comment="ユーザーUUID")
@@ -137,10 +260,10 @@ class EmployeeGroup(Base):
     }
 
     __table_args__ = (
-        Index('ix_m_employee_grouptenant_uuid_user_uuid_group_code', tenant_uuid, user_uuid, group_code),
-        Index('ix_m_employee_grouptenant_uuid', tenant_uuid),
-        Index('ix_m_employee_groupuser_uuid', user_uuid),
-        Index('ix_m_employee_groupgroup_code', group_code),
+        Index('ix_m_user_grouptenant_uuid_user_uuid_group_code', tenant_uuid, user_uuid, group_code),
+        Index('ix_m_user_grouptenant_uuid', tenant_uuid),
+        Index('ix_m_user_groupuser_uuid', user_uuid),
+        Index('ix_m_user_groupgroup_code', group_code),
         UniqueConstraint(tenant_uuid, user_uuid, group_code),
     )
 

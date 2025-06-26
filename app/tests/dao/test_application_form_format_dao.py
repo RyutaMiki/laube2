@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.orm import Session
 from app.models.models import ApplicationFormFormat
 from app.daos.application_form_format_dao import ApplicationFormFormatDao
-from datetime import datetime
+from datetime import datetime, date, time
 from app.models.specifiedValue import AutoApproverlFlag, PullingFlag, RouteFlag, WithdrawalFlag
 
 @pytest.fixture
@@ -16,7 +16,7 @@ def application_form_format_dict():
         "auto_approverl_flag": AutoApproverlFlag.AUTOMATIC_APPROVAL,
         "pulling_flag": PullingFlag.A,
         "withdrawal_flag": WithdrawalFlag.ENABLED,
-        "route_flag": RouteFlag.NO_INDIVIDUAL_ROUTE,  # ← 修正ポイント！
+        "route_flag": RouteFlag.NO_INDIVIDUAL_ROUTE,
         "sort_number": 1,
         "table_name": 'dummy',
         "screen_code": 'dummy',

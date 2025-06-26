@@ -8,7 +8,7 @@ def user_group_repository():
     from app.repositories.user_group_repository import UserGroupRepository
     return UserGroupRepository()
 
-def test_find_by_keys(session, user_group_repository):
+def test_find_by_keys(db_session, user_group_repository):
     group = UserGroup(
         tenant_uuid="t001",
         user_uuid="u001",
@@ -23,10 +23,10 @@ def test_find_by_keys(session, user_group_repository):
         update_user_uuid="test-user",
         update_count=1
     )
-    session.add(group)
-    session.commit()
+    db_session.add(group)
+    db_session.commit()
 
-    result = user_group_repository.find_by_keys(session, "t001", "u001", "G001")
+    result = user_group_repository.find_by_keys(db_session, "t001", "u001", "G001")
 
     assert result is not None
     assert result.group_code == "G001"

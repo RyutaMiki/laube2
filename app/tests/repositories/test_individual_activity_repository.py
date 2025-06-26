@@ -2,7 +2,7 @@ from datetime import datetime
 from app.models.models import IndividualActivity
 from app.models.specifiedValue import ApprovalFunction
 
-def test_find_by_tenant_and_route(session, individual_activity_repository):
+def test_find_by_tenant_and_route(db_session, individual_activity_repository):
     activity = IndividualActivity(
         tenant_uuid="abc",
         individual_route_code="ROUTE001",
@@ -14,11 +14,11 @@ def test_find_by_tenant_and_route(session, individual_activity_repository):
         update_user_uuid="test-user",
         update_count=1
     )
-    session.add(activity)
-    session.commit()
+    db_session.add(activity)
+    db_session.commit()
 
     results = individual_activity_repository.find_by_tenant_and_route(
-        session,
+        db_session,
         "abc",
         "ROUTE001",
         "A001"

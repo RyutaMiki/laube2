@@ -44,21 +44,21 @@ def service(mock_dao):
     return service
 
 
-def test_create_application_form_service(session, dummy_application_form_dict, service, mock_dao):
+def test_create_application_form_service(db_session, dummy_application_form_dict, service, mock_dao):
     mock_obj = ApplicationForm(**dummy_application_form_dict)
     mock_dao.create.return_value = mock_obj
 
-    result = service.create(session, dummy_application_form_dict)
+    result = service.create(db_session, dummy_application_form_dict)
 
     assert result.application_form_code == "FORM001"
-    mock_dao.create.assert_called_once_with(session, dummy_application_form_dict)
+    mock_dao.create.assert_called_once_with(db_session, dummy_application_form_dict)
 
 
-def test_get_application_form_service(session, service, mock_dao):
+def test_get_application_form_service(db_session, service, mock_dao):
     mock_obj = ApplicationForm(id=1, application_form_code="FORM001")
     mock_dao.get.return_value = mock_obj
 
-    result = service.get(session, 1)
+    result = service.get(db_session, 1)
 
     assert result.application_form_code == "FORM001"
-    mock_dao.get.assert_called_once_with(session, 1)
+    mock_dao.get.assert_called_once_with(db_session, 1)

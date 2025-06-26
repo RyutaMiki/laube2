@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from app.models.models import TenantUser
 
-def test_find_active_user(session, tenant_user_repository):
+def test_find_active_user(db_session, tenant_user_repository):
     user = TenantUser(
         tenant_uuid="tenant123",
         user_uuid="user123",
@@ -13,11 +13,11 @@ def test_find_active_user(session, tenant_user_repository):
         update_user_uuid="test-user",
         update_count=1
     )
-    session.add(user)
-    session.commit()
+    db_session.add(user)
+    db_session.commit()
 
     result = tenant_user_repository.find_active_user(
-        session,
+        db_session,
         "tenant123",
         "user123"
     )

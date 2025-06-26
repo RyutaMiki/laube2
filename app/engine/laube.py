@@ -147,252 +147,153 @@ class Laube():
         except Exception as e:
             raise e
 
+    def get_application_info(
+        self,
+        db_session: Session,
+        tenant_uuid: str,
+        application_form_code: str,
+        target_group_code: str,
+        target_user_uuid: str,
+        boss_group_code: Optional[str],
+        boss_user_uuid: Optional[str],
+        applicant_group_code: str,
+        applicant_user_uuid: str
+    ) -> ApplicationInfoDto:
+        """
+        申請モード1における申請情報を構築する（対象者・申請者・承認ルート）
 
-    """
-    [利用場所]
-    申請画面のInitAPIにて呼び出される事を想定しています。
+        Returns:
+            ApplicationInfoDto: UIに渡す申請用DTO
+        Raises:
+            LaubeException: 各種マスタが存在しない場合など
+        """
+        if not db_session:
+            raise LaubeException(self.E001)
+        if not tenant_uuid:
+            raise LaubeException(self.E002)
+        if not target_group_code:
+            raise LaubeException(self.E003)
+        if not target_user_uuid:
+            raise LaubeException(self.E004)
+        if not application_form_code:
+            raise LaubeException(self.E005)
+        if not applicant_group_code:
+            raise LaubeException(self.E009)
+        if not applicant_user_uuid:
+            raise LaubeException(self.E010)
 
-    [機能]
-    申請モード1 [下書き/申請] 時の承認ルートを返却します。
+        system_date = datetime.now()
+        dto = ApplicationInfoDto()
+        dto.screen_mode = ScreenMode.APPLY_MODE_1
+        dto.application_form_code = application_form_code
 
-    [前提]
-    本メソッドを呼び出す前に必ず、is_display_boss_fieldメソッドを呼出してチェックを行って下さい。
+        # 各種マスタ取得
+        form = self.application_form_repository.get_by_code(db_session, tenant_uuid, application_form_code)
+        if not form:
+            raise LaubeException(self.E006)
 
-    Args:
-        session                 [必須] : セッション情報
-        application_form_code   [必須] : 申請書コード
-        target_company_code     [必須] : 会社コード[対象者]
-        target_group_code       [必須] : 部署コード[対象者]
-        target_employee_code    [必須] : 従業員番号[対象者]
-        boss_group_code         [任意] : 部署コード[上司]
-        boos_employee_code      [任意] : 従業員番号[上司]
-        applicant_company_code  [必須] : 会社コード[申請者]
-        applicant_group_code    [必須] : 部署コード[申請者]
-        applicant_employee_code [必須] : 従業員番号[申請者]
+        classification = self.application_classification_repository.get_by_code(
+            db_session, tenant_uuid, form.application_classification_code
+        )
+        if not classification:
+            raise LaubeException(self.E011)
 
-    Returns:
-        ルート情報
+        dto.application_form_name = form.application_form_name
+        dto.application_classification_code = classification.application_classification_code
+        dto.application_classification_name = classification.application_classification_name
 
-    Raises:
-        LaubeException : Laube例外
-    """
-    def get_application_info(self, session, application_form_code, target_company_code, target_group_code, target_employee_code, boss_group_code, boos_employee_code, applicant_company_code, applicant_group_code, applicant_employee_code):
+        # 対象者
+        dto.target_group_code = target_group_code
+        dto.target_group_name = self.group_repository.get_name(db_session, tenant_uuid, target_group_code)
+        dto.target_user_uuid = target_user_uuid
+        dto.target_user_name = self.employee_repository.get_name(db_session, tenant_uuid, target_user_uuid)
 
-        applicationInfoDto = ApplicationInfoDto()
+        # 申請者
+        dto.applicant_group_code = applicant_group_code
+        dto.applicant_group_name = self.group_repository.get_name(db_session, tenant_uuid, applicant_group_code)
+        dto.applicant_user_uuid = applicant_user_uuid
+        dto.applicant_user_name = self.employee_repository.get_name(db_session, tenant_uuid, applicant_user_uuid)
 
-        try:
-            if not session:
-                raise LaubeException(self.E001)
+        # 申請書ルート情報取得（個別/共通）
+        form_route = self.application_form_route_repository.get_by_code_and_group(
+            db_session, tenant_uuid, application_form_code, target_group_code
+        ) or self.application_form_route_repository.get_by_code_and_group(
+            db_session, tenant_uuid, application_form_code, None
+        )
 
-            if not application_form_code:
-                raise LaubeException(self.E005)
+        approver_list = []
 
-            if not target_company_code:
-                raise LaubeException(self.E002)
+        if form.route_flag == RouteFlag.INDIVIDUAL_ROUTE:
+            if form_route and form_route.individual_route_code:
+                approver_list = self.__get_individual_approver_list(
+                    db_session, tenant_uuid, form_route.individual_route_code, form
+                )
+        elif form.route_flag == RouteFlag.BOSS_ROUTE:
+            approver_list = self.__get_boss_approver_list(
+                db_session, tenant_uuid, target_group_code, target_user_uuid,
+                application_form_code, boss_group_code, boss_user_uuid, form.job_title_code
+            )
+            if not approver_list:
+                approver_list = self.__get_individual_approver_list(
+                    db_session, tenant_uuid, classification.individual_route_code, form
+                )
 
-            if not target_group_code:
-                raise LaubeException(self.E003)
+        # 間接ルート（共通ルート）があれば適用
+        if form_route and form_route.common_route_code:
+            approver_list = self.__get_common_approver_list(
+                db_session, tenant_uuid, form_route.common_route_code, approver_list
+            )
 
-            if not target_employee_code:
-                raise LaubeException(self.E004)
+        # 申請者がルートに含まれる場合 → 自動承認処理
+        has_applicant = any(
+            a.approver_user_uuid == applicant_user_uuid and
+            a.approver_group_code == applicant_group_code
+            for a in approver_list
+        )
+        new_approver_list = []
+        if form.skip_apply_employee and has_applicant:
+            reached = False
+            for idx, approver in enumerate(approver_list, 1):
+                dto_ = ApproverDto()
+                dto_.route_number = idx
+                dto_.approver_user_uuid = approver.approver_user_uuid
+                dto_.approver_group_code = approver.approver_group_code
+                dto_.approver_group_name = self.group_repository.get_name(db_session, tenant_uuid, approver.approver_group_code)
+                dto_.approver_employee_name = self.employee_repository.get_name(db_session, tenant_uuid, approver.approver_user_uuid)
+                dto_.route_type = RouteType.INDIVIDUAL_ROUTE
+                dto_.apply_date = None
 
-            if not applicant_company_code:
-                raise LaubeException(self.E008)
-
-            if not applicant_group_code:
-                raise LaubeException(self.E009)
-
-            if not applicant_employee_code:
-                raise LaubeException(self.E010)
-
-            # データベースのレコードを最初に取得します。[高速化対応]
-            self.__get_database(session, target_company_code)
-
-            system_date = datetime.now()
-
-            # 対象者の情報 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-            # 会社コード[対象者]/申請書コードにて申請書マスタを検索します。
-            applicationForm = next((someone for someone in self.applicationForm_list if someone.application_form_code == application_form_code), None)
-
-            if applicationForm is None:
-                raise LaubeException(self.E006)
-
-            applicationInfoDto.screen_mode = ScreenMode.APPLY_MODE_1  # 申請モード1　[下書き/申請]
-
-            applicationInfoDto.application_form_code = application_form_code
-            applicationInfoDto.application_form_name, applicationInfoDto.application_classification_code, applicationInfoDto.application_classification_name = self.__get_application_form_name(session, target_company_code, application_form_code)
-            applicationInfoDto.target_company_code = target_company_code
-            applicationInfoDto.target_company_name = self.__get_company_name(session, target_company_code)
-            applicationInfoDto.target_group_code = target_group_code
-            applicationInfoDto.target_group_name = self.__get_group_name(session, target_company_code, target_group_code)
-            applicationInfoDto.target_employee_code = target_employee_code
-            applicationInfoDto.target_employee_name = self.__get_employee_name(session, target_company_code, target_employee_code)
-
-            # 申請者の情報 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-            # 会社コード[申請者]にて会社マスタを検索します。
-            applicationInfoDto.applicant_company_code = applicant_company_code
-            applicationInfoDto.applicant_company_name = self.__get_company_name(session, applicant_company_code)
-            applicationInfoDto.applicant_group_code = applicant_group_code
-            applicationInfoDto.applicant_group_name = self.__get_group_name(session, applicant_company_code, applicant_group_code)
-            applicationInfoDto.applicant_employee_code = applicant_employee_code
-            applicationInfoDto.applicant_employee_name = self.__get_employee_name(session, applicant_company_code, applicant_employee_code)
-
-            # 承認ルート情報 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-            applicationInfoDto.approverl_list = list()
-
-            # 会社コード[対象者]/申請書コードにて申請書マスタを検索します。
-            applicationForm = next((someone for someone in self.applicationForm_list if someone.application_form_code == application_form_code), None)
-
-            if applicationForm is None:
-                raise LaubeException(self.E006)
-
-            # 会社コード[対象者]/申請書コードにて申請分類マスタを検索します。
-            applicationClassification = next((someone for someone in self.applicationClassification_list if someone.application_classification_code == applicationForm.application_classification_code), None)
-
-            if applicationClassification is None:
-                raise LaubeException(self.E011)
-
-            # 会社コード[対象者]/部署コード[対象者]/申請書コードにて申請書別ルートマスタを検索します。
-            applicationFormRoute = next((someone for someone in self.applicationFormRoute_list if someone.application_form_code == application_form_code and someone.group_code == target_group_code), None)
-
-            if applicationFormRoute is None:
-                # レコードが見つからない場合、部署コード=Noneで再検索します。
-                applicationFormRoute = next((someone for someone in self.applicationFormRoute_list if someone.application_form_code == application_form_code and someone.group_code is None), None)
-
-            # 直接部門ルートを検索します。
-
-            # 申請書マスタの直接部門フラグが「あり」の場合
-            if applicationForm.route_flag == RouteFlag.INDIVIDUAL_ROUTE:
-
-                if applicationFormRoute is None or applicationFormRoute.individual_route_code is None or len(applicationFormRoute.individual_route_code.strip()) == 0:
-                    pass
+                if approver.approver_user_uuid == applicant_user_uuid:
+                    dto_.activity_status = ActivityStatus.AUTHORIZER_AUTOMATIC_APPROVAL
+                    dto_.approval_function = ApprovalFunction.AUTHORIZER_AUTOMATIC_APPROVAL
+                    dto_.approver_comment = "申請者本人のため自動承認"
+                    dto_.reaching_date = system_date
+                    dto_.process_date = system_date
+                    reached = True
                 else:
-                    applicationInfoDto.approverl_list = self.__get_individual_approverl_list(session, target_company_code, applicationFormRoute.individual_route_code, applicationForm)
-
-            else:
-                # 直接部門フラグ「上司ルート」の場合
-                if applicationForm.route_flag == RouteFlag.BOSS_ROUTE:
-                    applicationInfoDto.approverl_list = self.__get_boss_approverl_list(session, target_company_code, target_group_code, target_employee_code, application_form_code, boss_group_code, boos_employee_code, applicationForm.job_title_code)
-
-                    # 承認ルートが空になった場合、申請分類マスタの直接部門ルートコードにて再取得します。(JSOX対応)
-                    if (applicationInfoDto.approverl_list is None or len(applicationInfoDto.approverl_list) == 0):
-                        applicationInfoDto.approverl_list = self.__get_individual_approverl_list(session, target_company_code, applicationClassification.individual_route_code, applicationForm)
-
-                # 直接部門ルートが「なし」の場合
-                else:
-                    applicationInfoDto.approverl_list = list()
-
-            # 申請書マスタの「申請者を承認から外す判定」が真の場合、申請者を承認ルートから削除します。
-
-            # 承認者の中に申請者がいるか確認します。
-            _has_applicant_user = False
-            for approverlDataInfo in applicationInfoDto.approverl_list:
-                approverlDataInfoDto = ApproverlDataInfoDto()
-                if approverlDataInfo.approverl_company_code == applicant_company_code and approverlDataInfo.approverl_group_code == applicant_group_code and approverlDataInfo.approverl_employee_code == applicant_employee_code:
-                    _has_applicant_user = True
-                    break
-
-            approverl_list = list()
-            if applicationForm.skip_apply_employee is True and _has_applicant_user:
-
-                # 申請者が直接部門ルートに存在する場合、そこまでの審査者を承認済とします。
-                _is_processed_applicant_user = False
-
-                number = 0
-                for approverlDataInfo in applicationInfoDto.approverl_list:
-
-                    approverlDataInfoDto = ApproverlDataInfoDto()
-
-                    if approverlDataInfo.approverl_company_code == applicant_company_code and approverlDataInfo.approverl_employee_code == applicant_employee_code:
-                        approverlDataInfoDto.reaching_date = system_date  # 到達日
-                        approverlDataInfoDto.process_date = system_date  # 処理日
-                        approverlDataInfoDto.activity_status = ActivityStatus.AUTHORIZER_AUTOMATIC_APPROVAL  # 自動承認
-                        approverlDataInfoDto.approval_function = ApprovalFunction.AUTHORIZER_AUTOMATIC_APPROVAL
-                        approverlDataInfoDto.approverl_comment = '審査者が申請者の同一の為、自動承認します'  # 承認者のコメント
-                        _is_processed_applicant_user = True
+                    if reached:
+                        dto_.activity_status = ActivityStatus.AUTHORIZER_UNTREATED
+                        dto_.reaching_date = None
+                        dto_.process_date = None
                     else:
-                        if _is_processed_applicant_user:
-                            approverlDataInfoDto.reaching_date = None  # 到達日
-                            approverlDataInfoDto.process_date = None  # 処理日
-                            approverlDataInfoDto.activity_status = ActivityStatus.AUTHORIZER_UNTREATED  # 未処理
-                            approverlDataInfoDto.approval_function = approverlDataInfo.approval_function
-                            approverlDataInfoDto.approverl_comment = None  # 承認者のコメント
-                        else:
-                            approverlDataInfoDto.reaching_date = system_date  # 到達日
-                            approverlDataInfoDto.process_date = system_date  # 処理日
-                            approverlDataInfoDto.activity_status = ActivityStatus.AUTHORIZER_AUTOMATIC_APPROVAL  # 自動承認
-                            approverlDataInfoDto.approval_function = ApprovalFunction.AUTHORIZER_AUTOMATIC_APPROVAL
-                            approverlDataInfoDto.approverl_comment = '審査者の後続に申請者がいる為、自動承認します'  # 承認者のコメント
+                        dto_.activity_status = ActivityStatus.AUTHORIZER_AUTOMATIC_APPROVAL
+                        dto_.reaching_date = system_date
+                        dto_.process_date = system_date
+                    dto_.approval_function = approver.approval_function
 
-                    approverlDataInfoDto.company_code = approverlDataInfo.company_code
-                    approverlDataInfoDto.company_name = self.__get_company_name(session, approverlDataInfo.company_code)
-                    approverlDataInfoDto.application_number = None
-                    approverlDataInfoDto.target_company_code = target_company_code  # 対象者の会社コード
-                    approverlDataInfoDto.target_company_name = self.__get_company_name(session, target_company_code)  # 対象者の会社名
-                    approverlDataInfoDto.target_group_code = target_group_code  # 対象者の部署コード
-                    approverlDataInfoDto.target_group_name = self.__get_group_name(session, target_company_code, target_group_code)  # 対象者の部署名
-                    approverlDataInfoDto.target_employee_code = target_employee_code  # 対象者の従業員番号
-                    approverlDataInfoDto.target_employee_name = self.__get_employee_name(session, target_company_code, target_employee_code)  # 対象者の従業員名
-                    approverlDataInfoDto.applicant_company_code = applicant_company_code  # 申請者の会社コード
-                    approverlDataInfoDto.applicant_company_name = self.__get_company_name(session, applicant_company_code)  # 申請者の会社名
-                    approverlDataInfoDto.applicant_group_code = applicant_group_code  # 申請者の部署コード
-                    approverlDataInfoDto.applicant_group_name = self.__get_group_name(session, applicant_company_code, applicant_group_code)  # 申請者の部署名
-                    approverlDataInfoDto.applicant_employee_code = applicant_employee_code  # 申請者の従業員番号
-                    approverlDataInfoDto.applicant_employee_name = self.__get_employee_name(session, applicant_company_code, applicant_employee_code)  # 申請者の従業員名
-                    approverlDataInfoDto.apply_date = None  # 申請日
-                    approverlDataInfoDto.application_status = None  # 申請書ステータス
-                    approverlDataInfoDto.route_type = RouteType.INDIVIDUAL_ROUTE
-                    number += 1
-                    approverlDataInfoDto.route_number = number
-                    approverlDataInfoDto.approverl_company_code = approverlDataInfo.approverl_company_code
-                    approverlDataInfoDto.approverl_company_name = self.__get_company_name(session, approverlDataInfo.approverl_company_code)
+                new_approver_list.append(dto_)
+            dto.approver_list = new_approver_list
+        else:
+            dto.approver_list = approver_list
 
-                    approverlDataInfoDto.approverl_role_code = approverlDataInfo.approverl_role_code
-                    if approverlDataInfoDto.approverl_role_code is None or len(approverlDataInfoDto.approverl_role_code.strip()) == 0:
-                        approverlDataInfoDto.approverl_role_name = None
-                    else:
-                        roleDao = RoleDao()
-                        role = roleDao.find_ix_m_role(session, approverlDataInfoDto.approverl_company_code, approverlDataInfoDto.approverl_role_code)
+        return dto
 
-                        if role is None:
-                            raise LaubeException(f'role record is missing. key={approverlDataInfoDto.approverl_company_code}, {approverlDataInfoDto.approverl_role_code}')
 
-                        approverlDataInfoDto.approverl_role_name = role.role_name
 
-                    approverlDataInfoDto.approverl_group_code = approverlDataInfo.approverl_group_code
-                    approverlDataInfoDto.approverl_group_name = self.__get_group_name(session, approverlDataInfo.approverl_company_code, approverlDataInfo.approverl_group_code)
-                    approverlDataInfoDto.approverl_employee_code = approverlDataInfo.approverl_employee_code
-                    approverlDataInfoDto.approverl_employee_name = self.__get_employee_name(session, approverlDataInfo.approverl_company_code, approverlDataInfo.approverl_employee_code)
-                    approverlDataInfoDto.deputy_approverl_company_code = None  # 会社コード[代理承認者]
-                    approverlDataInfoDto.deputy_approverl_company_name = None  # 会社名[代理承認者]
-                    approverlDataInfoDto.deputy_approverl_group_code = None  # 部署コード[代理承認者]
-                    approverlDataInfoDto.deputy_approverl_group_name = None  # 代理承認者の部署名
-                    approverlDataInfoDto.deputy_approverl_employee_code = None  # 従業員番号[代理承認者]
-                    approverlDataInfoDto.deputy_approverl_employee_name = None  # 従業員名[代理承認者]
-                    approverlDataInfoDto.deputy_contents = None  # 依頼理由
-                    approverl_list.append(approverlDataInfoDto)
 
-                applicationInfoDto.approverl_list = approverl_list
 
-            if applicationFormRoute is None or applicationFormRoute.common_route_code is None or len(applicationFormRoute.common_route_code.strip()) == 0:
-                pass
-            else:
-                # 間接部門ルートを検索します。
-                applicationInfoDto.approverl_list = self.__get_common_approverl_list(session, target_company_code, applicationFormRoute.common_route_code, applicationInfoDto.approverl_list)
 
-            return applicationInfoDto
 
-        except LaubeException as e:
-            raise e
-
-        except ArtemisException as e:
-            raise LaubeException(e)
-
-        except Exception as e:
-            raise LaubeException(e)
 
     """
     [利用場所]

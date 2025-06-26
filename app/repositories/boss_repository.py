@@ -1,13 +1,18 @@
+from sqlalchemy.orm import Session
 from typing import Optional
 from app.repositories.base.boss_repository_base import BossRepositoryBase
-from app.models.models import Boss  # 念のため必要
-from sqlalchemy.orm import Session
+from app.models.models import Boss
+from app.daos.boss_dao import BossDao
+
 
 class BossRepository(BossRepositoryBase):
     """
     BossRepositoryBase のカスタムメソッド追加用クラス。
     データ取得はすべてDAOを通じて行う。
     """
+    def __init__(self):
+        super().__init__()
+        self.dao = BossDao()
 
     def get_by_all_keys(
         self, db: Session, tenant_uuid: str, group_code: str, user_uuid: str, application_form_code: str

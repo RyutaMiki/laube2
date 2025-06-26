@@ -22,9 +22,15 @@ class WithdrawalFlag(IntEnum):
 
 
 class RouteFlag(IntEnum):
-    """直接/間接部門フラグ / Route flag"""
-    DIRECT = 1    # 直接部門 / Direct
-    INDIRECT = 2  # 間接部門 / Indirect
+    """
+    Enum:個別ルートフラグ
+    NO_INDIVIDUAL_ROUTE 直接部門なし
+    INDIVIDUAL_ROUTE 直接部門有り
+    BOSS_ROUTE 上司ルート
+    """
+    NO_INDIVIDUAL_ROUTE = 1
+    INDIVIDUAL_ROUTE = 2
+    BOSS_ROUTE = 3
 
 
 class ApplicationStatus(IntEnum):

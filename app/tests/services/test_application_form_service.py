@@ -5,6 +5,7 @@ from app.services.application_form_service import ApplicationFormService
 from app.models.models import ApplicationForm
 from app.models.specifiedValue import AutoApproverlFlag, PullingFlag, RouteFlag, WithdrawalFlag
 
+
 @pytest.fixture
 def dummy_application_form_dict():
     return {
@@ -30,32 +31,34 @@ def dummy_application_form_dict():
         "update_count": 1
     }
 
+
 @pytest.fixture
 def mock_dao():
-    # DAOのMockインスタンスを返す
     return MagicMock()
 
-def test_create_application_form_service(db_session, dummy_application_form_dict, mock_dao):
+
+@pytest.fixture
+def service(mock_dao):
     service = ApplicationFormService()
     service.dao = mock_dao
+    return service
 
+
+def test_create_application_form_service(session, dummy_application_form_dict, service, mock_dao):
     mock_obj = ApplicationForm(**dummy_application_form_dict)
     mock_dao.create.return_value = mock_obj
 
-    result = service.create(db_session, dummy_application_form_dict)
+    result = service.create(session, dummy_application_form_dict)
 
     assert result.application_form_code == "FORM001"
-    mock_dao.create.assert_called_once_with(db_session, dummy_application_form_dict)
+    mock_dao.create.assert_called_once_with(session, dummy_application_form_dict)
 
 
-def test_get_application_form_service(db_session, mock_dao):
-    service = ApplicationFormService()
-    service.dao = mock_dao
-
+def test_get_application_form_service(session, service, mock_dao):
     mock_obj = ApplicationForm(id=1, application_form_code="FORM001")
     mock_dao.get.return_value = mock_obj
 
-    result = service.get(db_session, 1)
+    result = service.get(session, 1)
 
     assert result.application_form_code == "FORM001"
-    mock_dao.get.assert_called_once_with(db_session, 1)
+    mock_dao.get.assert_called_once_with(session, 1)

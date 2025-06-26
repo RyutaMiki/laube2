@@ -1,5 +1,5 @@
-from app.models.models import UserGroup
 from sqlalchemy.orm import Session
+from app.models.models import UserGroup
 from typing import List, Optional, Any
 from app.daos.base.user_group_dao_base import UserGroupDaoBase
 
@@ -12,4 +12,17 @@ class UserGroupDao(UserGroupDaoBase):
         def custom_search(self, db_session: Session, keyword: str) -> List[UserGroup]:
             return db_session.query(UserGroup).filter(UserGroup.name.like(f"%{keyword}%")).all()
     """
-    pass  # 必要に応じてカスタムメソッドをここに追加してください
+    def find_by_keys(
+        self,
+        db_session: Session,
+        tenant_uuid: str,
+        company_code: str,
+        employee_code: str,
+        group_code: str
+    ) -> UserGroup | None:
+        return db_session.query(UserGroup).filter(
+            UserGroup.tenant_uuid == tenant_uuid,
+            UserGroup.company_code == company_code,
+            UserGroup.employee_code == employee_code,
+            UserGroup.group_code == group_code
+        ).first()

@@ -206,7 +206,6 @@ class Laube():
         Args:
             db_session (Session): SQLAlchemyのDBセッション
             tenant_uuid (str): 呼び出し元テナントのUUID（共通情報・ログ用など）
-            target_tenant_uuid (str): 対象となる個別ルートの所属テナントUUID（データ取得対象）
             individual_route_code (str): 個別ルートコード（個別アクティビティ紐付けキー）
             application_form (ApplicationForm): 申請書マスタ情報（自動承認フラグなど参照）
 
@@ -242,7 +241,7 @@ class Laube():
             utility = Utility()
             system_date = utility.convert_datetime_2_date(datetime.now())
 
-            activities = self.individual_activity_repository.find_by_tenant_and_route(db_session, tenant_uuid, target_tenant_uuid, individual_route_code)
+            activities = self.individual_activity_repository.find_by_tenant_and_route(db_session, tenant_uuid, individual_route_code)
 
             if not activities:
                 return []

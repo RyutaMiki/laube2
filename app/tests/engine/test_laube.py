@@ -83,3 +83,29 @@ def test_param_validation_errors(laube_with_mocks, tenant_uuid, group_code, user
         laube_with_mocks.is_display_boss_field("dummy", tenant_uuid, group_code, user_uuid, form_code)
     assert expected_code in str(excinfo.value)
 
+def test_application_form_not_found(laube_with_mocks):
+    laube_with_mocks.application_form_repository.get_by_code.return_value = None
+    laube_with_mocks.E006 = "Laube-E006"
+    with pytest.raises(LaubeException) as excinfo:
+        laube_with_mocks.is_display_boss_field("dummy", "t1", "G1", "U1", "FORM1")
+    assert "Laube-E006" in str(excinfo.value)
+
+
+def test_invalid_route_flag(laube_with_mocks):
+    laube_with_mocks.application_form_repository.get_by_code.return_value = mock_application_form(999)
+    laube_with_mocks.E007 = "Laube-E007"
+    with pytest.raises(LaubeException) as excinfo:
+        laube_with_mocks.is_display_boss_field("dummy", "t1", "G1", "U1", "FORM1")
+    assert "Laube-E007" in str(excinfo.value)
+
+
+def test_unexpected_exception_wrapped(laube_with_mocks):
+    def raise_unexpected(*args, **kwargs):
+        raise ZeroDivisionError("division by zero")
+
+    laube_with_mocks.application_form_repository.get_by_code = raise_unexpected
+
+    with pytest.raises(LaubeException) as excinfo:
+        laube_with_mocks.is_display_boss_field("dummy", "t1", "G1", "U1", "FORM1")
+
+    assert isinstance(excinfo.value.original_exception, ZeroDivisionError)

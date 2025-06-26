@@ -16,10 +16,17 @@
 
 
 class LaubeException(Exception):
-    """
-    Laube専用の業務例外クラス。
-    """
-    def __init__(self, code: str, message: str = ""):
-        self.code = code
-        self.message = message or code
-        super().__init__(f"[{code}] {self.message}")
+    def __init__(self, code_or_exception, message=None):
+        if isinstance(code_or_exception, Exception) and not isinstance(code_or_exception, LaubeException):
+            self.original_exception = code_or_exception
+            self.code = "UNEXPECTED"
+            self.message = str(code_or_exception)
+            super().__init__(self.message)
+        else:
+            self.code = code_or_exception
+            self.message = message or ""
+            self.original_exception = None
+            super().__init__(self.message)
+
+    def __str__(self):
+        return f"[{self.code}] {self.message}"

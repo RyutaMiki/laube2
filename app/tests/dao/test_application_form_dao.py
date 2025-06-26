@@ -17,7 +17,7 @@ def application_form_dict():
         "auto_approverl_flag": AutoApproverlFlag.AUTOMATIC_APPROVAL,
         "pulling_flag": PullingFlag.A,
         "withdrawal_flag": WithdrawalFlag.ENABLED,
-        "route_flag": RouteFlag.NO_INDIVIDUAL_ROUTE,  # ← ここが修正ポイント！
+        "route_flag": RouteFlag.NO_INDIVIDUAL_ROUTE,
         "sort_number": 1,
         "executed_after_approverl": 'dummy',
         "table_name": 'dummy',

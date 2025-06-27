@@ -1,18 +1,45 @@
 # main.py
 from fastapi import FastAPI
-from app.api.routers import access_control_router, common_router  # あなたの構成に合わせて調整！
+from app.api.routers import access_control_router, common_router
 
+# アプリケーションインスタンスを生成
 app = FastAPI(
-    title="Cerberus Access Control API",
-    description="権限・ロール・リソース制御のためのAPI",
+    title="Laube2 Engine API",
+    description="Laube2 ワークフローエンジン用のAPI群。認証、セキュリティ、業務処理などを含む。",
     version="1.0.0"
 )
 
-# ルーターを登録
-app.include_router(common_router.router)
-app.include_router(access_control_router.router)
+# 認証系ルート（ログイン、トークン取得など）
+app.include_router(
+    auth.router,
+    prefix="/auth",
+    tags=["Auth"]
+)
 
-# ルートにもヘルスチェックを追加（任意）
-@app.get("/")
-def read_root():
-    return {"message": "FastAPI is alive!"}
+# 認証後のみアクセス可能な保護ルート（ユーザー情報取得など）
+app.include_router(
+    protected.router,
+    prefix="/secure",
+    tags=["Secure"]
+)
+
+# 業務用Laube2エンジンの実行・制御ルート
+app.include_router(
+    laube2_router,
+    prefix="/laube2",
+    tags=["Laube2"]
+)
+
+# 簡易トークン認証（サンプル用途）
+app.include_router(
+    secure_router.router,
+    prefix="/secure",
+    tags=["Secure Example"]
+)
+
+# ✅ Cerberus Access Control API（統合！）
+app.include_router(
+    access_control_router,
+    prefix="/access-control",
+    tags=["Access Control"]
+)

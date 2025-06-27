@@ -1,28 +1,40 @@
-from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
-from app.utils.jwt import decode_access_token
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from starlette.requests import Request
+import logging
 
-# OAuth2のパスワード認証フローに基づくスキーマ
-# Swagger UI では /login エンドポイントでトークンを取得することが前提となる
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+security = HTTPBearer()
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+
+def verify_token(request: Request, credentials: HTTPAuthorizationCredentials = Depends(security)):
     """
-    アクセストークンをデコードし、認証済みユーザー情報を取得する依存関数。
+    BearerトークンによるAPI認証を行う依存関数。
 
-    FastAPI のルート関数で `Depends(get_current_user)` として使用することで、
-    リクエストヘッダーの Bearer トークンを自動的に取得・検証できる。
+    この関数はFastAPIのDependsとして使用され、Authorizationヘッダーに含まれる
+    Bearerトークンを検証する。トークンが不正な場合は403エラーを返し、
+    ログにクライアントIPおよび受信トークンを記録する。
 
-    Args:
-        token (str): リクエストの Authorization ヘッダーから取得された Bearer トークン。
-
-    Returns:
-        str: トークンからデコードされたユーザー識別子（通常はユーザーIDやメールアドレスなど）。
+    Parameters:
+    ----------
+    request : Request
+        リクエスト情報（クライアントIP取得のために使用）
+    credentials : HTTPAuthorizationCredentials
+        Authorizationヘッダーに含まれるBearerトークン情報（自動でDependsされる）
 
     Raises:
-        HTTPException: トークンの検証に失敗した場合（例：署名不正、有効期限切れなど）。
+    ------
+    HTTPException
+        トークンが不正な場合に403 Forbiddenを返す
+
+    Usage:
+    ------
+    @router.get("/secure-endpoint", dependencies=[Depends(verify_token)])
+    def secure_route(): ...
     """
-    payload = decode_access_token(token)
-    if payload is None:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    return payload["sub"]
+    token = credentials.credentials
+    if token != "secret-token-123":
+        logging.warning(f"認証失敗: IP={request.client.host}, トークン={token}")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid token",
+        )

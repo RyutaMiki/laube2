@@ -1,15 +1,51 @@
 from app.models.models import UserRole
 from sqlalchemy.orm import Session
-from typing import List, Optional, Any
+from typing import Optional
 from app.daos.base.user_role_dao_base import UserRoleDaoBase
 
 class UserRoleDao(UserRoleDaoBase):
     """
-    UserRole に関するカスタムDAO処理を書く場所
+    UserRole に関するカスタムDAO処理クラス。
 
-    - サンプルメソッドをここに追加できます。
-    - 例:
-        def custom_search(self, db_session: Session, keyword: str) -> List[UserRole]:
-            return db_session.query(UserRole).filter(UserRole.name.like(f"%{keyword}%")).all()
+    ユーザーとロールの関連付けを管理する。
+    トランザクション制御は呼び出し元で行う。
     """
-    pass  # 必要に応じてカスタムメソッドをここに追加してください
+
+    def add_user_role(self, db: Session, user_id: str, role_id: str) -> UserRole:
+        """
+        ユーザーにロールを割り当てる UserRole エンティティを作成する。
+
+        Parameters:
+        ----------
+        db : Session
+            SQLAlchemyセッション
+        user_id : str
+            ユーザーID（UUIDなど）
+        role_id : str
+            ロールID（UUIDなど）
+
+        Returns:
+        -------
+        UserRole
+            作成された UserRole エンティティ（commit前）
+        """
+        entity = UserRole(user_id=user_id, role_id=role_id)
+        db.add(entity)
+        return entity
+
+    def remove_user_role(self, db: Session, user_id: str, role_id: str) -> None:
+        """
+        指定されたユーザーとロールの関連付けを削除する。
+
+        Parameters:
+        ----------
+        db : Session
+            SQLAlchemyセッション
+        user_id : str
+            ユーザーID
+        role_id : str
+            ロールID
+        """
+        entity = db.query(UserRole).filter_by(user_id=user_id, role_id=role_id).first()
+        if entity:
+            db.delete(entity)

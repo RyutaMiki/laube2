@@ -33,6 +33,26 @@ class RouteFlag(IntEnum):
     BOSS_ROUTE = 3
 
 
+class ReworkTriggerType(IntEnum):
+    """
+    Enum: 差し戻しトリガー種別
+    MANUAL 手動による差し戻し
+    AUTO 自動条件による差し戻し
+    TIMEOUT 承認タイムアウトによる差し戻し
+    POLICY ポリシー条件に基づく差し戻し
+    REJECT 否認による差し戻し
+    ERROR 異常エラーによる差し戻し
+    WITHDRAWAL 申請者の取り下げによる差し戻し
+    """
+    MANUAL = 1         # 手動による差し戻し
+    AUTO = 2           # 自動条件による差し戻し
+    TIMEOUT = 3        # 承認タイムアウトによる差し戻し
+    POLICY = 4         # ポリシー条件に基づく差し戻し
+    REJECT = 5         # 否認による差し戻し
+    ERROR = 6          # 異常エラーによる差し戻し
+    WITHDRAWAL = 7     # 申請者の取り下げによる差し戻し
+
+
 class ApplicationStatus(IntEnum):
     """申請書状態 / Application Status"""
     DRAFT = 1      # 下書き / Draft

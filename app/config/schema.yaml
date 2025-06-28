@@ -1914,7 +1914,6 @@ models:
         nullable: true
         comment: 依頼理由
 
-      # --- 多重インスタンス／ループ制御 ---
       - name: instance_group_id
         type: String
         nullable: true
@@ -1952,14 +1951,12 @@ models:
         nullable: false
         comment: 同期必須ならTrue
 
-      # --- 排他進行系（交互並列など） ---
       - name: is_interleaved_locked
         type: Boolean
         default: false
         nullable: false
         comment: 並列経路で他が実行中ならTrue
 
-      # --- マイルストーン系 ---
       - name: is_milestone
         type: Boolean
         default: false
@@ -1972,7 +1969,6 @@ models:
         nullable: false
         comment: マイルストーン到達済み
 
-      # --- キャンセル・終了・制御 ---
       - name: is_canceled
         type: Boolean
         default: false
@@ -1997,7 +1993,6 @@ models:
         nullable: false
         comment: 終了ノードならTrue
 
-      # --- Discriminator, Deferred Choice等 ---
       - name: is_discriminator_loser
         type: Boolean
         default: false
@@ -2016,7 +2011,6 @@ models:
         nullable: false
         comment: Deferred Choiceで敗者ならTrue
 
-      # --- トリガー・イベント ---
       - name: trigger_type
         type: String
         args: [50]
@@ -2034,7 +2028,6 @@ models:
         nullable: true
         comment: トリガー発生日時
 
-      # --- 基本・監査項目 ---
       - name: reaching_date
         type: TIMESTAMP
         nullable: true
@@ -2062,6 +2055,18 @@ models:
         default: false
         nullable: false
         comment: アクティビティの完了状態
+
+      - name: skipped_reason
+        type: String
+        args: [255]
+        nullable: true
+        comment: スキップ理由（退職・休職・条件不一致など）
+
+      - name: is_dynamic_inserted
+        type: Boolean
+        default: false
+        nullable: false
+        comment: 申請後に動的に挿入されたステップかどうか
 
       - name: create_date
         type: TIMESTAMP

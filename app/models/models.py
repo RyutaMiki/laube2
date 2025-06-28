@@ -7,7 +7,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import uuid
-from app.models.enum_type import EnumType
+from app.models.specifiedValue import EnumType
 from app.models.specifiedValue import *
 Base = declarative_base()
 
@@ -710,6 +710,8 @@ class ActivityObject(Base):
     activity_status = Column('activity_status', EnumType(enum_class=ActivityStatus), nullable=True, comment="承認者状態")
     approverl_comment = Column('approverl_comment', String(255), nullable=True, comment="承認者のコメント")
     is_completed = Column('is_completed', Boolean, nullable=False, default=False, comment="アクティビティの完了状態")
+    skipped_reason = Column('skipped_reason', String(255), nullable=True, comment="スキップ理由（退職・休職・条件不一致など）")
+    is_dynamic_inserted = Column('is_dynamic_inserted', Boolean, nullable=False, default=False, comment="申請後に動的に挿入されたステップかどうか")
     create_date = Column('create_date', TIMESTAMP, nullable=False, default=datetime.now)
     create_user_uuid = Column('create_user_uuid', String(36), nullable=False)
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)

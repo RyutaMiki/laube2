@@ -2587,6 +2587,18 @@ models:
         nullable: true
         comment: 任意人数承認で可とする場合の閾値（approval_condition_type='THRESHOLD'時）
 
+      - name: re_evaluation_condition
+        type: String
+        args: [255]
+        nullable: true
+        comment: 承認者の状態変化によって再評価される条件式（DSLやJSONLogicなど）
+
+      - name: re_evaluation_mode
+        type: EnumType
+        args: [enum_class=ReEvaluationMode]
+        nullable: true
+        comment: 再評価時の遷移動作（SKIP / INSERT / OVERRIDE）
+
       - name: sort_number
         type: Integer
         nullable: true
@@ -2999,6 +3011,24 @@ models:
         args: [255]
         nullable: true
         comment: 差し戻し条件式（DSL/JSONLogicなどで柔軟に指定可能）
+
+      - name: rework_trigger_type
+        type: EnumType
+        args: [enum_class=ReworkTriggerType]
+        nullable: true
+        comment: 差し戻しトリガーの種別（MANUAL / AUTO / TIMEOUT / POLICY）
+
+      - name: is_dynamic_appendable
+        type: Boolean
+        default: false
+        nullable: false
+        comment: 差し戻し先ルートに対して動的にステップを追加できるか
+
+      - name: preserve_history_flag
+        type: Boolean
+        default: true
+        nullable: false
+        comment: 差し戻し時に履歴を保持するか（Falseにすると初期化的に扱われる）
 
       - name: comment
         type: String

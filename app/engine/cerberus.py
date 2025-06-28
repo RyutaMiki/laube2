@@ -1,8 +1,7 @@
 from sqlalchemy.orm import Session
-from app.daos.user_role_dao import UserRoleDao
-from app.daos.role_permission_dao import RolePermissionDao
-from app.daos.policy_dao import PolicyDao
-
+from app.repositories.user_role_repository import UserRoleRepository
+from app.repositories.role_permission_repository import RolePermissionRepository
+from app.repositories.policy_repository import PolicyRepository
 
 ######################################################################
 # Copyright 2016–2025 Ryuta Miki. All Rights Reserved.
@@ -20,88 +19,62 @@ from app.daos.policy_dao import PolicyDao
 # limitations under the License.
 ######################################################################
 
-
 class Cerberus:
     """
     Cerberus（ケルベロス）アクセス制御エンジン。
 
-    このクラスは、ユーザー・ロール・パーミッション・リソースの関係を管理し、
-    アクセス制御の中心的な操作（追加・削除）を提供する。
-
-    セッションは外部から注入され、内部で管理は行わない。
+    ユーザー・ロール・パーミッション・リソースの関係を管理する。
+    Repository経由でトランザクション責務を委譲する。
     """
 
     def __init__(self):
-        """
-        Cerberusエンジンを初期化する。
-        各種DAOをインスタンス化する。
-        """
-        self.user_role_dao = UserRoleDao()
-        self.role_permission_dao = RolePermissionDao()
-        self.policy_dao = PolicyDao()
+        self.user_role_repo = UserRoleRepository()
+        self.role_permission_repo = RolePermissionRepository()
+        self.policy_repo = PolicyRepository()
 
     def assign_role_to_user(self, db: Session, user_id: str, role_id: str):
         """
         ユーザーにロールを割り当てる。
-
-        :param db: SQLAlchemyセッション
-        :param user_id: 対象ユーザーID（UUID）
-        :param role_id: 割り当てるロールID（UUID）
-        :return: 作成された UserRole エンティティ
         """
-        return self.user_role_dao.add_user_role(db, user_id, role_id)
+        return self.user_role_repo.assign_role_to_user(db, user_id, role_id)
 
     def revoke_role_from_user(self, db: Session, user_id: str, role_id: str):
         """
-        ユーザーからロールの割り当てを削除する。
-
-        :param db: SQLAlchemyセッション
-        :param user_id: 対象ユーザーID（UUID）
-        :param role_id: 削除するロールID（UUID）
+        ユーザーからロールを解除する。
         """
-        self.user_role_dao.remove_user_role(db, user_id, role_id)
+        self.user_role_repo.revoke_role_from_user(db, user_id, role_id)
 
     def assign_permission_to_role(self, db: Session, role_id: str, permission_id: str):
         """
         ロールにパーミッションを割り当てる。
-
-        :param db: SQLAlchemyセッション
-        :param role_id: 対象ロールID（UUID）
-        :param permission_id: 割り当てるパーミッションID（UUID）
-        :return: 作成された RolePermission エンティティ
         """
-        return self.role_permission_dao.add_role_permission(db, role_id, permission_id)
+        return self.role_permission_repo.assign_permission_to_role(db, role_id, permission_id)
 
     def revoke_permission_from_role(self, db: Session, role_id: str, permission_id: str):
         """
-        ロールからパーミッションの割り当てを削除する。
-
-        :param db: SQLAlchemyセッション
-        :param role_id: 対象ロールID（UUID）
-        :param permission_id: 削除するパーミッションID（UUID）
+        ロールからパーミッションを解除する。
         """
-        self.role_permission_dao.remove_role_permission(db, role_id, permission_id)
+        self.role_permission_repo.revoke_permission_from_role(db, role_id, permission_id)
 
-    def assign_resource_to_role(self, db: Session, role_id: str, permission_id: str, resource_id: str, condition: str = None):
+    def assign_resource_to_role(
+        self,
+        db: Session,
+        role_id: str,
+        permission_id: str,
+        resource_id: str,
+        condition: str = None
+    ):
         """
-        ポリシーを作成し、ロールにリソースとパーミッションを割り当てる。
+        ポリシーを作成して、ロールにリソースとパーミッションを割り当てる。
+        事前にrole-permissionに存在しないとエラー。
+        """
+        if not self.role_permission_repo.has_permission(db, role_id, permission_id):
+            raise ValueError(f"Permission {permission_id} is not assigned to Role {role_id}")
 
-        :param db: SQLAlchemyセッション
-        :param role_id: 対象ロールID（UUID）
-        :param permission_id: 対象パーミッションID（UUID）
-        :param resource_id: 対象リソースID（UUID）
-        :param condition: オプションのアクセス条件（JSONまたは式）
-        :return: 作成された Policy エンティティ
-        """
-        return self.policy_dao.add_policy(db, role_id, permission_id, resource_id, condition)
+        return self.policy_repo.assign_resource_to_role(db, role_id, permission_id, resource_id, condition)
 
     def revoke_resource_from_role(self, db: Session, role_id: str, permission_id: str, resource_id: str):
         """
-        ロールから指定されたリソースとパーミッションに関するポリシーを削除する。
-
-        :param db: SQLAlchemyセッション
-        :param role_id: 対象ロールID（UUID）
-        :param permission_id: 対象パーミッションID（UUID）
-        :param resource_id: 対象リソースID（UUID）
+        ロールからリソースとパーミッションのポリシーを削除する。
         """
-        self.policy_dao.remove_policy(db, role_id, permission_id, resource_id)
+        self.policy_repo.revoke_resource_from_role(db, role_id, permission_id, resource_id)

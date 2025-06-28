@@ -49,3 +49,13 @@ class PolicyRepository(PolicyRepositoryBase):
         resource_id : str
         """
         self.dao.remove_policy(db, role_id, permission_id, resource_id)
+
+    def has_policy(self, db: Session, role_id: str, permission_id: str) -> bool:
+        """
+        指定されたrole_idとpermission_idの組み合わせで
+        少なくとも1つのpolicyが存在するかチェック
+        """
+        return db.query(self.model_class).filter_by(
+            role_id=role_id,
+            permission_id=permission_id
+        ).first() is not None

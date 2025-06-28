@@ -36,14 +36,21 @@ class RolePermissionRepository(RolePermissionRepositoryBase):
         """
         return self.dao.add_role_permission(db, role_id, permission_id)
 
-    def revoke_permission_from_role(self, db: Session, role_id: str, permission_id: str) -> None:
+    def revoke_permission_from_role(self, db: Session, role_id: str, permission_id: str):
         """
-        ロールからパーミッションの割り当てを解除する。
+        ロールからパーミッションを解除する。
+        policyが関連している場合は削除不可。
+        """
+        if self.policy_repo.has_policy(db, role_id, permission_id):
+            raise ValueError(f"Permission {permission_id} is still used in policies for Role {role_id}")
 
-        Parameters:
-        ----------
-        db : Session
-        role_id : str
-        permission_id : str
+        self.role_permission_repo.revoke_permission_from_role(db, role_id, permission_id)
+
+    def has_permission(self, db: Session, role_id: str, permission_id: str) -> bool:
         """
-        self.dao.remove_role_permission(db, role_id, permission_id)
+        指定されたロールが指定されたパーミッションを保持しているかどうかを返す。
+        """
+        return db.query(self.model_class).filter_by(
+            role_id=role_id,
+            permission_id=permission_id
+        ).first() is not None

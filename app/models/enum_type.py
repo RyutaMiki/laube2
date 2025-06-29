@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from enum import Enum
 from typing import Any, Optional, Type, TypeVar
-
 from sqlalchemy import Integer
 from sqlalchemy.types import TypeDecorator
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.models.models import Users
+from app.models.models import User
 from app.database.connection import get_db
 from app.utils.security import verify_password
 from app.utils.jwt import create_access_token
@@ -41,7 +41,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     Raises:
         HTTPException: 認証失敗時に 401 Unauthorized を返します。
     """
-    user = db.query(Users).filter(Users.username == data.username).first()
+    user = db.query(User).filter(User.username == data.username).first()
     if not user or not verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     token = create_access_token({"sub": user.username})

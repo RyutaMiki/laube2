@@ -33,6 +33,18 @@ class RouteFlag(IntEnum):
     BOSS_ROUTE = 3
 
 
+class ReEvaluationMode(IntEnum):
+    """
+    Enum: 再評価モード
+    SKIP: 既存のアクティビティをスキップ
+    INSERT: 既存に挿入
+    OVERRIDE: 上書き
+    """
+    SKIP = 1
+    INSERT = 2
+    OVERRIDE = 3
+
+
 class ReworkTriggerType(IntEnum):
     """
     Enum: 差し戻しトリガー種別

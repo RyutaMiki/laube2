@@ -23,10 +23,15 @@ class Cerberus:
     """
     Cerberus（ケルベロス）アクセス制御エンジン。
 
-    ユーザー・ロール・パーミッション・リソースの関係を管理する。
-    Repository経由でトランザクション責務を委譲する。
-    """
+    【責務】
+    - 認可情報（ロール・パーミッション・ポリシー）の制御を行う。
+    - ワークフローエンジンや申請承認ロジックには一切関与しない。
+    - ユーザー/リソース/アクセスの関係性をチェック・制御する役割。
 
+    【非責務】
+    - 承認者の決定
+    - 承認ルート構築（LaubeEngine等の役割）
+    """
     def __init__(self):
         self.user_role_repo = UserRoleRepository()
         self.role_permission_repo = RolePermissionRepository()

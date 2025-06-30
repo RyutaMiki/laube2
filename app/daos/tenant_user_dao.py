@@ -1,27 +1,35 @@
 from sqlalchemy.orm import Session
 from app.models.models import TenantUser
-from typing import List, Optional, Any
+from typing import List, Optional
 from app.daos.base.tenant_user_dao_base import TenantUserDaoBase
+
 
 class TenantUserDao(TenantUserDaoBase):
     """
     TenantUser に関するカスタムDAO処理を書く場所
 
-    - サンプルメソッドをここに追加できます。
-    - 例:
-        def custom_search(self, db_session: Session, keyword: str) -> List[TenantUser]:
-            return db_session.query(TenantUser).filter(TenantUser.name.like(f"%{keyword}%")).all()
+    - ユーザー検索など、共通利用されるクエリロジックを記述
     """
-    def find_active_employee(
+
+    def find_active_user(
         self,
         db_session: Session,
         tenant_uuid: str,
-        company_code: str,
-        employee_code: str
-    ) -> TenantUser | None:
+        user_uuid: str
+    ) -> Optional[TenantUser]:
+        """
+        指定されたテナント内でアクティブなユーザーをUUIDで検索する。
+
+        Args:
+            db_session (Session): SQLAlchemyのDBセッション
+            tenant_uuid (str): テナントUUID
+            user_uuid (str): ユーザーUUID
+
+        Returns:
+            TenantUser | None: 一致するアクティブユーザー、または None
+        """
         return db_session.query(TenantUser).filter(
             TenantUser.tenant_uuid == tenant_uuid,
-            TenantUser.company_code == company_code,
-            TenantUser.employee_code == employee_code,
+            TenantUser.user_uuid == user_uuid,
             TenantUser.is_active.is_(True)
         ).first()
